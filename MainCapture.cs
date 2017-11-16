@@ -53,12 +53,19 @@ namespace PetriUI
         public void StartCapture()
         {
 
-            int interval = 15;
-            numberOfCaptures = 2;
+            numberOfCaptures = MainPage.numberOfCaptures;
+
             MomentCapture.Capture();
 
-            SetTimer(interval);
+            SetTimer(MainPage.interval);
 
+        }
+
+        public void ConfirmCapture()
+        {
+           
+            MomentCapture.ConfirmCapture();
+         
         }
 
         private static void Trigger(Object source, ElapsedEventArgs e)
@@ -75,7 +82,7 @@ namespace PetriUI
                 testTimer.Close();
                 testTimer.Dispose();
 
-                MainWindow.captureThread.Abort();
+                //MainPage.captureThread.Abort();
             }
         }
 

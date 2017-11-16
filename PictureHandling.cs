@@ -37,7 +37,7 @@ namespace PetriUI
 
         // This string makes a timestamped session folder for files saved that use this class.
         private static string _saveDirectory;
-
+        public static string confirmPath;
 
         // This loops through all the child-level images in IPcPicture and saves them as Bitmaps.
         public static void SaveAllImages(IPcPicture picture)
@@ -69,5 +69,19 @@ namespace PetriUI
 
             marker++;
         }
+
+        public static void SavePicture(IPcPicture picture)
+        {
+            _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
+
+            ToolBox.EnsureDirectoryExists(_saveDirectory);
+
+            PcImage image = picture.Image;
+
+            confirmPath = Path.Combine(_saveDirectory, "confirmPicture.bmp");
+            ToolBox.SaveProcessedImage(image, confirmPath);
+
+        }
+
     }
 }

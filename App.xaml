@@ -12,7 +12,7 @@
             <Setter Property="Label.HorizontalAlignment" Value="Center"></Setter>
             <Setter Property="Label.FontFamily" Value="Trebuchet MS"></Setter>
             <Setter Property="Label.FontWeight" Value="Bold"></Setter>
-            <Setter Property="Label.FontSize" Value="22"></Setter>
+            <Setter Property="Label.FontSize" Value="30"></Setter>
 
         </Style>
 
@@ -29,13 +29,36 @@
 
         </Style>
 
+        <!-- BUtton2 Style -->
+        <Style x:Key="button2Style" TargetType="{x:Type Button}">
+
+            <Setter Property="Width" Value="40"></Setter>
+            <Setter Property="Height" Value="20"></Setter>
+            <Setter Property="Margin" Value="0,10,0,0"></Setter>
+            <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+            <Setter Property="FontSize" Value="20"></Setter>
+            <Setter Property="Background" Value="#00BFFF"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+
+        </Style>
+
         <!-- label Style -->
         <Style x:Key="label1Style" TargetType="{x:Type Label}">
             <Setter Property="Label.FontFamily" Value="Impact"></Setter>
-            <Setter Property="Label.FontSize" Value="15"></Setter>
+            <Setter Property="Label.FontSize" Value="20"></Setter>
             <Setter Property="Label.HorizontalAlignment" Value="Right"></Setter>
+            <Setter Property="Label.VerticalAlignment" Value="Center"></Setter>
         </Style>
-        
+
+        <!-- textBox Style -->
+        <Style x:Key="textBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="TextBox.Height" Value="30"></Setter>
+            <Setter Property="TextBox.Width" Value="100"></Setter>
+            <Setter Property="TextBox.HorizontalAlignment" Value="Right"></Setter>
+            <Setter Property="TextBox.VerticalAlignment" Value="Center"></Setter>
+
+        </Style>
+
 
 
     </Application.Resources>
