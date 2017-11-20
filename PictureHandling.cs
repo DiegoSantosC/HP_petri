@@ -28,17 +28,19 @@ using System.IO;
 
 // Sprout SDK Namespaces
 using hp.pc;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
 
 namespace PetriUI
 {
     class PictureHandling
     {
-        private static int marker = 0;
+        private static int marker = 0, marker2 = 0;
 
         // This string makes a timestamped session folder for files saved that use this class.
         private static string _saveDirectory;
         public static string confirmPath;
-
+        
         // This loops through all the child-level images in IPcPicture and saves them as Bitmaps.
         public static void SaveAllImages(IPcPicture picture)
         {
@@ -47,11 +49,21 @@ namespace PetriUI
             int i = 1;
             foreach (IPcPicture image in picture.Children)
             {
-
                 string fileAndPath = Path.Combine(_saveDirectory, "Object_" + i + ".bmp");
                 ToolBox.SaveProcessedImage(image.Image, fileAndPath);
                 ++i;
             }
+        }
+
+        private static int GetOutlineWidth(IPcOutline outline)
+        {
+            return Convert.ToInt32((outline.PixelDensity.X) * (outline.PhysicalBoundaries.Size.Width));
+        }
+
+
+        private static int GetOutlineHeight(IPcOutline outline)
+        {
+            return Convert.ToInt32((outline.PixelDensity.Y) * (outline.PhysicalBoundaries.Size.Height));
         }
 
 
@@ -70,7 +82,7 @@ namespace PetriUI
             marker++;
         }
 
-        public static void SavePicture(IPcPicture picture)
+        public static OutlineParameters SavePicture(IPcPicture picture, IPcOutline parentOutline)
         {
             _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
 
@@ -78,10 +90,40 @@ namespace PetriUI
 
             PcImage image = picture.Image;
 
-            confirmPath = Path.Combine(_saveDirectory, "confirmPicture.bmp");
+            confirmPath = Path.Combine(_saveDirectory, "confirmPicture" + marker2 + ".bmp");
             ToolBox.SaveProcessedImage(image, confirmPath);
+            marker2++;
+
+            List<Point> outlineBoundaries = new List<Point>();
+
+            foreach (IPcOutline outline in parentOutline.Children)
+            {
+               
+                outlineBoundaries.Add(new Point(Convert.ToInt32(GetOutlineWidth(outline)), Convert.ToInt32(GetOutlineHeight(outline))));
+            }
+
+            List<PcPhysicalPoint> pictureLocation = new List<PcPhysicalPoint>();
+
+            foreach (IPcPicture pic in picture.Children)
+            {
+                pictureLocation.Add(pic.PhysicalBoundaries.Location);
+
+            }
+
+            OutlineParameters op = new OutlineParameters(pictureLocation, outlineBoundaries);
+
+            return op;
+        }
+
+        public static void SweepPicture()
+        {
+            string _sweepDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
+            string _sweepPath = Path.Combine(_sweepDirectory, "confirmPicture" + (marker2-1) + ".bmp");
+          
+            ToolBox.deleteImage(_sweepPath);
 
         }
+
 
     }
 }

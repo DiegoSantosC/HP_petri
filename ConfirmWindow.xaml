@@ -6,13 +6,14 @@
         xmlns:local="clr-namespace:PetriUI"
         mc:Ignorable="d"
         Title="ConfirmWindow"
-        Width="700" Height="500"
+        Width="800" Height="600"
         WindowStartupLocation="CenterScreen"
         >
     <Grid>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="500"/>
             <ColumnDefinition />
 
@@ -29,7 +30,7 @@
         </Grid.RowDefinitions>
 
         <!-- Border -->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#00BFFF"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="#00BFFF"/>
 
 
         <!-- Parameter labels -->
@@ -40,10 +41,19 @@
         <Label Name="numberOfCapturesInput" Grid.Row="5" Grid.Column="0"  Margin="20,0,0,0"></Label>
 
         <!-- Confirmation Stack Panel -->
-        <StackPanel Grid.Column="1" Grid.Row="6"  Height="286" VerticalAlignment="Top" Margin="0,0,41,0" Name="confStackPanel" RenderTransformOrigin="0.518,0.399"/>
+        <Border Grid.Column="2" Grid.Row="6" Height="310" Margin="0,20,20,30" VerticalAlignment="Bottom" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" RenderTransformOrigin="0.484,0.958">
+        <StackPanel Name="confStackPanel" RenderTransformOrigin="0.518,0.399">
+            <StackPanel.BitmapEffect>
+                <BevelBitmapEffect BevelWidth="10" EdgeProfile="CurvedIn" LightAngle="320" Relief="0.4" Smoothness="0.4" />
+            </StackPanel.BitmapEffect>
+        </StackPanel>
+        </Border>
 
         <!-- Confirm button -->
-        <Button Grid.Column="1" Grid.Row="4" Style="{StaticResource button2Style}" Click="Confirm_Button_Click" Margin="0,2,20,10" RenderTransformOrigin="-1.259,0.59" Width="169" Height="Auto" Grid.RowSpan="2">Confirm Capture</Button>
+        <Button Grid.Column="2" Grid.Row="4" Style="{StaticResource button2Style}" Click="Confirm_Button_Click" Margin="0,2,20,10" Width="169" Height="Auto" Grid.RowSpan="2">Confirm Capture</Button>
+
+        <!-- New Capture button -->
+        <Button Grid.Column="0" Grid.Row="6" Style="{StaticResource button2Style}" Click="Cancel_Button_Click" Margin="0,2,20,40" Width="169" Height="40" VerticalAlignment="Bottom">Try new Capture</Button>
 
 
     </Grid>

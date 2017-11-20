@@ -140,5 +140,10 @@ namespace PetriUI
                 bmp.Save(filePathAndName);
             }
         }
+
+        public static void deleteImage(string filePathAndName)
+        {
+            File.Delete(filePathAndName);
+        }
     }
 }

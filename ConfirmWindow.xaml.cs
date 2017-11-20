@@ -17,12 +17,28 @@ namespace PetriUI
 
     public partial class ConfirmWindow : Window
     {
-        public  ConfirmWindow(int numberOfCaptures, int interval)
+        public ConfirmWindow(int numberOfCaptures, int hoursInterval, int minutesInterval)
         {
             InitializeComponent();
 
             numberOfCapturesInput.Content = numberOfCaptures;
-            totalTimeInput.Content = interval * numberOfCaptures + " minutes";
+
+            int hours, minutes;
+
+            if(hoursInterval == 0)
+            {
+                hours = (minutesInterval * numberOfCaptures)/60;
+                minutes = (minutesInterval * numberOfCaptures) % 60;
+            }
+            else
+            {
+                minutesInterval = minutesInterval + hoursInterval * 60;
+                hours = (minutesInterval * numberOfCaptures) / 60;
+                minutes = (minutesInterval * numberOfCaptures) % 60;
+
+            }
+
+            totalTimeInput.Content = hours + " hours " + minutes + " minutes";
 
             Image confirmImg = new Image();
             BitmapImage src = new BitmapImage();
@@ -34,12 +50,23 @@ namespace PetriUI
             confirmImg.Stretch = Stretch.Uniform;
           
             confStackPanel.Children.Add(confirmImg);
+            
         }
 
         private void Confirm_Button_Click(object sender, RoutedEventArgs e)
         {
+            this.Close();
         }
-    
-        
+
+        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            PictureHandling.SweepPicture();
+
+            this.Close();
+
+        }
+
+
     }
 }

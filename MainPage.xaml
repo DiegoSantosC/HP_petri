@@ -10,7 +10,7 @@
     <Grid Margin="10,0,10,10">
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="800"/>
             <ColumnDefinition />
             
         </Grid.ColumnDefinitions>
@@ -18,8 +18,7 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="600"/>
             <RowDefinition Height="100"/>
 
         </Grid.RowDefinitions>
@@ -30,20 +29,32 @@
         </Border>        
         
         <!-- Title label -->
-        <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource headerStyle}"> Capture Screen</Label>
+        <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource headerStyle}"> Insert your parameters</Label>
         
         <!-- User input labels textAreas and buttons -->
-        <Label Grid.Column="1" Grid.Row="2" Margin="0,0,400,0" Style="{StaticResource label1Style}">Insert time interval (min)</Label>
-        <Label Grid.Column="1" Grid.Row="3" Margin="0,0,400,0" Style="{StaticResource label1Style}">Insert number of captures </Label>
+        <!--<Label Grid.Column="1" Grid.Row="2" Margin="0,0,400,0" Style="{StaticResource label1Style}">Insert time interval (min)</Label>-->
+        <!--<Label Grid.Column="1" Grid.Row="3" Margin="0,0,400,0" Style="{StaticResource label1Style}">Insert number of captures </Label>-->
         
         
         <!-- TestBoxes for parameter insertion -->
 
-        <TextBox Name="intervalTextBox" Grid.Column="1" Grid.Row="2" Margin="0,0,230,0" Style="{StaticResource textBoxStyle}"></TextBox>
-        <TextBox Name="numberOfCapturesTextBox" Grid.Column="1" Grid.Row="3" Margin="0,0,230,0" Style="{StaticResource textBoxStyle}"></TextBox>
-        
-        <!-- Start capture button -->
-        <Button Grid.Column="1" Grid.Row="4" Style="{StaticResource button1Style}" Click="Capture_Button_Click" Margin="0,0,50,0"> Start Capture </Button>
-        
+        <!--<TextBox Name="hoursTextBox" Grid.Column="1" Grid.Row="2" Margin="0,0,230,0" Style="{StaticResource textBoxStyle}">0</TextBox> -->
+        <!--<Label Grid.Column="1" Grid.Row="2" Margin="0,0,200,0" Style="{StaticResource label1Style}">h</Label> -->
+        <!--<TextBox Name="minutesTextBox" Grid.Column="1" Grid.Row="2" Margin="0,0,80,0" Style="{StaticResource textBoxStyle}">0</TextBox> -->
+        <!--<Label Grid.Column="1" Grid.Row="2" Margin="0,0,30,0" Style="{StaticResource label1Style}">min</Label> -->
+        <!--<TextBox Name="numberOfCapturesTextBox" Grid.Column="1" Grid.Row="3" Margin="0,0,230,0" Style="{StaticResource textBoxStyle}">0</TextBox> -->
+
+        <!-- Show objects button -->
+        <Button Grid.Column="1" Grid.Row="2" Style="{StaticResource button1Style}" Click="objectShow_Button_Click" Margin="0,0,50,0"> Show Objects </Button>
+
+        <!-- Confirm capture button -->
+        <!--<Button Grid.Column="1" Grid.Row="4" Margin="50,50,300,50" Width="250" Style="{StaticResource button1Style}" Click="CaptureConfirm_Button_Click">Capture Previsualization</Button> -->
+
+        <!-- Confirmation Stack Panel -->
+        <StackPanel Grid.Column="0" Grid.Row="3" Name="objectShowStackPanel">
+            <StackPanel.BitmapEffect>
+                <BevelBitmapEffect BevelWidth="10" EdgeProfile="CurvedIn" LightAngle="320" Relief="0.4" Smoothness="0.4" />
+            </StackPanel.BitmapEffect>
+        </StackPanel>
     </Grid>
 </Page>

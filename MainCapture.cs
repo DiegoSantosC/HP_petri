@@ -52,7 +52,7 @@ namespace PetriUI
 
         public void StartCapture()
         {
-
+          
             numberOfCaptures = MainPage.numberOfCaptures;
 
             MomentCapture.Capture();
@@ -61,11 +61,12 @@ namespace PetriUI
 
         }
 
-        public void ConfirmCapture()
+        public OutlineParameters ConfirmCapture()
         {
            
-            MomentCapture.ConfirmCapture();
-         
+            OutlineParameters op = MomentCapture.ConfirmCapture();
+
+            return op;         
         }
 
         private static void Trigger(Object source, ElapsedEventArgs e)
@@ -81,13 +82,13 @@ namespace PetriUI
                 testTimer.Stop();
                 testTimer.Close();
                 testTimer.Dispose();
-
-                //MainPage.captureThread.Abort();
             }
         }
 
         private static void SetTimer(int interval)
         {
+
+            // interval*60 test purposes ommited
             testTimer = new System.Timers.Timer(interval * 1000);
             testTimer.Elapsed += Trigger;
             testTimer.Enabled = true;

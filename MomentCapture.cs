@@ -47,13 +47,12 @@ namespace PetriUI
         }
 
       
-        public static void ConfirmCapture()
+        public static OutlineParameters ConfirmCapture()
         {
             try
             {
                 using (IPcLink link = HPPC.CreateLink())
                 {
-                    Console.WriteLine("{0}Capturing a Moment for picture extraction.", ToolBox.TimeStamp());
                     using (IPcMoment moment = link.CaptureMoment())
                     {
                         // IPcPictures are extracted pictures from moment capture that contain information about
@@ -64,19 +63,20 @@ namespace PetriUI
                         // Developer Guide for detailed information on handling skew angles.
 
                         IPcPicture picture = link.ExtractPicture(moment);
+                        IPcOutline outline = link.ExtractOutline(moment);
 
-                        PictureHandling.SavePicture(picture);
-
-                        
+                        OutlineParameters op = PictureHandling.SavePicture(picture, outline);
+                        return op;
                     }
                 }
-
+               
 
             }
             catch (Exception exception)
             {
                 Console.WriteLine("\t\t*****An error occurred*****\n\n{0}{1}\n\nExit now, or this console will automatically exit in 15 seconds.", ToolBox.TimeStamp(), exception.Message);
                 ToolBox.AppExceptionExit();
+                return null;
             }
         }
     }
