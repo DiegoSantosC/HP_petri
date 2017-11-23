@@ -23,6 +23,7 @@
             <Setter Property="Height" Value="30"></Setter>
             <Setter Property="Margin" Value="0,10,0,0"></Setter>
             <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="FontSize" Value="20"></Setter>
             <Setter Property="Background" Value="#00BFFF"></Setter>
             <Setter Property="Foreground" Value="White"></Setter>

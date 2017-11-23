@@ -12,11 +12,13 @@ namespace PetriUI
     {
         private List<PcPhysicalPoint> location;
         private List<Point> size;
+        private Point globalPicSize;
 
-        public OutlineParameters(List<PcPhysicalPoint> outlineLocation, List<Point> outlineSize)
+        public OutlineParameters(List<PcPhysicalPoint> outlineLocation, List<Point> outlineSize, Point gPS)
         {
             location = outlineLocation;
             size = outlineSize;
+            globalPicSize = gPS;
         }
 
         public List<PcPhysicalPoint> getLocation(OutlineParameters op)
@@ -27,6 +29,12 @@ namespace PetriUI
         {
             return op.size;
         }
+
+        public Point getGlobalSize(OutlineParameters op)
+        {
+            return op.globalPicSize;
+        }
+
         public void setLocation(List<PcPhysicalPoint> outlineLocation)
         {
             this.location = outlineLocation;

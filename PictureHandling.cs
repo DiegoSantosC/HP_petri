@@ -96,6 +96,8 @@ namespace PetriUI
 
             List<Point> outlineBoundaries = new List<Point>();
 
+            Point globalPicSize = new Point(Convert.ToInt32(GetOutlineWidth(parentOutline)), Convert.ToInt32(GetOutlineHeight(parentOutline)));
+
             foreach (IPcOutline outline in parentOutline.Children)
             {
                
@@ -106,11 +108,12 @@ namespace PetriUI
 
             foreach (IPcPicture pic in picture.Children)
             {
-                pictureLocation.Add(pic.PhysicalBoundaries.Location);
-
+                PcPhysicalPoint loc = new PcPhysicalPoint(pic.PhysicalBoundaries.Location.X * (pic.PixelDensity.X), pic.PhysicalBoundaries.Location.Y * (pic.PixelDensity.Y));
+                pictureLocation.Add(loc);
+                
             }
 
-            OutlineParameters op = new OutlineParameters(pictureLocation, outlineBoundaries);
+            OutlineParameters op = new OutlineParameters(pictureLocation, outlineBoundaries, globalPicSize);
 
             return op;
         }
