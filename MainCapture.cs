@@ -47,17 +47,20 @@ namespace PetriUI
     class MainCapture
     {
 
-        private static System.Timers.Timer testTimer;
-        private static int cont = 1, numberOfCaptures;
+        private static System.Timers.Timer intervalTimer;
+        private static int cont = 1, nOfC;
 
-        public void StartCapture()
+        public void StartCapture(object param)
         {
-          
-            numberOfCaptures = MainPage.numberOfCaptures;
+            Tuple t = (Tuple) param;
 
-            MomentCapture.Capture();
+            CaptureWindow cw = t.getCaptureWindow();
+            int[] parameters = t.getParameters();
+            MomentCapture.Capture(parameters[2], cw);
 
-            SetTimer(MainPage.interval);
+            SetTimer(parameters[1]);
+
+            //nOfC = parameters[0];
 
         }
 
@@ -71,17 +74,17 @@ namespace PetriUI
 
         private static void Trigger(Object source, ElapsedEventArgs e)
         {
-            if (cont < numberOfCaptures)
+            if (cont < nOfC)
             {
       
-                MomentCapture.Capture();
+                //MomentCapture.Capture(parameters[2]);
                 cont++;
             }
             else
             {
-                testTimer.Stop();
-                testTimer.Close();
-                testTimer.Dispose();
+                intervalTimer.Stop();
+                intervalTimer.Close();
+                intervalTimer.Dispose();
             }
         }
 
@@ -89,10 +92,10 @@ namespace PetriUI
         {
 
             // interval*60 test purposes ommited
-            testTimer = new System.Timers.Timer(interval * 1000);
-            testTimer.Elapsed += Trigger;
-            testTimer.Enabled = true;
-            testTimer.AutoReset = true;
+            intervalTimer = new System.Timers.Timer(interval * 1000);
+            intervalTimer.Elapsed += Trigger;
+            intervalTimer.Enabled = true;
+            intervalTimer.AutoReset = true;
         }
     }
 }

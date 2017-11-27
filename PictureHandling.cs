@@ -30,6 +30,7 @@ using System.IO;
 using hp.pc;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
+using System.Windows.Media.Imaging;
 
 namespace PetriUI
 {
@@ -120,13 +121,40 @@ namespace PetriUI
 
         public static void SweepPicture()
         {
-            string _sweepDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
-            string _sweepPath = Path.Combine(_sweepDirectory, "confirmPicture" + (marker2-1) + ".bmp");
+            string _sweepDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "LayerObjects");
+            string _sweepPath = Path.Combine(_sweepDirectory, "objectScan" + (marker2-1) + ".bmp");
           
             ToolBox.deleteImage(_sweepPath);
 
         }
 
+        internal static void SaveIndexedImage(IPcPicture picture, int index, CaptureWindow cw)
+        {
 
+            _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object" + index);
+            ToolBox.EnsureDirectoryExists(_saveDirectory);
+
+            int i = 0;
+            foreach (IPcPicture image in picture.Children)
+            {
+                if (i == index)
+                {
+                    string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                    ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+                    
+                    BitmapImage bmpImage = new BitmapImage();
+                    bmpImage.BeginInit();
+                    bmpImage.UriSource = new Uri(fileAndPath, UriKind.Relative);
+                    bmpImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bmpImage.EndInit();
+
+                    cw.DrawImage(bmpImage);
+
+                    ++i;
+                }
+
+                ++i;
+            }
+        }
     }
 }

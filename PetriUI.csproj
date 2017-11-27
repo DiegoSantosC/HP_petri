@@ -78,12 +78,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Tuple.cs" />
+    <Compile Include="SelectionBorder.cs" />
     <Compile Include="OutlineParameters.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CapturePage.xaml.cs">
-      <DependentUpon>CapturePage.xaml</DependentUpon>
+    <Compile Include="CaptureWindow.xaml.cs">
+      <DependentUpon>CaptureWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolBox.cs" />
     <Compile Include="ConfirmWindow.xaml.cs">
@@ -111,7 +113,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CapturePage.xaml">
+    <Page Include="CaptureWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

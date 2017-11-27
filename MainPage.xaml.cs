@@ -21,7 +21,7 @@ using System.Windows.Navigation;
 namespace PetriUI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainPage.xaml
     /// </summary>
     /// 
 
@@ -29,9 +29,9 @@ namespace PetriUI
     public partial class MainPage : Page
     {
 
-        public static Thread captureThread;
-        public static int numberOfCaptures, minutesInterval, hoursInterval, interval;
-
+        public static List<int[]> parameters;
+        private static int counter;
+       
         public MainPage()
         {
             InitializeComponent();
@@ -41,6 +41,10 @@ namespace PetriUI
             this.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
 
             objectShowStackPanel.Visibility = Visibility.Collapsed;
+
+            parameters = new List<int[]>();
+
+            counter = 1;
         }
         
         private void objectShow_Button_Click(object sender, RoutedEventArgs e)
@@ -57,21 +61,24 @@ namespace PetriUI
             }
 
             List<System.Windows.Shapes.Rectangle> outlineDefinitionList = new List<System.Windows.Shapes.Rectangle>();
-            List<Border> transparentCanvasList = new List<Border>();
+            List<SelectionBorder> transparentCanvasList = new List<SelectionBorder>();
 
             System.Drawing.Point globalPicSize = op.getGlobalSize(op);
 
             ImageBorder.Visibility = Visibility.Visible;
 
+            ImageCanvas.Children.Clear();
+            ImageCanvas.Children.Add(objectShowStackPanel);
+
             for (int i = 0; i < numberObjects; i++)
             {
+
                 // Rectangle definition
 
                 outlineDefinitionList.Add(new System.Windows.Shapes.Rectangle());
                 outlineDefinitionList.ElementAt(i).Width = (op.getSize(op).ElementAt(i).X *790)/globalPicSize.X; // Window/Canvas ratio
-                outlineDefinitionList.ElementAt(i).Height = (op.getSize(op).ElementAt(i).Y *590) / globalPicSize.Y;
+                outlineDefinitionList.ElementAt(i).Height = (op.getSize(op).ElementAt(i).Y *590)/ globalPicSize.Y;
 
-                outlineDefinitionList.ElementAt(i).MouseDown += new MouseButtonEventHandler(RectangleClickedHandler);
                 ImageCanvas.Children.Add(outlineDefinitionList.ElementAt(i));
                 outlineDefinitionList.ElementAt(i).Stroke = System.Windows.Media.Brushes.LightGreen;
                 outlineDefinitionList.ElementAt(i).StrokeThickness = 3;
@@ -80,7 +87,7 @@ namespace PetriUI
 
                 // Canvas definition
 
-                transparentCanvasList.Add(new Border());
+                transparentCanvasList.Add(new SelectionBorder(i, new Border()));
                 transparentCanvasList.ElementAt(i).Width = (op.getSize(op).ElementAt(i).X * 790) / globalPicSize.X; // Window/Canvas ratio
                 transparentCanvasList.ElementAt(i).Height = (op.getSize(op).ElementAt(i).Y * 590) / globalPicSize.Y;
 
@@ -88,8 +95,9 @@ namespace PetriUI
                 ImageCanvas.Children.Add(transparentCanvasList.ElementAt(i));
                 transparentCanvasList.ElementAt(i).Opacity = 0;
                 transparentCanvasList.ElementAt(i).Background = System.Windows.Media.Brushes.Green;
-                transparentCanvasList.ElementAt(i).MouseEnter += new MouseEventHandler((null, null) => BorderMouseEnterHandler(this, null, transparentCanvasList.ElementAt(i));
-                
+                transparentCanvasList.ElementAt(i).MouseEnter += new MouseEventHandler(BorderMouseEnterHandlerEnter);
+                transparentCanvasList.ElementAt(i).MouseLeave += new MouseEventHandler(BorderMouseEnterHandlerLeave);
+
                 transparentCanvasList.ElementAt(i).Margin =
                     new Thickness((op.getLocation(op).ElementAt(i).X * 790) / globalPicSize.X, (op.getLocation(op).ElementAt(i).Y * 590) / globalPicSize.Y, 0, 0);
             }
@@ -105,30 +113,58 @@ namespace PetriUI
             confirmImg.Source = src;
             confirmImg.Stretch = Stretch.Uniform;
 
+            objectShowStackPanel.Children.Clear();
             objectShowStackPanel.Children.Add(confirmImg);
+
+            ShowButton.Content = "Scan new Layout";
+            ParametersBorder.Visibility = Visibility.Hidden;
         }
 
-        private void BorderMouseEnterHandler(object sender, MouseEventArgs e, Border b)
+        private void BorderMouseEnterHandlerEnter(object sender, MouseEventArgs e)
         {
-            b.Opacity = 0.2;
+            Border senderBut = (Border)sender;
+            senderBut.Opacity = 0.3;
+        }
+
+        private void BorderMouseEnterHandlerLeave(object sender, MouseEventArgs e)
+        {
+            Border senderBut = (Border)sender;
+            senderBut.Opacity = 0;
         }
 
         void RectangleClickedHandler(object sender, EventArgs e)
         {
-            MonitoringParametersShow(0);
+            SelectionBorder sb = (SelectionBorder) sender;
+            MonitoringParametersShow(sb.getIndex());
 
         }
 
-        private void MonitoringParametersShow(int i)
+        private void MonitoringParametersShow(int objectToParameterize)
         {
             
             ParametersBorder.Visibility = Visibility.Visible;
-       
+
+            ParametersTitleLabel.Content = "Object " + objectToParameterize + " capture parameters";
+
         }
 
         private void CaptureConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
-            /*
+
+            for (int i=0; i<parameters.Count; i++)
+            {
+                CaptureWindow cw = new CaptureWindow(parameters.ElementAt(i));
+                cw.Show();
+
+            }
+
+            parameters = new List<int[]>();
+        }
+
+        private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)
+        {
+            
+           int minutesInterval, hoursInterval, numberOfCaptures;
 
            if ((Int32.TryParse(minutesTextBox.Text, out minutesInterval)) && (Int32.TryParse(hoursTextBox.Text, out hoursInterval)) && (Int32.TryParse(numberOfCapturesTextBox.Text, out numberOfCaptures)))
            {
@@ -138,24 +174,49 @@ namespace PetriUI
                }
                else
                {
-                   MainCapture newCapture = new MainCapture();
+               
+                    int hours, minutes;
 
-                   captureThread = new Thread(newCapture.StartCapture);
-                   captureThread.Start();
+                    if (hoursInterval == 0)
+                    {
+                        hours = (minutesInterval * numberOfCaptures) / 60;
+                        minutes = (minutesInterval * numberOfCaptures) % 60;
+                    }
+                    else
+                    {
+                        minutesInterval = minutesInterval + hoursInterval * 60;
+                        hours = (minutesInterval * numberOfCaptures) / 60;
+                        minutes = (minutesInterval * numberOfCaptures) % 60;
 
-                   interval = hoursInterval * 60 + minutesInterval;
-                   CapturePage cp = new CapturePage(numberOfCaptures, interval);
-                   this.NavigationService.Navigate(cp);
-               }
+                    }
+
+                    String str = hours + " hours " + minutes + " minutes";
+
+                    int objIndex = Int32.Parse(ParametersTitleLabel.Content.ToString().Split(' ')[1]);
+
+                    CaptureDetailsLabel.Content = CaptureDetailsLabel.Content +
+                         Environment.NewLine + "Capture " + counter + ": " + str + " , " + numberOfCaptures + " captures will be made." ;
+
+                    counter++;
+
+                    ParametersBorder.Visibility = Visibility.Hidden;
+                    CaptureConfirmButton.Visibility = Visibility.Visible;
+                    minutesTextBox.Text = "0";
+                    hoursTextBox.Text = "0";
+                    numberOfCapturesTextBox.Text = "0";
+
+                    int[] param = new int[3];
+                    param[0] = numberOfCaptures;
+                    param[1] = minutesInterval;
+                    param[2] = objIndex;
+                    parameters.Add(param);
+
+                }
            }
            else
            {
                MessageBox.Show("Parameter parsing error");
            }
-           */
-
         }
-
     }
-
-    }
+}

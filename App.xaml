@@ -51,6 +51,15 @@
             <Setter Property="Label.VerticalAlignment" Value="Center"></Setter>
         </Style>
 
+        <!-- label Style -->
+        <Style x:Key="label2Style" TargetType="{x:Type Label}">
+            <Setter Property="Label.FontFamily" Value="Impact"></Setter>
+            <Setter Property="Label.FontSize" Value="17"></Setter>
+            <Setter Property="Label.Foreground" Value="#FFAE2E2E"/>
+            <Setter Property="Label.HorizontalAlignment" Value="Left"></Setter>
+            <Setter Property="Label.VerticalAlignment" Value="Center"></Setter>
+        </Style>
+
         <!-- textBox Style -->
         <Style x:Key="textBoxStyle" TargetType="{x:Type TextBox}">
             <Setter Property="TextBox.Height" Value="30"></Setter>
