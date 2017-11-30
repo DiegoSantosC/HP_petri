@@ -8,26 +8,18 @@ namespace PetriUI
 {
     class MomentCapture
     {
-        public static void Capture(int index, CaptureWindow cw)
+        public static void Capture(Task t)
         {
-            try
-            {
-                using (IPcLink link = HPPC.CreateLink())
-                {
-                    using (IPcMoment moment = link.CaptureMoment())
-                    {
-                        IPcPicture picture = link.ExtractPicture(moment);
-                        PictureHandling.SaveIndexedImage(picture, index, cw);
-                    }
-                }
+           using (IPcLink link = HPPC.CreateLink())
+           {
+              using (IPcMoment moment = link.CaptureMoment())
+              {
+                  IPcPicture picture = link.ExtractPicture(moment);
+                  PictureHandling.SaveIndexedImage(picture, t);
+              }
+           }
 
 
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("\t\t*****An error occurred*****\n\n{0}{1}\n\nExit now, or this console will automatically exit in 15 seconds.", ToolBox.TimeStamp(), exception.Message);
-                ToolBox.AppExceptionExit();
-            }
         }
 
       

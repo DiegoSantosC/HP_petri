@@ -31,6 +31,8 @@ using hp.pc;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace PetriUI
 {
@@ -101,8 +103,11 @@ namespace PetriUI
 
             foreach (IPcOutline outline in parentOutline.Children)
             {
-               
-                outlineBoundaries.Add(new Point(Convert.ToInt32(GetOutlineWidth(outline)), Convert.ToInt32(GetOutlineHeight(outline))));
+
+                if (GetOutlineHeight(outline) > 50 && GetOutlineWidth(outline) > 50)
+                {
+                    outlineBoundaries.Add(new Point(Convert.ToInt32(GetOutlineWidth(outline)), Convert.ToInt32(GetOutlineHeight(outline))));
+                }
             }
 
             List<PcPhysicalPoint> pictureLocation = new List<PcPhysicalPoint>();
@@ -128,32 +133,36 @@ namespace PetriUI
 
         }
 
-        internal static void SaveIndexedImage(IPcPicture picture, int index, CaptureWindow cw)
+        internal static void SaveIndexedImage(IPcPicture picture, Task t)
         {
 
-            _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object" + index);
+            _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + t.getIndex());
             ToolBox.EnsureDirectoryExists(_saveDirectory);
 
             int i = 0;
+
             foreach (IPcPicture image in picture.Children)
             {
-                if (i == index)
+                if (i == t.getIndex())
                 {
                     string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
                     ToolBox.SaveProcessedImage(image.Image, fileAndPath);
-                    
-                    BitmapImage bmpImage = new BitmapImage();
-                    bmpImage.BeginInit();
-                    bmpImage.UriSource = new Uri(fileAndPath, UriKind.Relative);
-                    bmpImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bmpImage.EndInit();
 
-                    cw.DrawImage(bmpImage);
+                    List<Uri> l = new List<Uri>();
+                    
+                    t.setCaptures(l);
+
+                    Console.WriteLine(" " + fileAndPath);
+                    Uri u = new Uri(fileAndPath, UriKind.Relative);
+                    l.Add(u);
+                    t.getCaptureWindow().DrawImage();
 
                     ++i;
                 }
 
                 ++i;
+
+
             }
         }
     }

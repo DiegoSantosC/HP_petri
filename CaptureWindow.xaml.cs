@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,42 +21,46 @@ namespace PetriUI
     /// Interaction logic for CaptureWindow.xaml
     /// </summary>
     public partial class CaptureWindow : Window
-    {          
+    {
+        private static Thread newCaptureThread;
+        private Task t;
         public CaptureWindow(int[] parameters)
         {
             InitializeComponent();
 
-            MainCapture newCapture = new MainCapture();
-
-            Tuple t = new Tuple(this, parameters);
-
-            Thread newCaptureThread = new Thread(newCapture.StartCapture);
-            newCaptureThread.SetApartmentState(ApartmentState.STA);
-            newCaptureThread.Start(t); 
-
             this.Width = 1200;
             this.Height = 900;
-       
 
+            List<Uri> u = new List<Uri>();
+            t = new Task(this, parameters[0], parameters[1], parameters[2], u);
+
+            MainCapture newCapture = new MainCapture();
+            newCaptureThread = new Thread(newCapture.StartCapture);
+            newCaptureThread.SetApartmentState(ApartmentState.STA);
+            newCaptureThread.Start(t);
         }
-        
+
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
-
-            //MainPage.captureThread.Abort();
+            
         }
 
-        public void DrawImage(BitmapImage img)
+        public void DrawImage()
         {
-            Image image = new Image();
-            image.Source = img;
-            image.Stretch = Stretch.Uniform;
+            Image img = new Image();
+        
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = t.getCaptures().ElementAt(t.getCaptures().Count -1);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            img.Source = src;
+            img.Stretch = Stretch.Uniform;
+            img.Stretch = Stretch.Uniform;
 
             StackPanel imgSP = new StackPanel();
-            imgSP.Children.Add(image);
+            imgSP.Children.Add(img);
             ImagesCanvas.Children.Add(imgSP);
-
-            Console.WriteLine("Traza");
         }
     }
 }

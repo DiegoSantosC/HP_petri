@@ -49,7 +49,11 @@ namespace PetriUI
         
         private void objectShow_Button_Click(object sender, RoutedEventArgs e)
         {
-            MainCapture newCapture = new MainCapture();
+
+            parameters = new List<int[]>();
+            CaptureDetailsLabel.Content = "";
+
+           MainCapture newCapture = new MainCapture();
             OutlineParameters op = newCapture.ConfirmCapture();
 
             int numberObjects = OutlineParameters.getCapacity(op);
@@ -159,6 +163,8 @@ namespace PetriUI
             }
 
             parameters = new List<int[]>();
+            CaptureDetailsLabel.Content = "";
+
         }
 
         private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)

@@ -45,23 +45,26 @@ namespace PetriUI
     // support and functionality.
 
     class MainCapture
-    {
-
-        private static System.Timers.Timer intervalTimer;
-        private static int cont = 1, nOfC;
-
+    { 
         public void StartCapture(object param)
         {
-            Tuple t = (Tuple) param;
+            Task t = new Task();
 
-            CaptureWindow cw = t.getCaptureWindow();
-            int[] parameters = t.getParameters();
-            MomentCapture.Capture(parameters[2], cw);
+            Task auxCp = (Task)param;
 
-            SetTimer(parameters[1]);
+            t.setCaptureWindow(auxCp.getCaptureWindow());
+            t.setNumberOfCaptures(auxCp.getNumberOfCaptures());
+            t.setInteval(auxCp.getInterval());
+            t.setIndex(auxCp.getIndex());
 
-            //nOfC = parameters[0];
+            for (int i=0; i<=t.getNumberOfCaptures(); i++)
+            {
+                MomentCapture.Capture(t);
 
+                // interval*60 missing for testing purposes
+
+                Thread.Sleep(t.getInterval() * 1000);
+            }
         }
 
         public OutlineParameters ConfirmCapture()
@@ -70,32 +73,6 @@ namespace PetriUI
             OutlineParameters op = MomentCapture.ConfirmCapture();
 
             return op;         
-        }
-
-        private static void Trigger(Object source, ElapsedEventArgs e)
-        {
-            if (cont < nOfC)
-            {
-      
-                //MomentCapture.Capture(parameters[2]);
-                cont++;
-            }
-            else
-            {
-                intervalTimer.Stop();
-                intervalTimer.Close();
-                intervalTimer.Dispose();
-            }
-        }
-
-        private static void SetTimer(int interval)
-        {
-
-            // interval*60 test purposes ommited
-            intervalTimer = new System.Timers.Timer(interval * 1000);
-            intervalTimer.Elapsed += Trigger;
-            intervalTimer.Enabled = true;
-            intervalTimer.AutoReset = true;
-        }
+        }    
     }
 }

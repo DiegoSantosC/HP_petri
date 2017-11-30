@@ -78,7 +78,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Tuple.cs" />
+    <Compile Include="Task.cs" />
     <Compile Include="SelectionBorder.cs" />
     <Compile Include="OutlineParameters.cs" />
     <Compile Include="MainWindow.xaml.cs">
