@@ -53,7 +53,7 @@ namespace PetriUI
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
 
-           MainCapture newCapture = new MainCapture();
+            MainCapture newCapture = new MainCapture();
             OutlineParameters op = newCapture.ConfirmCapture();
 
             int numberObjects = OutlineParameters.getCapacity(op);

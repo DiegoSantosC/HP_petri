@@ -158,6 +158,7 @@ namespace PetriUI
                     t.getCaptureWindow().DrawImage();
 
                     ++i;
+
                 }
 
                 ++i;

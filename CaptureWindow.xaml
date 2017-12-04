@@ -10,31 +10,40 @@
     <Grid>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="600"/>
+            <ColumnDefinition Width="600"/>
+           
             
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="90"/>
             <RowDefinition/>
             <RowDefinition Height="100"/>
 
         </Grid.RowDefinitions>
 
         <!-- Border -->
-        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="#00BFFF"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#00BFFF"/>
 
         <!-- Title label -->
-        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" Style="{StaticResource headerStyle}">Capturing images </Label>
+        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capturing images </Label>
 
-             <!-- New Capture button -->
-        <Button Grid.Column="2" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
+             <!-- Cancel Capture button -->
+        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
 
         <!-- Image drawing Canvas -->
-        <Canvas Name="ImagesCanvas" Grid.Column="1" Grid.Row="2"/>
+        <Canvas Name="ImagesCanvas" Margin ="10" Grid.Column="1" Grid.Row="2"/>
 
+        <!-- Last drawing Canvas -->
+        <Canvas Name="LastImageCanvas" Margin ="50" Grid.Column="0" Grid.Row="2"/>
+
+        <!-- Project into mat screen button -->
+        <Button Grid.Column="0" Name="ProjectButton" Visibility ="Hidden" Grid.Row="3" Style="{StaticResource button2Style}" 
+                HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="30,0,0,40" Width="220" Height="40" Click="Project_IntoMat">Project into Mat Screen</Button>
+        
+        <!-- Information label -->
+        <Label Name="infoLabel" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden">Click capture to focus (last capture focused by default)</Label>
 
     </Grid>
 </Window>

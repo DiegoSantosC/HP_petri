@@ -45,12 +45,16 @@ namespace PetriUI
     // support and functionality.
 
     class MainCapture
-    { 
+    {
+        public static bool stopRequested;
+
         public void StartCapture(object param)
         {
             Task t = new Task();
 
             Task auxCp = (Task)param;
+
+            stopRequested = false;
 
             t.setCaptureWindow(auxCp.getCaptureWindow());
             t.setNumberOfCaptures(auxCp.getNumberOfCaptures());
@@ -59,12 +63,17 @@ namespace PetriUI
 
             for (int i=0; i<=t.getNumberOfCaptures(); i++)
             {
-                MomentCapture.Capture(t);
+                if (stopRequested) break;
+
+                App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                    new Action(() => t.getCaptureWindow().Trigger_Capture()));
 
                 // interval*60 missing for testing purposes
 
                 Thread.Sleep(t.getInterval() * 1000);
             }
+
+            Console.WriteLine("Capture for object finished");
         }
 
         public OutlineParameters ConfirmCapture()
