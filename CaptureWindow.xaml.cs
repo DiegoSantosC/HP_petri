@@ -106,7 +106,7 @@ namespace PetriUI
                 cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0,0,0,0));
             }
 
-            captureFramework cf = new captureFramework(img2, 400, ratio);
+            cf = new captureFramework(img2, 400, ratio);
 
             LastImageCanvas.Children.Clear();
             LastImageCanvas.Children.Add(cf.getBorder());
@@ -114,6 +114,8 @@ namespace PetriUI
 
             ProjectButton.Visibility = Visibility.Visible;
             infoLabel.Visibility = Visibility.Visible;
+
+            timeLabel.Content = "Capture taken at: " + cf.getTime();
         }
 
         private void CaptureFocused(object sender, MouseEventArgs e)
@@ -152,16 +154,21 @@ namespace PetriUI
         {
             StackPanel sp = (StackPanel)sender;
 
-            Image img = new Image();
+            Image img, clone = new Image();
             
             foreach (object child in sp.Children)
             {
                 img = (Image)child;
+                clone.Source = img.Source;
             }
+
+            int index = Int32.Parse(sp.Uid);
+
+            infoLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
 
             cf.getCapturePanel().Children.Clear();
 
-            cf.getCapturePanel().Children.Add(img)
+            cf.getCapturePanel().Children.Add(clone);
         }
     }
 }

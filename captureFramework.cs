@@ -13,6 +13,7 @@ namespace PetriUI
     {
         private Border frameworkBorder;
         private StackPanel capturePanel;
+        private String timeOfCapture;
 
         public captureFramework(System.Windows.Controls.Image img, int size, double ratio)
         {
@@ -41,11 +42,18 @@ namespace PetriUI
             capturePanel.Opacity = 1;
             capturePanel.Children.Add(img);
 
+            timeOfCapture = DateTime.Now.ToString("hh.mm.ss"); ;
+
         }
 
         public Border getBorder()
         {
             return frameworkBorder;
+        }
+
+        public String getTime()
+        {
+            return timeOfCapture;
         }
 
         public StackPanel getCapturePanel()
