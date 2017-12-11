@@ -68,14 +68,12 @@ namespace PetriUI
             src1.EndInit();
             img1.Source = src1;
             img1.Stretch = Stretch.Uniform;
-            img1.Stretch = Stretch.Uniform;
 
             src2.BeginInit();
             src2.UriSource = t.getCaptures().ElementAt(t.getCaptures().Count - 1);
             src2.CacheOption = BitmapCacheOption.OnLoad;
             src2.EndInit();
             img2.Source = src1;
-            img2.Stretch = Stretch.Uniform;
             img2.Stretch = Stretch.Uniform;
 
             double ratio = src1.Width / src1.Height;
@@ -165,7 +163,7 @@ namespace PetriUI
 
             int index = Int32.Parse(sp.Uid);
 
-            infoLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
+            timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
 
             cf.getCapturePanel().Children.Clear();
 

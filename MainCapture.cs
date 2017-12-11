@@ -28,6 +28,8 @@ using System.Timers;
 
 // Sprout SDK Namespaces
 using hp.pc;
+using System.Windows.Controls;
+using System.Collections.Generic;
 
 namespace PetriUI
 {
@@ -61,19 +63,17 @@ namespace PetriUI
             t.setInteval(auxCp.getInterval());
             t.setIndex(auxCp.getIndex());
 
-            for (int i=0; i<=t.getNumberOfCaptures(); i++)
+            for (int i=0; i<t.getNumberOfCaptures(); i++)
             {
+                // interval*60 missing for testing purposes
+                Thread.Sleep(t.getInterval() * 1000);
+
                 if (stopRequested) break;
 
                 App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                     new Action(() => t.getCaptureWindow().Trigger_Capture()));
-
-                // interval*60 missing for testing purposes
-
-                Thread.Sleep(t.getInterval() * 1000);
+  
             }
-
-            Console.WriteLine("Capture for object finished");
         }
 
         public OutlineParameters ConfirmCapture()
@@ -83,5 +83,11 @@ namespace PetriUI
 
             return op;         
         }    
+
+        public List<Image> Samples(List<int> indexes)
+        {
+            List<Image> samples = MomentCapture.getSamples(indexes);
+            return samples;
+        }
     }
 }

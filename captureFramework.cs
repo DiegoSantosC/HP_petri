@@ -42,7 +42,7 @@ namespace PetriUI
             capturePanel.Opacity = 1;
             capturePanel.Children.Add(img);
 
-            timeOfCapture = DateTime.Now.ToString("hh.mm.ss"); ;
+            timeOfCapture = DateTime.Now.ToString("hh:mm:ss"); ;
 
         }
 

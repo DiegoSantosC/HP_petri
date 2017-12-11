@@ -58,6 +58,48 @@ namespace PetriUI
             }
         }
 
+        internal static List<System.Windows.Controls.Image> SaveSamples(IPcPicture picture, List<int> indexes)
+        {
+            List<System.Windows.Controls.Image> imgs = new List<System.Windows.Controls.Image>();
+
+            int[] indexArray = indexes.ToArray();
+
+            int i = 0;
+
+            foreach (IPcPicture image in picture.Children)
+            {
+                for (int j = 0; j < indexArray.Length; j++)
+                {
+                    if (i == indexArray[j])
+                    {
+                        _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + indexArray[j]);
+                        ToolBox.EnsureDirectoryExists(_saveDirectory);
+
+                        string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                        ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+
+                        Uri u = new Uri(fileAndPath, UriKind.Relative);
+                        System.Windows.Controls.Image im = new System.Windows.Controls.Image();
+                        BitmapImage src = new BitmapImage();
+
+                        src.BeginInit();
+                        src.UriSource = u;
+                        src.CacheOption = BitmapCacheOption.OnLoad;
+                        src.EndInit();
+                        im.Source = src;
+                        im.Stretch = Stretch.Uniform;
+                        im.Stretch = Stretch.Uniform;
+
+                        imgs.Add(im);
+
+                    }
+                }
+                i++;
+            }
+
+            return imgs;
+        }
+
         private static int GetOutlineWidth(IPcOutline outline)
         {
             return Convert.ToInt32((outline.PixelDensity.X) * (outline.PhysicalBoundaries.Size.Width));
@@ -152,7 +194,6 @@ namespace PetriUI
                     
                     t.setCaptures(l);
 
-                    Console.WriteLine(" " + fileAndPath);
                     Uri u = new Uri(fileAndPath, UriKind.Relative);
                     l.Add(u);
                     t.getCaptureWindow().DrawImage();

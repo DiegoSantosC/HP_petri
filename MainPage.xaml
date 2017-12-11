@@ -36,8 +36,8 @@
         <Button Grid.Column="0" Name="ShowButton" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="objectShow_Button_Click" Margin="50,0,0,0"> Show Objects </Button>
 
         <!-- Navigation label and "button"-->
-        <Label Grid.Column="1" FontSize="14" Grid.Row="2" Margin="0,80,20,0" Style="{StaticResource label1Style}">Capture Previews</Label>
-        <StackPanel Name="navigationSp" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="2" Width="80" Height="80" Margin="0,20,35,0"/>
+        <Label Name="navLabel" Grid.Column="1"  Visibility="Hidden" FontSize="14" Grid.Row="2" Margin="0,80,20,0" Style="{StaticResource label1Style}">Capture Previews</Label>
+        <StackPanel Name="navigationSp" Grid.Column="1" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="2" Width="80" Height="80" Margin="0,20,35,0"/>
 
 
         <!-- Object Show Canvas -->

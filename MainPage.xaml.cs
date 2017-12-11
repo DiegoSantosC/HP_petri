@@ -31,6 +31,8 @@ namespace PetriUI
 
         public static List<int[]> parameters;
         private static int counter;
+
+        private CapturePreviews cp;
        
         public MainPage()
         {
@@ -46,16 +48,8 @@ namespace PetriUI
 
             counter = 1;
 
-            System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
-            BitmapImage src = new BitmapImage();
-            src.BeginInit();
-            src.UriSource = new Uri("Resources\" + FlechaDcha.png", UriKind.Relative);
-            src.CacheOption = BitmapCacheOption.OnLoad;
-            src.EndInit();
-            navImg.Source = src;
-            navImg.Stretch = Stretch.Uniform;
+            cp = new CapturePreviews(this);
 
-            navigationSp.Children.Add(navImg);
         }
         
         private void objectShow_Button_Click(object sender, RoutedEventArgs e)
@@ -141,6 +135,29 @@ namespace PetriUI
             senderBut.Opacity = 0.3;
         }
 
+        private void navigationArrowEnter(object sender, MouseEventArgs e)
+        {
+            StackPanel senderBut = (StackPanel)sender;
+            senderBut.Width = senderBut.Width*1.1;
+            senderBut.Height = senderBut.Height * 1.1;
+
+        }
+
+        private void navigationArrowLeave(object sender, MouseEventArgs e)
+        {
+            StackPanel senderBut = (StackPanel)sender;
+            senderBut.Width = senderBut.Width / 1.1;
+            senderBut.Height = senderBut.Height / 1.1;
+
+        }
+
+        private void navigationArrowClick(object sender, MouseEventArgs e)
+        {
+
+            this.NavigationService.Navigate(cp);
+
+        }
+
         private void BorderMouseEnterHandlerLeave(object sender, MouseEventArgs e)
         {
             Border senderBut = (Border)sender;
@@ -166,16 +183,39 @@ namespace PetriUI
         private void CaptureConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
 
-            for (int i=0; i<parameters.Count; i++)
-            {
-                CaptureWindow cw = new CaptureWindow(parameters.ElementAt(i));
-                cw.Show();
+            System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "FlechaDcha.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            navImg.Source = src;
+            navImg.Stretch = Stretch.Uniform;
 
+            navigationSp.Children.Add(navImg);
+
+            navigationSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
+            navigationSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+
+            navigationSp.MouseDown += new MouseButtonEventHandler(navigationArrowClick);
+
+            navigationSp.Visibility = Visibility.Visible;
+            navLabel.Visibility = Visibility.Visible;
+
+            List<CaptureWindow> capturesList = new List<CaptureWindow>();
+            List<int> indexes = new List<int>();
+
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                capturesList.Add(new CaptureWindow(parameters.ElementAt(i)));
+                indexes.Add(parameters.ElementAt(i)[2]);
             }
+
+            cp.AddCaptures(capturesList, indexes);
+            this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
-
         }
 
         private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)
