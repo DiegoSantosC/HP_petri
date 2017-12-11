@@ -27,7 +27,7 @@
         <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#00BFFF"/>
 
         <!-- Title label -->
-        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capturing images </Label>
+        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture details </Label>
 
              <!-- Cancel Capture button -->
         <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
@@ -44,6 +44,9 @@
         
         <!-- Information label -->
         <Label Name="infoLabel" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden">Click capture to focus (last capture focused by default)</Label>
+
+        <!-- Time label -->
+        <Label Name="timeLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden" Margin="80,0,0,30">Capture taken at:</Label>
 
     </Grid>
 </Window>

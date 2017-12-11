@@ -116,6 +116,7 @@ namespace PetriUI
             infoLabel.Visibility = Visibility.Visible;
 
             timeLabel.Content = "Capture taken at: " + cf.getTime();
+            timeLabel.Visibility = Visibility.Visible;
         }
 
         private void CaptureFocused(object sender, MouseEventArgs e)

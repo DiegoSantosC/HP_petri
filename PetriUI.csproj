@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{179B939B-9A0D-4B5A-B408-460BF01C618E}</ProjectGuid>
+    <ProjectGuid>{06995841-505D-4304-A77D-456BF8659DEF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PetriUI</RootNamespace>
@@ -79,6 +79,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="captureFramework.cs" />
+    <Compile Include="CapturePreviews.xaml.cs">
+      <DependentUpon>CapturePreviews.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Task.cs" />
     <Compile Include="SelectionBorder.cs" />
     <Compile Include="OutlineParameters.cs" />
@@ -89,9 +92,10 @@
       <DependentUpon>CaptureWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolBox.cs" />
-    <Compile Include="ConfirmWindow.xaml.cs">
-      <DependentUpon>ConfirmWindow.xaml</DependentUpon>
-    </Compile>
+    <Page Include="CapturePreviews.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,10 +110,6 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ConfirmWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -158,6 +158,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="FlechaDcha.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="flechaIz.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

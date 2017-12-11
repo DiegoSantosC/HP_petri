@@ -45,6 +45,17 @@ namespace PetriUI
             parameters = new List<int[]>();
 
             counter = 1;
+
+            System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri("Resources\" + FlechaDcha.png", UriKind.Relative);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            navImg.Source = src;
+            navImg.Stretch = Stretch.Uniform;
+
+            navigationSp.Children.Add(navImg);
         }
         
         private void objectShow_Button_Click(object sender, RoutedEventArgs e)
