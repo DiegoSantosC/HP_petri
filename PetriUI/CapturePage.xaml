@@ -1,0 +1,34 @@
+﻿<Page x:Class="PetriUI.CapturePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PetriUI"
+      mc:Ignorable="d" 
+      Title="CapturePage">
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition/>
+
+        </Grid.RowDefinitions>
+
+        <!-- Border -->
+        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="#00BFFF"/>
+
+        <!-- Title label -->
+        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" Style="{StaticResource headerStyle}">Capturing images </Label>
+
+             <!-- New Capture button -->
+        <Button Grid.Column="3" Grid.Row="2" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,80" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
+
+    </Grid>
+</Page>
