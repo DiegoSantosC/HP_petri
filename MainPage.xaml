@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PetriUI"
         mc:Ignorable="d"
         Title="Home" 
-        >
+    >
     <Grid Margin="10,0,10,10">
 
         <Grid.ColumnDefinitions>
@@ -92,5 +92,8 @@
 
         <!-- Confirm capture button -->
         <Button Name="CaptureConfirmButton" Grid.Column="2" Grid.Row="4" VerticalAlignment="Top" Visibility="Hidden" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="CaptureConfirm_Button_Click">Start Captures</Button>
+
+        <!-- Confirm capture button -->
+        <Button Name="CaptureCancelButton" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Foreground="White" HorizontalAlignment="Right" FontSize="20" Height="30" Background="#990E0E" Visibility="Hidden" Width="150" Click="CaptureCancel_Button_Click">Cancel Captures</Button>
     </Grid>
 </Page>

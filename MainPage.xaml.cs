@@ -28,12 +28,12 @@ namespace PetriUI
 
     public partial class MainPage : Page
     {
-
         public static List<int[]> parameters;
         private static int counter;
 
         private CapturePreviews cp;
-       
+
+        public static bool capturesRunning;
         public MainPage()
         {
             InitializeComponent();
@@ -49,6 +49,8 @@ namespace PetriUI
             counter = 1;
 
             cp = new CapturePreviews(this);
+
+            capturesRunning = false;
 
         }
         
@@ -138,16 +140,27 @@ namespace PetriUI
         private void navigationArrowEnter(object sender, MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
-            senderBut.Width = senderBut.Width*1.1;
-            senderBut.Height = senderBut.Height * 1.1;
+
+            foreach (object child in senderBut.Children)
+            {
+                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
+
+                childImg.Opacity = 0.7;
+            }
 
         }
 
         private void navigationArrowLeave(object sender, MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
-            senderBut.Width = senderBut.Width / 1.1;
-            senderBut.Height = senderBut.Height / 1.1;
+
+            foreach (object child in senderBut.Children)
+            {
+                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
+
+                childImg.Opacity = 1;
+            }
+
 
         }
 
@@ -182,11 +195,10 @@ namespace PetriUI
 
         private void CaptureConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
-
             System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
             BitmapImage src = new BitmapImage();
             src.BeginInit();
-            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "FlechaDcha.png", UriKind.Absolute);
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\FlechaDcha.png", UriKind.Absolute);
             src.CacheOption = BitmapCacheOption.OnLoad;
             src.EndInit();
             navImg.Source = src;
@@ -216,6 +228,14 @@ namespace PetriUI
 
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
+        }
+
+        private void CaptureCancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            parameters = new List<int[]>();
+            CaptureDetailsLabel.Content = "";
+
+            CaptureCancelButton.Visibility = Visibility.Hidden;
         }
 
         private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)
@@ -268,8 +288,10 @@ namespace PetriUI
                     param[2] = objIndex;
                     parameters.Add(param);
 
+                    CaptureCancelButton.Visibility = Visibility.Visible;
+
                 }
-           }
+            }
            else
            {
                MessageBox.Show("Parameter parsing error");

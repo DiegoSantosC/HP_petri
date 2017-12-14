@@ -72,6 +72,9 @@ namespace PetriUI
                 {
                     if (i == indexArray[j])
                     {
+                        // REVISAR CÓDIGO !!!!!!!!!
+
+
                         _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + indexArray[j]);
                         ToolBox.EnsureDirectoryExists(_saveDirectory);
 
@@ -90,7 +93,11 @@ namespace PetriUI
                         im.Stretch = Stretch.Uniform;
                         im.Stretch = Stretch.Uniform;
 
+                        Console.WriteLine(indexArray[j]);
+
                         imgs.Add(im);
+
+                        i++;
 
                     }
                 }
@@ -132,6 +139,7 @@ namespace PetriUI
             _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
 
             ToolBox.EnsureDirectoryExists(_saveDirectory);
+            ToolBox.EnsureDirectoryExists(ToolBox.defaultFilePath);
 
             PcImage image = picture.Image;
 

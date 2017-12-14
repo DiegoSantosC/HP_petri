@@ -35,6 +35,12 @@
         <Label Grid.Column="0" FontSize="14" Grid.Row="2" Margin="20,100,0,0" Style="{StaticResource label1Style}">Capture Settings</Label>
         <StackPanel Name="navigationSp" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="2" Width="80" Height="80" Margin="20,25,0,0"/>
 
+        <!-- Fake carrousel left and right -->
+        <StackPanel Name="leftSp" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Margin="200,0,0,0" Height="100"/>
+        <StackPanel Name="rightSp" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center" Width="100" Margin="0,0,200,0" Height="100"/>
+
+
+
         <!-- Show objects button -->
         <Button Grid.Column="1" Name="ShowButton" Height="40" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="4" Style="{StaticResource button1Style}" Click="showDetails">Show Capture Details</Button>
 

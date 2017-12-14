@@ -39,8 +39,8 @@ namespace PetriUI
         // This is a simple static member to allow you to easily save a files to a directory on your Desktop by getting
         // its path. You can easily change the string to your desired path, for example you could set defaultFilePath to
         // something like, @"C:\Temp\SproutStuff"
-        public static string defaultFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"TestOutput_Petri");
-
+        public static string defaultFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"Output_Petri");
+        
 
         // This little method just sends you back a timestamp to use for file/directory names, logging, or console messages.
         // The default format is HourHour.MinuteMinute.SecondSecond.MillisecondMillisecond

@@ -21,9 +21,9 @@ namespace PetriUI
     public partial class CapturePreviews : Page
     {
         private MainPage mainPage;
-        private List<CaptureWindow> capturesList;
-        private List<Image> samplesList;
-
+        private static List<CaptureWindow> capturesList;
+        private static List<Image> samplesList;
+        private static int numberCapturesRunning;
         public CapturePreviews(MainPage mp)
         {
             mainPage = mp;
@@ -33,10 +33,14 @@ namespace PetriUI
             this.Width = System.Windows.SystemParameters.PrimaryScreenWidth;
             this.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
 
+            numberCapturesRunning = 0;
+
+            // Navigate to previous page
+
             System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
             BitmapImage src = new BitmapImage();
             src.BeginInit();
-            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "flechaIz.png", UriKind.Absolute);
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\flechaIz.png", UriKind.Absolute);
             src.CacheOption = BitmapCacheOption.OnLoad;
             src.EndInit();
             navImg.Source = src;
@@ -49,8 +53,101 @@ namespace PetriUI
 
             navigationSp.MouseDown += new MouseButtonEventHandler(navigationArrowClick);
 
+            // Scroll Left
+
+            System.Windows.Controls.Image rightImg = new System.Windows.Controls.Image();
+            BitmapImage srcRight = new BitmapImage();
+            srcRight.BeginInit();
+            srcRight.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Right.png", UriKind.Absolute);
+            srcRight.CacheOption = BitmapCacheOption.OnLoad;
+            srcRight.EndInit();
+            rightImg.Source = srcRight;
+            rightImg.Stretch = Stretch.Uniform;
+
+            rightSp.Children.Add(rightImg);
+
+            rightSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
+            rightSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+
+            rightSp.MouseDown += new MouseButtonEventHandler(scrollRight);
+
+            // Scroll Right
+
+            System.Windows.Controls.Image LeftImg = new System.Windows.Controls.Image();
+            BitmapImage srcLeft = new BitmapImage();
+            srcLeft.BeginInit();
+            srcLeft.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Left.png", UriKind.Absolute);
+            srcLeft.CacheOption = BitmapCacheOption.OnLoad;
+            srcLeft.EndInit();
+            LeftImg.Source = srcLeft;
+            LeftImg.Stretch = Stretch.Uniform;
+
+            leftSp.Children.Add(LeftImg);
+
+            leftSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
+            leftSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+
+            leftSp.MouseDown += new MouseButtonEventHandler(scrollLeft);
+
             capturesList = new List<CaptureWindow>();
             samplesList = new List<Image>();
+            
+        }
+
+        private void scrollRight(object sender, MouseButtonEventArgs e)
+        {
+            String s = infoLabel.Content.ToString();
+            String[] data = s.Split('/');
+
+            int current = Int32.Parse(data[0]);
+            int total = Int32.Parse(data[1]);
+
+            if (current == total)
+            {
+                sampleSP.Children.Clear();
+                sampleSP.Children.Add(samplesList.ElementAt(0));
+
+                infoLabel.Content = "1/" + capturesList.Count.ToString();
+            }else
+            {
+                sampleSP.Children.Clear();
+                sampleSP.Children.Add(samplesList.ElementAt(current));
+
+                infoLabel.Content = (current+1) + "/" + capturesList.Count.ToString();
+            }
+
+        }
+        public static void DecrementCaptures()
+        {
+            numberCapturesRunning--;
+            if (numberCapturesRunning == 0)
+            {
+                MainPage.capturesRunning = false;
+            }
+        }
+
+        private void scrollLeft(object sender, MouseButtonEventArgs e)
+        {
+            String s = infoLabel.Content.ToString();
+            String[] data = s.Split('/');
+
+            int current = Int32.Parse(data[0]);
+            int total = Int32.Parse(data[1]);
+
+            if (current == 1)
+            {
+                sampleSP.Children.Clear();
+                sampleSP.Children.Add(samplesList.ElementAt(total-1));
+
+                infoLabel.Content = total + "/" + capturesList.Count.ToString();
+            }
+            else
+            {
+                sampleSP.Children.Clear();
+                sampleSP.Children.Add(samplesList.ElementAt(current -2));
+
+                infoLabel.Content = (current - 1) + "/" + capturesList.Count.ToString();
+            }
 
         }
 
@@ -64,37 +161,65 @@ namespace PetriUI
             {
                 capturesList.Add(cwList.ElementAt(i));
                 capturesList.ElementAt(i).Uid = (capturesList.Count -1).ToString();
-                samplesList.Add(samples.ElementAt(i));
+                samplesList.Add(samples.ElementAt(samples.Count-1-i));
                 samplesList.ElementAt(i).Uid = (samplesList.Count - 1).ToString();
+
+
+
+                numberCapturesRunning++;
             }
 
-            
-            
+            sampleSP.Children.Clear();
             sampleSP.Children.Add(samplesList.ElementAt(0));
+
+            infoLabel.Content = "1/" + capturesList.Count.ToString();
+
+            MainPage.capturesRunning = true;
            
         }
 
         private void navigationArrowEnter(object sender, MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
-            senderBut.Width = senderBut.Width * 1.1;
-            senderBut.Height = senderBut.Height * 1.1;
+   
+            foreach (object child in senderBut.Children)
+            {
+                Image childImg = (Image)child;
+
+                childImg.Opacity = 0.7;
+            }
 
         }
 
         private void showDetails(object sender, RoutedEventArgs e)
         {
-            for(int i=0; i<capturesList.Count; i++)
+            int index;
+
+            foreach (object child in sampleSP.Children)
             {
-                capturesList.ElementAt(i).Show();
+                Image childImg = (Image)child;
+                index = Int32.Parse(childImg.Uid);
+
+                try
+                {
+                    capturesList.ElementAt(index).Show();
+                }
+                catch (InvalidOperationException ex) { }               
             }
+
+            
         }
 
         private void navigationArrowLeave(object sender, MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
-            senderBut.Width = senderBut.Width / 1.1;
-            senderBut.Height = senderBut.Height / 1.1;
+          
+            foreach (object child in senderBut.Children)
+            {
+                Image childImg = (Image)child;
+
+                childImg.Opacity = 1;
+            }
 
         }
 
@@ -102,6 +227,15 @@ namespace PetriUI
         {
             this.NavigationService.Navigate(mainPage);
 
+        }
+
+        public static void killAllCaptures()
+        {
+            for(int i=0; i<capturesList.Count; i++)
+            {
+                capturesList.ElementAt(i).KillCaptures();
+                capturesList.ElementAt(i).Close();
+            }
         }
     }
 }

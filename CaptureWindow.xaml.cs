@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -25,6 +26,8 @@ namespace PetriUI
         private Task t;
         private captureFramework cf;
         private List<captureFramework> cfs;
+        private bool running;
+        private Thread newCaptureThread;
 
         public CaptureWindow(int[] parameters)
         {
@@ -39,12 +42,19 @@ namespace PetriUI
             t = new Task(this, parameters[0], parameters[1], parameters[2], u);
 
             MainCapture newCapture = new MainCapture();
-            Thread newCaptureThread = new Thread(newCapture.StartCapture);
+            newCaptureThread = new Thread(newCapture.StartCapture);
             newCaptureThread.SetApartmentState(ApartmentState.STA);
             newCaptureThread.Start(t);
+            running = true;
         }
 
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            newCaptureThread.Abort();
+            running = false;
+
+        }
+        public void KillCaptures()
         {
             MainCapture.stopRequested = true;
         }
@@ -117,6 +127,13 @@ namespace PetriUI
             timeLabel.Visibility = Visibility.Visible;
         }
 
+        internal void CaptureFinished()
+        {
+            CapturePreviews.DecrementCaptures();
+            finishedCapture.Visibility = Visibility.Visible;
+            running = false;
+        }
+
         private void CaptureFocused(object sender, MouseEventArgs e)
         {
             StackPanel sp = (StackPanel)sender;
@@ -128,6 +145,14 @@ namespace PetriUI
 
             cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height * 1.1;
             cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width * 1.1;
+
+
+            foreach (object child in sp.Children)
+            {
+                Image childImg = (Image)child;
+
+                childImg.Opacity = 0.8;
+            }
 
         }
 
@@ -142,6 +167,13 @@ namespace PetriUI
 
             cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height / 1.1;
             cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width / 1.1;
+
+            foreach (object child in sp.Children)
+            {
+                Image childImg = (Image)child;
+
+                childImg.Opacity = 1;
+            }
         }
 
         private void Project_IntoMat(object sender, RoutedEventArgs e)
@@ -168,6 +200,50 @@ namespace PetriUI
             cf.getCapturePanel().Children.Clear();
 
             cf.getCapturePanel().Children.Add(clone);
+        }
+
+        private void CaptureWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (MainWindow.killRequest)
+            {
+                newCaptureThread.Abort();
+                e.Cancel = false;
+            }
+            else
+            {
+                if (running)
+                {
+                    string msg = "Kill capture process?";
+
+                    MessageBoxResult res =
+                      MessageBox.Show(
+                          msg,
+                          "Closing Dialog",
+                          MessageBoxButton.YesNo,
+                          MessageBoxImage.Warning);
+
+                    if (res == MessageBoxResult.No)
+                    {
+                        e.Cancel = true;
+                        this.Hide();
+
+                    }
+                    else
+                    {
+                        e.Cancel = false;
+                        CapturePreviews.DecrementCaptures();
+                        newCaptureThread.Abort();
+
+                    }
+
+                }
+                else
+                {
+                    e.Cancel = false;
+      
+                }
+            }
+           
         }
     }
 }

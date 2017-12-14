@@ -72,8 +72,11 @@ namespace PetriUI
 
                 App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                     new Action(() => t.getCaptureWindow().Trigger_Capture()));
-  
             }
+
+            if(!stopRequested)App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                   new Action(() => t.getCaptureWindow().CaptureFinished()));
+            
         }
 
         public OutlineParameters ConfirmCapture()
