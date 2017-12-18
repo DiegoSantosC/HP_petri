@@ -68,15 +68,7 @@ namespace PetriUI
 
             for (int j = 0; j < indexArray.Length; j++)
             {
-                Console.Write(indexArray[j]);
-            }
-
-            Console.Write("\n");
-
-            for (int j = 0; j < indexArray.Length; j++)
-            {
                 i = 0;
-                Console.WriteLine("Image " + i + " index " + indexArray[j]);
 
                 foreach (IPcPicture image in picture.Children)
                 {

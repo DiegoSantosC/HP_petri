@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
 using System.ComponentModel;
+using System.IO;
 
 namespace PetriUI
 {
@@ -46,12 +47,16 @@ namespace PetriUI
                     e.Cancel = false;
                     killRequest = true;
                     CapturePreviews.killAllCaptures();
-                    
+
+                    Directory.Delete(ToolBox.defaultFilePath);
                 }
                 else
                 {
                     e.Cancel = true;
                 }
+            }else
+            {
+                Directory.Delete(ToolBox.defaultFilePath, true);
             }
         }
     }

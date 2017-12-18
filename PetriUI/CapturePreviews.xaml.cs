@@ -151,20 +151,18 @@ namespace PetriUI
 
         }
 
-        public void AddCaptures(List<CaptureWindow> cwList, List<int> ind)
+        public void AddCaptures(List<int[]> parameters, List<int> ind)
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
             samples = mc.Samples(ind);
 
-            for (int i = 0; i < cwList.Count; i++)
+            for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(cwList.ElementAt(i));
+                capturesList.Add(new CaptureWindow(samples.ElementAt(samples.Count - 1 - i), parameters.ElementAt(i)));
                 capturesList.ElementAt(i).Uid = (capturesList.Count -1).ToString();
                 samplesList.Add(samples.ElementAt(samples.Count-1-i));
                 samplesList.ElementAt(i).Uid = (samplesList.Count - 1).ToString();
-
-
 
                 numberCapturesRunning++;
             }

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -29,7 +31,7 @@ namespace PetriUI
         private bool running;
         private Thread newCaptureThread;
 
-        public CaptureWindow(int[] parameters)
+        public CaptureWindow(Image img, int[] parameters)
         {
             InitializeComponent();
 
@@ -46,6 +48,46 @@ namespace PetriUI
             newCaptureThread.SetApartmentState(ApartmentState.STA);
             newCaptureThread.Start(t);
             running = true;
+
+            FirstCapture(img);
+        }
+
+        private void FirstCapture(Image img)
+        {
+            Image clone1 = new Image();
+            Image clone2 = new Image();
+
+            clone1.Source = img.Source;
+            clone2.Source = img.Source;
+
+            double ratio = clone1.Source.Width / clone1.Source.Height;
+
+            cfs.Add(new captureFramework(clone1, 250, ratio));
+
+            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getBorder());
+            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getCapturePanel());
+
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseEnter += new MouseEventHandler(CaptureFocused);
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseLeave += new MouseEventHandler(CaptureUnfocused);
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseDown += new MouseButtonEventHandler(captureClicked);
+
+
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
+            cfs.ElementAt(cfs.Count - 1).getBorder().Background = System.Windows.Media.Brushes.LightBlue;
+
+            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0, 0, 0, 0));
+            
+            cf = new captureFramework(clone2, 400, ratio);
+
+            LastImageCanvas.Children.Clear();
+            LastImageCanvas.Children.Add(cf.getBorder());
+            LastImageCanvas.Children.Add(cf.getCapturePanel());
+
+            ProjectButton.Visibility = Visibility.Visible;
+            infoLabel.Visibility = Visibility.Visible;
+
+            timeLabel.Content = "Capture taken at: " + cf.getTime();
+            timeLabel.Visibility = Visibility.Visible;
         }
 
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
@@ -54,6 +96,34 @@ namespace PetriUI
             running = false;
 
         }
+
+        private void Save_Results(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Title = "Choose Saving Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            List<string> data = new List<string>();
+
+            for (int i = 0; i < cfs.Count; i++){
+
+                data.Add(cfs.ElementAt(i).getTime());
+            }
+
+            if(result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+
+                ToolBox.SaveResults(t.getIndex(), fileLocation, data);
+            }
+        }
+
         public void KillCaptures()
         {
             MainCapture.stopRequested = true;
@@ -101,18 +171,19 @@ namespace PetriUI
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
             cfs.ElementAt(cfs.Count - 1).getBorder().Background = System.Windows.Media.Brushes.LightBlue;
 
-            if (cfs.Count > 1)
-            { 
+            if (cfs.Count < 8)
+            {
+
                 Thickness lastPosition = cfs.ElementAt(cfs.Count - 2).getBorder().Margin;
                 Thickness newPosition = new Thickness(lastPosition.Left + 40, lastPosition.Top + 40, lastPosition.Right, lastPosition.Bottom);
 
                 cfs.ElementAt(cfs.Count - 1).setPosition(newPosition);
 
-            }
-            else
+            }else
             {
-                cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0,0,0,0));
+                RelocateImages();
             }
+
 
             cf = new captureFramework(img2, 400, ratio);
 
@@ -127,10 +198,26 @@ namespace PetriUI
             timeLabel.Visibility = Visibility.Visible;
         }
 
+        private void RelocateImages()
+        {
+            double newDeplacement;
+
+            newDeplacement = 7 * 40 / cfs.Count;
+
+            for (int i=0; i<cfs.Count; i++)
+            {
+                Thickness newPosition = new Thickness(i*newDeplacement, i * newDeplacement, 0, 0);
+
+                cfs.ElementAt(i).setPosition(newPosition);
+            }
+        }
+
         internal void CaptureFinished()
         {
             CapturePreviews.DecrementCaptures();
-            finishedCapture.Visibility = Visibility.Visible;
+            finishedCapture.Background = Brushes.Green;
+            RunningLabel.Content = "Capture Process Finished";
+            SaveButton.Visibility = Visibility.Visible;
             running = false;
         }
 
@@ -143,17 +230,13 @@ namespace PetriUI
 
             int index = Int32.Parse(sp.Uid);
 
-            cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height * 1.1;
-            cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width * 1.1;
+            captureFramework focused = cfs.ElementAt(index);
 
+            focused.getBorder().Height = cfs.ElementAt(index).getBorder().Height * 1.1;
+            focused.getBorder().Width = cfs.ElementAt(index).getBorder().Width * 1.1;
 
-            foreach (object child in sp.Children)
-            {
-                Image childImg = (Image)child;
-
-                childImg.Opacity = 0.8;
-            }
-
+            StackPanel.SetZIndex(sp, 100);
+            
         }
 
         private void CaptureUnfocused(object sender, MouseEventArgs e)
@@ -168,12 +251,7 @@ namespace PetriUI
             cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height / 1.1;
             cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width / 1.1;
 
-            foreach (object child in sp.Children)
-            {
-                Image childImg = (Image)child;
-
-                childImg.Opacity = 1;
-            }
+            StackPanel.SetZIndex(sp, 0);
         }
 
         private void Project_IntoMat(object sender, RoutedEventArgs e)

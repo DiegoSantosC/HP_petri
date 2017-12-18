@@ -33,6 +33,9 @@
         <!-- Cancel Capture button -->
         <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
 
+        <!-- Save Capture button -->
+        <Button Name="SaveButton" Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" Visibility="Hidden" Margin="0,0,50,20" Width="169" Height="40" Click="Save_Results"> Save </Button>
+
         <!-- Image drawing Canvas -->
         <Canvas Name="ImagesCanvas" Margin ="10" Grid.Column="1" Grid.Row="2"/>
 
@@ -40,8 +43,8 @@
         <Canvas Name="LastImageCanvas" Margin ="50" Grid.Column="0" Grid.Row="2"/>
         
         <!-- Capture Finished -->
-        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden" Name="finishedCapture" Background="Green"> 
-            <Label FontSize="15" Foreground="White">Capture Process Finished</Label>
+        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Top" Name="finishedCapture" Background="#990E0E"> 
+            <Label Name="RunningLabel" FontSize="15" Foreground="White">Capture Running</Label>
         </Border>  
 
         <!-- Project into mat screen button -->

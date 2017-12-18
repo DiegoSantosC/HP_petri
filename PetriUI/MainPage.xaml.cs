@@ -214,16 +214,14 @@ namespace PetriUI
             navigationSp.Visibility = Visibility.Visible;
             navLabel.Visibility = Visibility.Visible;
 
-            List<CaptureWindow> capturesList = new List<CaptureWindow>();
             List<int> indexes = new List<int>();
 
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(parameters.ElementAt(i)));
                 indexes.Add(parameters.ElementAt(i)[2]);
             }
 
-            cp.AddCaptures(capturesList, indexes);
+            cp.AddCaptures(parameters, indexes);
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
