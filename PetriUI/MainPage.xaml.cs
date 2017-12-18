@@ -28,12 +28,12 @@ namespace PetriUI
 
     public partial class MainPage : Page
     {
-
         public static List<int[]> parameters;
         private static int counter;
 
         private CapturePreviews cp;
-       
+
+        public static bool capturesRunning;
         public MainPage()
         {
             InitializeComponent();
@@ -49,6 +49,8 @@ namespace PetriUI
             counter = 1;
 
             cp = new CapturePreviews(this);
+
+            capturesRunning = false;
 
         }
         
@@ -193,11 +195,10 @@ namespace PetriUI
 
         private void CaptureConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
-
             System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
             BitmapImage src = new BitmapImage();
             src.BeginInit();
-            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "Resources\FlechaDcha.png", UriKind.Absolute);
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\FlechaDcha.png", UriKind.Absolute);
             src.CacheOption = BitmapCacheOption.OnLoad;
             src.EndInit();
             navImg.Source = src;
@@ -227,6 +228,8 @@ namespace PetriUI
 
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
+
+            ShowButton.IsEnabled = false;
         }
 
         private void CaptureCancel_Button_Click(object sender, RoutedEventArgs e)

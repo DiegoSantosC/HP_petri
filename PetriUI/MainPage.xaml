@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PetriUI"
         mc:Ignorable="d"
         Title="Home" 
-        >
+    >
     <Grid Margin="10,0,10,10">
 
         <Grid.ColumnDefinitions>

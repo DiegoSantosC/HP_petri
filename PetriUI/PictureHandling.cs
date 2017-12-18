@@ -66,9 +66,19 @@ namespace PetriUI
 
             int i = 0;
 
-            foreach (IPcPicture image in picture.Children)
+            for (int j = 0; j < indexArray.Length; j++)
             {
-                for (int j = 0; j < indexArray.Length; j++)
+                Console.Write(indexArray[j]);
+            }
+
+            Console.Write("\n");
+
+            for (int j = 0; j < indexArray.Length; j++)
+            {
+                i = 0;
+                Console.WriteLine("Image " + i + " index " + indexArray[j]);
+
+                foreach (IPcPicture image in picture.Children)
                 {
                     if (i == indexArray[j])
                     {
@@ -90,12 +100,16 @@ namespace PetriUI
                         im.Stretch = Stretch.Uniform;
                         im.Stretch = Stretch.Uniform;
 
-                        imgs.Add(im);
+                        imgs.Insert(0, im);
 
                     }
-                }
-                i++;
+
+                    i++;
+                }                      
             }
+
+            
+            
 
             return imgs;
         }
@@ -132,6 +146,7 @@ namespace PetriUI
             _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
 
             ToolBox.EnsureDirectoryExists(_saveDirectory);
+            ToolBox.EnsureDirectoryExists(ToolBox.defaultFilePath);
 
             PcImage image = picture.Image;
 

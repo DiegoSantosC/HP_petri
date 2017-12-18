@@ -21,9 +21,9 @@ namespace PetriUI
     public partial class CapturePreviews : Page
     {
         private MainPage mainPage;
-        private List<CaptureWindow> capturesList;
-        private List<Image> samplesList;
-
+        private static List<CaptureWindow> capturesList;
+        private static List<Image> samplesList;
+        private static int numberCapturesRunning;
         public CapturePreviews(MainPage mp)
         {
             mainPage = mp;
@@ -33,12 +33,14 @@ namespace PetriUI
             this.Width = System.Windows.SystemParameters.PrimaryScreenWidth;
             this.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
 
+            numberCapturesRunning = 0;
+
             // Navigate to previous page
 
             System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
             BitmapImage src = new BitmapImage();
             src.BeginInit();
-            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "Resources\flechaIz.png", UriKind.Absolute);
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\flechaIz.png", UriKind.Absolute);
             src.CacheOption = BitmapCacheOption.OnLoad;
             src.EndInit();
             navImg.Source = src;
@@ -56,7 +58,7 @@ namespace PetriUI
             System.Windows.Controls.Image rightImg = new System.Windows.Controls.Image();
             BitmapImage srcRight = new BitmapImage();
             srcRight.BeginInit();
-            srcRight.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "Resources\Blue_Right.png", UriKind.Absolute);
+            srcRight.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Right.png", UriKind.Absolute);
             srcRight.CacheOption = BitmapCacheOption.OnLoad;
             srcRight.EndInit();
             rightImg.Source = srcRight;
@@ -74,7 +76,7 @@ namespace PetriUI
             System.Windows.Controls.Image LeftImg = new System.Windows.Controls.Image();
             BitmapImage srcLeft = new BitmapImage();
             srcLeft.BeginInit();
-            srcLeft.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "Resources\Blue_Left.png", UriKind.Absolute);
+            srcLeft.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Left.png", UriKind.Absolute);
             srcLeft.CacheOption = BitmapCacheOption.OnLoad;
             srcLeft.EndInit();
             LeftImg.Source = srcLeft;
@@ -115,6 +117,14 @@ namespace PetriUI
             }
 
         }
+        public static void DecrementCaptures()
+        {
+            numberCapturesRunning--;
+            if (numberCapturesRunning == 0)
+            {
+                MainPage.capturesRunning = false;
+            }
+        }
 
         private void scrollLeft(object sender, MouseButtonEventArgs e)
         {
@@ -129,7 +139,7 @@ namespace PetriUI
                 sampleSP.Children.Clear();
                 sampleSP.Children.Add(samplesList.ElementAt(total-1));
 
-                infoLabel.Content = "1/" + capturesList.Count.ToString();
+                infoLabel.Content = total + "/" + capturesList.Count.ToString();
             }
             else
             {
@@ -153,12 +163,18 @@ namespace PetriUI
                 capturesList.ElementAt(i).Uid = (capturesList.Count -1).ToString();
                 samplesList.Add(samples.ElementAt(samples.Count-1-i));
                 samplesList.ElementAt(i).Uid = (samplesList.Count - 1).ToString();
+
+
+
+                numberCapturesRunning++;
             }
 
             sampleSP.Children.Clear();
             sampleSP.Children.Add(samplesList.ElementAt(0));
 
             infoLabel.Content = "1/" + capturesList.Count.ToString();
+
+            MainPage.capturesRunning = true;
            
         }
 
@@ -183,7 +199,12 @@ namespace PetriUI
             {
                 Image childImg = (Image)child;
                 index = Int32.Parse(childImg.Uid);
-                capturesList.ElementAt(index).Show();
+
+                try
+                {
+                    capturesList.ElementAt(index).Show();
+                }
+                catch (InvalidOperationException ex) { }               
             }
 
             
@@ -206,6 +227,15 @@ namespace PetriUI
         {
             this.NavigationService.Navigate(mainPage);
 
+        }
+
+        public static void killAllCaptures()
+        {
+            for(int i=0; i<capturesList.Count; i++)
+            {
+                capturesList.ElementAt(i).KillCaptures();
+                capturesList.ElementAt(i).Close();
+            }
         }
     }
 }

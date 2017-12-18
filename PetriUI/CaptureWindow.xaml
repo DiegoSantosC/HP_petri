@@ -5,7 +5,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:PetriUI"
       mc:Ignorable="d" 
-      Title="CaptureWindow">
+      Title="CaptureWindow"
+      Closing="CaptureWindow_Closing">
 
     <Grid>
 
@@ -29,7 +30,7 @@
         <!-- Title label -->
         <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture details </Label>
 
-             <!-- Cancel Capture button -->
+        <!-- Cancel Capture button -->
         <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
 
         <!-- Image drawing Canvas -->
@@ -37,6 +38,11 @@
 
         <!-- Last drawing Canvas -->
         <Canvas Name="LastImageCanvas" Margin ="50" Grid.Column="0" Grid.Row="2"/>
+        
+        <!-- Capture Finished -->
+        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden" Name="finishedCapture" Background="Green"> 
+            <Label FontSize="15" Foreground="White">Capture Process Finished</Label>
+        </Border>  
 
         <!-- Project into mat screen button -->
         <Button Grid.Column="0" Name="ProjectButton" Visibility ="Hidden" Grid.Row="3" Style="{StaticResource button2Style}" 
