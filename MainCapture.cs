@@ -1,15 +1,13 @@
-﻿/* The MIT License (MIT)
-*
-*  © Copyright 2015 HP Inc.
+﻿/* © Copyright 2018 HP Inc.
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
 *  in the Software without restriction, including without limitation the rights
-*  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-*  copies of the Software, and to permit persons to whom the Software is
-*  furnished to do so, subject to the following conditions:
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
 *
-*  The above copyright notice and this permission notice shall be included in
+* The above copyright notice and this permission notice shall be included in
 *  all copies or substantial portions of the Software.
 *
 *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -33,23 +31,15 @@ using System.Collections.Generic;
 
 namespace PetriUI
 {
-    //                    Picture Extraction Sample App Overview
-    // This sample app is an educational aid in showcasing how to extract pictures from
-    // Sprout's captured moments, and various ways a developer may want to use or save
-    // that information, via helper methods and built-in SDK binding support. This sample
-    // app assumes you understand the basics of IPcLinks and IPcMoments. If you need
-    // refreshing on those, refer to the Capture Moment sample app, the Sprout Developer
-    // Guide, or the C# Binding Documentation.
-    //
-    // This sample app has been developed in .NET 2.0 specifically to increase support
-    // of other frameworks and software development kits. You may change the project's
-    // properties to a later version of .NET to gain access to more advanced library
-    // support and functionality.
-
+    /// <summary>
+    /// Thread defined to either trigger a capture immediately or to
+    /// trigger them over time given a task parameters
+    /// </summary>
     class MainCapture
     {
         public static bool stopRequested;
 
+        // Capture over time
         public void StartCapture(object param)
         {
             Task t = new Task();
@@ -79,14 +69,15 @@ namespace PetriUI
             
         }
 
+        // Outline capture 
         public OutlineParameters ConfirmCapture()
         {
-           
             OutlineParameters op = MomentCapture.ConfirmCapture();
 
             return op;         
         }    
 
+        // Image captures samples 
         public List<Image> Samples(List<int> indexes)
         {
             List<Image> samples = MomentCapture.getSamples(indexes);

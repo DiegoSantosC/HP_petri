@@ -24,30 +24,36 @@
 
         </Grid.RowDefinitions>
 
-        <!-- Border -->
+        <!-- HP Aesthetics Border -->
         <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#00BFFF"/>
 
         <!-- Title label -->
         <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture details </Label>
 
+        
         <!-- Cancel Capture button -->
         <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
 
-        <!-- Image drawing Canvas -->
-        <Canvas Name="ImagesCanvas" Margin ="10" Grid.Column="1" Grid.Row="2"/>
-
-        <!-- Last drawing Canvas -->
-        <Canvas Name="LastImageCanvas" Margin ="50" Grid.Column="0" Grid.Row="2"/>
-        
-        <!-- Capture Finished -->
-        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden" Name="finishedCapture" Background="Green"> 
-            <Label FontSize="15" Foreground="White">Capture Process Finished</Label>
-        </Border>  
+        <!-- Save Capture button -->
+        <Button Name="SaveButton" Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" Visibility="Hidden" Margin="0,0,50,20" Width="169" Height="40" Click="Save_Results"> Save </Button>
 
         <!-- Project into mat screen button -->
         <Button Grid.Column="0" Name="ProjectButton" Visibility ="Hidden" Grid.Row="3" Style="{StaticResource button2Style}" 
                 HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="30,0,0,40" Width="220" Height="40" Click="Project_IntoMat">Project into Mat Screen</Button>
         
+        
+        <!-- Captures drawing Canvas -->
+        <Canvas Name="ImagesCanvas" Margin ="10" Grid.Column="1" Grid.Row="2"/>
+
+        <!-- Last Capture drawing Canvas -->
+        <Canvas Name="LastImageCanvas" Margin ="50" Grid.Column="0" Grid.Row="2"/>
+        
+        
+        <!-- Capture Finished Label -->
+        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Top" Name="finishedCapture" Background="#990E0E"> 
+            <Label Name="RunningLabel" FontSize="15" Foreground="White">Capture Running</Label>
+        </Border>  
+     
         <!-- Information label -->
         <Label Name="infoLabel" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden">Click capture to focus (last capture focused by default)</Label>
 

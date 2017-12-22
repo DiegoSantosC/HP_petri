@@ -19,51 +19,53 @@
 *  THE SOFTWARE.
 */
 
-// .NET framework namespace
+// .NET framework namespaces
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// Sprout SDK namespace
-using System.Collections.Generic;
-using System.Windows.Controls;
-
 namespace PetriUI
 {
     /// <summary>
-    /// Defines a user's indexed Border
+    /// Definition of the File creation class
     /// </summary>
-    class SelectionBorder: Border
+    class LogFile
     {
+        private List<string> data;
         private int index;
-        private Border selectBorder;
+        private string targetLocation;
 
-        public SelectionBorder(int indx, Border SB)
+        // File creation
+        public LogFile(string targetLocation, int index, List<string> data)
         {
-            index = indx;
-            selectBorder = SB;
-
+            this.targetLocation = targetLocation;
+            this.index = index;
+            this.data = data;
         }
 
-        // Getters and setters
-        public int getIndex()
+        // File content building
+        public void BuildAndSave()
         {
-            return this.index;
-        }
+            string[] header =
+            {
+                "Log File for object " + index,
+                " ",
+                data.Count + " captures have been taken:",
+  
+            };
 
-        public Border getBorder()
-        {
-            return this.selectBorder;
-        }
+            File.WriteAllLines(targetLocation + @"\README.txt", header); 
 
-        public void setIndex(int i)
-        {
-            this.index = i;
-        }
-        public void setBorder(Border b)
-        {
-            this.selectBorder = b;
+            string captureTime = "";
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                captureTime = "\t Capture " + (i + 1) + " taken at " + data.ElementAt(i);
+                File.AppendAllText(targetLocation + @"\README.txt", captureTime + Environment.NewLine);
+            }       
         }
     }
 }

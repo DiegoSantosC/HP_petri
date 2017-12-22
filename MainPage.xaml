@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PetriUI"
         mc:Ignorable="d"
-        Title="Home" 
-    >
+        Title="Home">
+    
     <Grid Margin="10,0,10,10">
 
         <Grid.ColumnDefinitions>
@@ -52,6 +52,8 @@
             </Canvas>
         </Border>
 
+        <!-- Settings input structure -->
+        
         <Border Name ="ParametersBorder" Width ="800" Height="500" Margin="0,100,0,0" HorizontalAlignment="Center" 
                 Grid.Column="1" Grid.Row="3" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" Visibility="Hidden">
 
@@ -70,14 +72,13 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition/>
           
-
                 </Grid.RowDefinitions>
 
                 <Label Name="ParametersTitleLabel" Grid.Column="1" Grid.Row="0" HorizontalAlignment ="Center" Style="{StaticResource label1Style}"> Object 1 capture parameters</Label>
                 <Label Grid.Column="0" Grid.Row="2"  Style="{StaticResource label1Style}">Insert time interval (min)</Label>
                 <Label Grid.Column="0" Grid.Row="3" Style="{StaticResource label1Style}">Insert number of captures </Label>
 
-                <!-- TestBoxes for parameter insertion -->
+                <!-- TextBoxes for parameter insertion -->
 
                 <TextBox Grid.Column="1" Grid.Row="2" Margin="0,0,30,0" Name="hoursTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
                 <Label Grid.Column="1" Grid.Row="2" Style="{StaticResource label1Style}">h</Label>
@@ -93,7 +94,7 @@
         <!-- Confirm capture button -->
         <Button Name="CaptureConfirmButton" Grid.Column="2" Grid.Row="4" VerticalAlignment="Top" Visibility="Hidden" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="CaptureConfirm_Button_Click">Start Captures</Button>
 
-        <!-- Confirm capture button -->
+        <!-- Cancel capture button -->
         <Button Name="CaptureCancelButton" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Foreground="White" HorizontalAlignment="Right" FontSize="20" Height="30" Background="#990E0E" Visibility="Hidden" Width="150" Click="CaptureCancel_Button_Click">Cancel Captures</Button>
     </Grid>
 </Page>

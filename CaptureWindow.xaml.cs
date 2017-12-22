@@ -1,11 +1,37 @@
-﻿using System;
+﻿/* © Copyright 2018 HP Inc.
+*
+*  Permission is hereby granted, free of charge, to any person obtaining a copy
+*  of this software and associated documentation files (the "Software"), to deal
+*  in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+*  all copies or substantial portions of the Software.
+*
+*  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+*  THE SOFTWARE.
+*/
+
+// .NET framework namespaces
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+
+// Sprout SDK namespaces
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,7 +46,14 @@ namespace PetriUI
 {
     /// <summary>
     /// Interaction logic for CaptureWindow.xaml
+    /// 
+    /// Functionality : Showing the details for a particular capture,
+    /// as well as viewing the capturing process over time
+    /// 
+    /// Launched by: Show details in CapturePreviews
+    /// 
     /// </summary>
+    
     public partial class CaptureWindow : Window
     {
         private Task t;
@@ -28,25 +61,78 @@ namespace PetriUI
         private List<captureFramework> cfs;
         private bool running;
         private Thread newCaptureThread;
+        private CapturePreviews cp;
 
-        public CaptureWindow(int[] parameters)
+        // This window is responsble for handling the captures of the object that represents, and thus 
+        // manages the MainCapture thread and hosts capture taking functions 
+        public CaptureWindow(CapturePreviews capt, Image img, int[] parameters)
         {
             InitializeComponent();
 
             this.Width = 1200;
             this.Height = 900;
 
+            cp = capt;
+
             cfs = new List<captureFramework>(); 
 
+            // A task holds details for a capture process (See <Task> constructior definition)
             List<Uri> u = new List<Uri>();
             t = new Task(this, parameters[0], parameters[1], parameters[2], u);
 
+            // Thread initialization 
             MainCapture newCapture = new MainCapture();
             newCaptureThread = new Thread(newCapture.StartCapture);
             newCaptureThread.SetApartmentState(ApartmentState.STA);
             newCaptureThread.Start(t);
             running = true;
+
+            FirstCapture(img);
         }
+
+        // This Window will be initialized with an image taken from CapturePreviews 
+        // featuring the state of the object to capture prior to the capture process
+        private void FirstCapture(Image img)
+        {
+            Image clone1 = new Image();
+            Image clone2 = new Image();
+
+            clone1.Source = img.Source;
+            clone2.Source = img.Source;
+
+            double ratio = clone1.Source.Width / clone1.Source.Height;
+
+            // Adding image to group
+            cfs.Add(new captureFramework(clone1, 250, ratio));
+
+            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getBorder());
+            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getCapturePanel());
+
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseEnter += new MouseEventHandler(CaptureFocused);
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseLeave += new MouseEventHandler(CaptureUnfocused);
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseDown += new MouseButtonEventHandler(captureClicked);
+
+
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
+            cfs.ElementAt(cfs.Count - 1).getBorder().Background = System.Windows.Media.Brushes.LightBlue;
+
+            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0, 0, 0, 0));
+            
+            // Setting to last image
+            cf = new captureFramework(clone2, 400, ratio);
+
+            LastImageCanvas.Children.Clear();
+            LastImageCanvas.Children.Add(cf.getBorder());
+            LastImageCanvas.Children.Add(cf.getCapturePanel());
+
+            ProjectButton.Visibility = Visibility.Visible;
+            infoLabel.Visibility = Visibility.Visible;
+
+            timeLabel.Content = "Capture taken at: " + cf.getTime();
+            timeLabel.Visibility = Visibility.Visible;
+        }
+
+        // Buttons functionalities
 
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -54,15 +140,53 @@ namespace PetriUI
             running = false;
 
         }
+
+        private void Save_Results(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Title = "Choose Saving Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            List<string> data = new List<string>();
+
+            for (int i = 0; i < cfs.Count; i++){
+
+                data.Add(cfs.ElementAt(i).getTime());
+            }
+
+            if(result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+
+                ToolBox.SaveResults(t.getIndex(), fileLocation, data);
+            }
+        }
+
         public void KillCaptures()
         {
             MainCapture.stopRequested = true;
         }
 
+        private void Project_IntoMat(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        // Function called from MainCapture each time counter is trigged
         public void Trigger_Capture()
         {
                MomentCapture.Capture(t);
         }
+
+
+        // Management of a new taken image
 
         public void DrawImage()
         {
@@ -71,6 +195,8 @@ namespace PetriUI
 
             BitmapImage src1 = new BitmapImage();
             BitmapImage src2 = new BitmapImage();
+
+            // Img acquisition 
 
             src1.BeginInit();
             src1.UriSource = t.getCaptures().ElementAt(t.getCaptures().Count -1);
@@ -88,6 +214,8 @@ namespace PetriUI
 
             double ratio = src1.Width / src1.Height;
 
+            // Adding image to group
+
             cfs.Add(new captureFramework(img1, 250, ratio));
 
             ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count -1).getBorder());
@@ -101,18 +229,22 @@ namespace PetriUI
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
             cfs.ElementAt(cfs.Count - 1).getBorder().Background = System.Windows.Media.Brushes.LightBlue;
 
-            if (cfs.Count > 1)
-            { 
+            // Positioning management
+
+            if (cfs.Count < 8)
+            {
+
                 Thickness lastPosition = cfs.ElementAt(cfs.Count - 2).getBorder().Margin;
                 Thickness newPosition = new Thickness(lastPosition.Left + 40, lastPosition.Top + 40, lastPosition.Right, lastPosition.Bottom);
 
                 cfs.ElementAt(cfs.Count - 1).setPosition(newPosition);
 
-            }
-            else
+            }else
             {
-                cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0,0,0,0));
+                RelocateImages();
             }
+
+            // Adding image to last
 
             cf = new captureFramework(img2, 400, ratio);
 
@@ -127,12 +259,30 @@ namespace PetriUI
             timeLabel.Visibility = Visibility.Visible;
         }
 
+        private void RelocateImages()
+        {
+            double newDeplacement;
+
+            newDeplacement = 7 * 40 / cfs.Count;
+
+            for (int i=0; i<cfs.Count; i++)
+            {
+                Thickness newPosition = new Thickness(i*newDeplacement, i * newDeplacement, 0, 0);
+
+                cfs.ElementAt(i).setPosition(newPosition);
+            }
+        }
+
         internal void CaptureFinished()
         {
             CapturePreviews.DecrementCaptures();
-            finishedCapture.Visibility = Visibility.Visible;
+            finishedCapture.Background = Brushes.Green;
+            RunningLabel.Content = "Capture Process Finished";
+            SaveButton.Visibility = Visibility.Visible;
             running = false;
         }
+
+        // Capture focusing functionalities
 
         private void CaptureFocused(object sender, MouseEventArgs e)
         {
@@ -143,17 +293,13 @@ namespace PetriUI
 
             int index = Int32.Parse(sp.Uid);
 
-            cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height * 1.1;
-            cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width * 1.1;
+            captureFramework focused = cfs.ElementAt(index);
 
+            focused.getBorder().Height = cfs.ElementAt(index).getBorder().Height * 1.1;
+            focused.getBorder().Width = cfs.ElementAt(index).getBorder().Width * 1.1;
 
-            foreach (object child in sp.Children)
-            {
-                Image childImg = (Image)child;
-
-                childImg.Opacity = 0.8;
-            }
-
+            StackPanel.SetZIndex(sp, 100);
+            
         }
 
         private void CaptureUnfocused(object sender, MouseEventArgs e)
@@ -168,17 +314,7 @@ namespace PetriUI
             cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height / 1.1;
             cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width / 1.1;
 
-            foreach (object child in sp.Children)
-            {
-                Image childImg = (Image)child;
-
-                childImg.Opacity = 1;
-            }
-        }
-
-        private void Project_IntoMat(object sender, RoutedEventArgs e)
-        {
-
+            StackPanel.SetZIndex(sp, 0);
         }
 
         private void captureClicked(object sender, MouseEventArgs e)
@@ -201,6 +337,8 @@ namespace PetriUI
 
             cf.getCapturePanel().Children.Add(clone);
         }
+
+        // Closing handling
 
         private void CaptureWindow_Closing(object sender, CancelEventArgs e)
         {
@@ -233,12 +371,13 @@ namespace PetriUI
                         e.Cancel = false;
                         CapturePreviews.DecrementCaptures();
                         newCaptureThread.Abort();
-
+                        cp.EraseFinishedCapture(Int32.Parse(this.Uid));
                     }
 
                 }
                 else
                 {
+                    cp.EraseFinishedCapture(Int32.Parse(this.Uid));
                     e.Cancel = false;
       
                 }

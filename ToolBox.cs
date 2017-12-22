@@ -23,10 +23,12 @@
 
 // .NET Framework Namespaces
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows.Controls;
 
 // Sprout SDK Namespaces
 using hp.pc;
@@ -36,14 +38,8 @@ namespace PetriUI
     // The ToolBox class is a toolbox of helper methods to speed up and simplify the process of executing basic tasks.
     class ToolBox
     {
-        // This is a simple static member to allow you to easily save a files to a directory on your Desktop by getting
-        // its path. You can easily change the string to your desired path, for example you could set defaultFilePath to
-        // something like, @"C:\Temp\SproutStuff"
-        public static string defaultFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"Output_Petri");
+        public static string defaultFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"Provsional_Output");
         
-
-        // This little method just sends you back a timestamp to use for file/directory names, logging, or console messages.
-        // The default format is HourHour.MinuteMinute.SecondSecond.MillisecondMillisecond
         public static string TimeStamp()
         {
             return DateTime.Now.ToString("HH.mm.ss.ff") + " - ";
@@ -90,6 +86,21 @@ namespace PetriUI
             Process thisProcess = Process.GetCurrentProcess();
             thisProcess.WaitForExit(15000);
             thisProcess.Kill();
+        }
+
+        internal static void SaveResults(int index, string targetLocation, List<string> data)
+        {
+            string directoryToSave = Path.Combine(defaultFilePath, @"Pictures\" + "Object_" + index);
+
+            string subFolder = Path.Combine(targetLocation, @"Captures_Object_" + index);
+            EnsureDirectoryExists(targetLocation);
+
+            Directory.Move(directoryToSave, subFolder);
+
+
+            LogFile file = new LogFile(targetLocation, index, data);
+
+            file.BuildAndSave();
         }
 
 

@@ -82,6 +82,7 @@
     <Compile Include="CapturePreviews.xaml.cs">
       <DependentUpon>CapturePreviews.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LogFile.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="SelectionBorder.cs" />
     <Compile Include="OutlineParameters.cs" />
