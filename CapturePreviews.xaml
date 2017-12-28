@@ -25,7 +25,8 @@
 
         <!-- HP Aesthetics Border -->
         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="#00BFFF"/>
-
+        <StackPanel Name="LogoSP" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" Height="100" Width="100"/>
+ 
         <!-- Title label -->
         <Label Grid.Column="1" Grid.Row="2" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Right" Style="{StaticResource headerStyle}">Capture Preview</Label>
 

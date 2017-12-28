@@ -88,6 +88,25 @@ namespace PetriUI
             running = true;
 
             FirstCapture(img);
+
+            Info_Init();
+
+            Logo_Init();
+
+        }
+
+        private void Logo_Init()
+        {
+            System.Windows.Controls.Image logo = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\HP_logo.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            logo.Source = src;
+            logo.Stretch = Stretch.Uniform;
+
+            LogoSP.Children.Add(logo);
         }
 
         // This Window will be initialized with an image taken from CapturePreviews 
@@ -130,6 +149,48 @@ namespace PetriUI
 
             timeLabel.Content = "Capture taken at: " + cf.getTime();
             timeLabel.Visibility = Visibility.Visible;
+        }
+
+        // Information
+
+        private void Info_Init()
+        {
+            // Icon initialization
+
+            System.Windows.Controls.Image infoImg = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\BlueQuestionMarkIcon.jpg", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            infoImg.Source = src;
+            infoImg.Stretch = Stretch.Uniform;
+
+            dataSP.Children.Add(infoImg);
+
+            dataSP.MouseEnter += new MouseEventHandler(infoShow);
+            dataSP.MouseLeave += new MouseEventHandler(infoHide);
+
+            // Label initialization
+
+            dataLabel.Content = "Capture of object " + t.getIndex() + Environment.NewLine +
+                "Captures taken each " + t.getInterval() + " minutes" + Environment.NewLine +
+                t.getNumberOfCaptures() + " captures to be taken" + Environment.NewLine +
+                t.getNumberOfCaptures() + " captures to go";
+
+
+        }
+
+        private void infoHide(object sender, MouseEventArgs e)
+        {
+            dataLabel.Visibility = Visibility.Hidden;
+            dataBorder.Visibility = Visibility.Hidden;
+        }
+
+        private void infoShow(object sender, MouseEventArgs e)
+        {
+            dataLabel.Visibility = Visibility.Visible;
+            dataBorder.Visibility = Visibility.Visible;
         }
 
         // Buttons functionalities
@@ -175,7 +236,16 @@ namespace PetriUI
 
         private void Project_IntoMat(object sender, RoutedEventArgs e)
         {
+            Image img = null;
 
+            foreach (Image childImg in cf.getCapturePanel().Children)
+            {
+                img = childImg;
+            }
+
+            ProjectedFormHandler handler = new ProjectedFormHandler();
+
+            handler.HandleProjection(img);
         }
 
 
@@ -257,6 +327,14 @@ namespace PetriUI
 
             timeLabel.Content = "Capture taken at: " + cf.getTime();
             timeLabel.Visibility = Visibility.Visible;
+
+            // Update info
+
+            dataLabel.Content = "Capture of object " + t.getIndex() + Environment.NewLine +
+               "Captures taken each " + t.getInterval() + " minutes" + Environment.NewLine +
+               t.getNumberOfCaptures() + " captures to be taken" + Environment.NewLine +
+               (t.getNumberOfCaptures() + 1 - cfs.Count) + " captures to go";
+
         }
 
         private void RelocateImages()

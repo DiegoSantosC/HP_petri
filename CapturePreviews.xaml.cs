@@ -73,6 +73,8 @@ namespace PetriUI
 
             PageNavigation_Init();
 
+            Logo_Init();
+
             ScrollLeft_Init();
 
             scrollRight_Init();
@@ -81,7 +83,21 @@ namespace PetriUI
             emptyLabel.Content = emptyLabel.Content + Environment.NewLine + "Go to Capture Settings for new Captures";
         }
 
-        
+        private void Logo_Init()
+        {
+            System.Windows.Controls.Image logo = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\HP_logo.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            logo.Source = src;
+            logo.Stretch = Stretch.Uniform;
+
+            LogoSP.Children.Add(logo);
+        }
+
+
         // Navigation to MainPage 
         private void PageNavigation_Init()
         {
@@ -279,12 +295,9 @@ namespace PetriUI
             List<Image> samples = new List<Image>();
             samples = mc.Samples(ind);
 
-            Console.WriteLine(samples.Count + " + " + parameters.Count);
-
-
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(i)));
+                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count -1- i)));
                 capturesList.ElementAt(i).Uid = (i).ToString();
                 samplesList.Add(samples.ElementAt(i));
                 samplesList.ElementAt(i).Uid = (i).ToString();
@@ -318,10 +331,19 @@ namespace PetriUI
 
         public void EraseFinishedCapture(int index)
         {
-            capturesList.RemoveAt(index);
-            samplesList.RemoveAt(index);
+            for(int j=0; j<capturesList.Count; j++)
+            {
+                if (Int32.Parse(capturesList.ElementAt(j).Uid) == index) capturesList.RemoveAt(j);
+
+            }
+            for (int j = 0; j < samplesList.Count; j++)
+            {
+                if (Int32.Parse(samplesList.ElementAt(j).Uid) == index) samplesList.RemoveAt(j);
+
+            }
 
             int i = 0;
+
             foreach (object child in sampleSP.Children)
             {
                 Image childImg = (Image)child;
@@ -330,7 +352,7 @@ namespace PetriUI
 
             if (i == index)
             {
-                if (numberCapturesRunning > 0)
+                if (capturesList.Count > 0)
                 {
                     ArtficialScroll();
                 }
@@ -358,7 +380,10 @@ namespace PetriUI
                 Image childImg = (Image)child;
                 index = Int32.Parse(childImg.Uid);
 
-                capturesList.ElementAt(index).Show();                          
+                foreach (CaptureWindow element in capturesList)
+                {
+                    if(Int32.Parse(element.Uid) == index) element.Show();
+                }                     
             }   
         }
 

@@ -23,8 +23,9 @@
 
         </Grid.RowDefinitions>
         
-        <!-- Border -->
+        <!-- HP Aesthetics Border -->
         <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#00BFFF"/>
+        <StackPanel Name="LogoSP" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0" Height="100" Width="100"/>
 
         <!-- Title label -->
         <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource headerStyle}">Capture Settings</Label>

@@ -81,8 +81,24 @@ namespace PetriUI
 
             capturesRunning = false;
 
+            Logo_Init();
+
         }
-        
+
+        private void Logo_Init()
+        {
+            System.Windows.Controls.Image logo = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\HP_logo.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            logo.Source = src;
+            logo.Stretch = Stretch.Uniform;
+
+            LogoSP.Children.Add(logo);
+        }
+
         // Object scan. This method can be called repeatedly 
         private void objectShow_Button_Click(object sender, RoutedEventArgs e)
         {

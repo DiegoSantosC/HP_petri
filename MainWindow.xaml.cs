@@ -90,7 +90,14 @@ namespace PetriUI
                 }
             }else
             {
-                Directory.Delete(ToolBox.defaultFilePath, true);
+                try
+                {
+                    Directory.Delete(ToolBox.defaultFilePath, true);
+                }catch(DirectoryNotFoundException notFound)
+                {
+
+                }
+             
             }
         }
     }
