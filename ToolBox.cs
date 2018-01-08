@@ -88,21 +88,6 @@ namespace PetriUI
             thisProcess.Kill();
         }
 
-        internal static void SaveResults(int index, string targetLocation, List<string> data)
-        {
-            string directoryToSave = Path.Combine(defaultFilePath, @"Pictures\" + "Object_" + index);
-
-            string subFolder = Path.Combine(targetLocation, @"Captures_Object_" + index);
-            EnsureDirectoryExists(targetLocation);
-
-            Directory.Move(directoryToSave, subFolder);
-
-            LogFile file = new LogFile(targetLocation, index, data);
-
-            file.BuildAndSave();
-        }
-
-
         // This method determines what the PcImage's pixel format was, and creates a corresponding bitmap using that
         // pixel format's requirements.
         // 

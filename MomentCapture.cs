@@ -77,7 +77,7 @@ namespace PetriUI
         }
 
         // Several pictures extracted by index
-        internal static List<Image> getSamples(List<int> indexes)
+        internal static List<Image> getSamples(List<string> folders, List<int> indexes)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace PetriUI
                     {
                         IPcPicture picture = link.ExtractPicture(moment);
 
-                        List<Image> img = PictureHandling.SaveSamples(picture, indexes);
+                        List<Image> img = PictureHandling.SaveSamples(picture, folders, indexes);
                         return img;
                     }
                 }

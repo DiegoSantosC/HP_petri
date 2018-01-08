@@ -62,26 +62,24 @@ namespace PetriUI
         }
 
         // Handle pictures given by and index to CapturePreviews
-        internal static List<System.Windows.Controls.Image> SaveSamples(IPcPicture picture, List<int> indexes)
+        internal static List<System.Windows.Controls.Image> SaveSamples(IPcPicture picture, List<string> folders, List<int> indexes)
         {
             List<System.Windows.Controls.Image> imgs = new List<System.Windows.Controls.Image>();
 
-            int[] indexArray = indexes.ToArray();
-
             int i = 0;
 
-            for (int j = 0; j < indexArray.Length; j++)
+            for (int j = 0; j < folders.Count; j++)
             {
                 i = 0;
 
                 foreach (IPcPicture image in picture.Children)
                 {
-                    if (i == indexArray[j])
+                    if (i == indexes[j])
                     {
-                        _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + indexArray[j]);
-                        ToolBox.EnsureDirectoryExists(_saveDirectory);
+                        string dir = Path.Combine(folders[j], @"Captures\");
+                        ToolBox.EnsureDirectoryExists(dir);
 
-                        string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                        string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
                         ToolBox.SaveProcessedImage(image.Image, fileAndPath);
 
                         Uri u = new Uri(fileAndPath, UriKind.Relative);
@@ -179,8 +177,8 @@ namespace PetriUI
         internal static void SaveIndexedImage(IPcPicture picture, Task t)
         {
 
-            _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + t.getIndex());
-            ToolBox.EnsureDirectoryExists(_saveDirectory);
+            string dir = Path.Combine(t.getFolder(), @"Captures\");
+            ToolBox.EnsureDirectoryExists(dir);
 
             int i = 0;
 
@@ -188,7 +186,7 @@ namespace PetriUI
             {
                 if (i == t.getIndex())
                 {
-                    string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                    string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
                     ToolBox.SaveProcessedImage(image.Image, fileAndPath);
 
                     List<Uri> l = new List<Uri>();

@@ -95,7 +95,7 @@
 
                 <!-- Folder election button -->
                 <Button Grid.Column="0" Height="25" Width="170" Grid.Row="5" FontSize="17" VerticalAlignment="Top" Margin="0,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Election_Button_Click">Choose save Folder</Button>
-                <Label Grid.Column="1" Name="FolderLabel" Grid.Row="5" VerticalAlignment="Top" Margin="20,20,0,0" FontSize="16" HorizontalAlignment="Left"></Label>
+                <Label Grid.Column="1" Name="FolderLabel" Grid.Row="5" VerticalAlignment="Top" Margin="20,20,0,0" FontSize="16" HorizontalAlignment="Left"> </Label>
 
                 <!-- Confirm parameters button -->
                 <Button Grid.Column="2" Grid.Row="5" VerticalAlignment="Bottom" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>

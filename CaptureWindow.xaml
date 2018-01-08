@@ -38,10 +38,7 @@
         </Border>
 
         <!-- Cancel Capture button -->
-        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="169" Height="40" Click="Cancel_Button_Click">Stop Capturing</Button>
-
-        <!-- Save Capture button -->
-        <Button Name="SaveButton" Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" Visibility="Hidden" Margin="0,0,50,20" Width="169" Height="40" Click="Save_Results"> Save </Button>
+        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="200" Height="40" Click="Cancel_Button_Click">Stop this capture</Button>
 
         <!-- Project into mat screen button -->
         <Button Grid.Column="0" Name="ProjectButton" Visibility ="Hidden" Grid.Row="3" Style="{StaticResource button2Style}" 

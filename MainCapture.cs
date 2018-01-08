@@ -85,9 +85,9 @@ namespace PetriUI
         }    
 
         // Image captures samples 
-        public List<Image> Samples(List<int> indexes)
+        public List<Image> Samples(List<string> folders, List<int> indexes)
         {
-            List<Image> samples = MomentCapture.getSamples(indexes);
+            List<Image> samples = MomentCapture.getSamples(folders, indexes);
             return samples;
         }
     }

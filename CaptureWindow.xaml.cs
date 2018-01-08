@@ -65,7 +65,7 @@ namespace PetriUI
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] parameters, string folder)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder)
         {
             InitializeComponent();
 
@@ -74,11 +74,17 @@ namespace PetriUI
 
             cp = capt;
 
-            cfs = new List<captureFramework>(); 
+            cfs = new List<captureFramework>();
 
             // A task holds details for a capture process (See <Task> constructior definition)
             List<Uri> u = new List<Uri>();
-            t = new Task(this, parameters[0], parameters[1], parameters[2], parameters[3], u, folder);
+
+            t = new Task(this, param[0], param[1], param[2], param[3], u, folder);
+
+            Directory.CreateDirectory(folder);
+            LogFile file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
+
+            file.BuildAndSave();
 
             // Thread initialization 
             MainCapture newCapture = new MainCapture();
@@ -183,8 +189,6 @@ namespace PetriUI
                 dataLabel.Content = dataLabel.Content + Environment.NewLine +
                 "Delay of " + t.getDelay() + " minutes until start"; 
             }
-
-
         }
 
         private void infoHide(object sender, MouseEventArgs e)
@@ -206,33 +210,6 @@ namespace PetriUI
             newCaptureThread.Abort();
             running = false;
 
-        }
-
-        private void Save_Results(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Title = "Choose Saving Location";
-
-            Nullable<bool> result = sfd.ShowDialog();
-
-            string fileLocation = "";
-
-            List<string> data = new List<string>();
-
-            for (int i = 0; i < cfs.Count; i++){
-
-                data.Add(cfs.ElementAt(i).getTime());
-            }
-
-            if(result == true)
-            {
-                if (sfd.FileName != "")
-                {
-                    fileLocation = sfd.FileName;
-                }
-
-                ToolBox.SaveResults(t.getIndex(), fileLocation, data);
-            }
         }
 
         public void KillCaptures()
@@ -362,7 +339,6 @@ namespace PetriUI
             CapturePreviews.DecrementCaptures();
             finishedCapture.Background = Brushes.Green;
             RunningLabel.Content = "Capture Process Finished";
-            SaveButton.Visibility = Visibility.Visible;
             running = false;
         }
 

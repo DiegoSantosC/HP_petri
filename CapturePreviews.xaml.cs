@@ -293,11 +293,11 @@ namespace PetriUI
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
-            samples = mc.Samples(ind);
+            samples = mc.Samples(folders, ind);
 
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count -1- i), folders.ElementAt(folders.Count -1 -i)));
+                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i)));
                 capturesList.ElementAt(i).Uid = (i).ToString();
                 samplesList.Add(samples.ElementAt(i));
                 samplesList.ElementAt(i).Uid = (i).ToString();

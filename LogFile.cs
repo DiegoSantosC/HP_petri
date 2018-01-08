@@ -34,16 +34,16 @@ namespace PetriUI
     /// </summary>
     class LogFile
     {
-        private List<string> data;
-        private int index;
+        private int index, nOfC, counter;
         private string targetLocation;
 
         // File creation
-        public LogFile(string targetLocation, int index, List<string> data)
+        public LogFile(string targetLocation, int ind, int number)
         {
             this.targetLocation = targetLocation;
-            this.index = index;
-            this.data = data;
+            this.index = ind;
+            nOfC = number;
+            counter = 1;
         }
 
         // File content building
@@ -53,19 +53,20 @@ namespace PetriUI
             {
                 "Log File for object " + index,
                 " ",
-                data.Count + " captures have been taken:",
-  
+                nOfC + " captures have been taken:",
+
             };
 
-            File.WriteAllLines(targetLocation + @"\README.txt", header); 
+            File.WriteAllLines(targetLocation + @"\README.txt", header);
 
-            string captureTime = "";
+        }
 
-            for (int i = 0; i < data.Count; i++)
-            {
-                captureTime = "\t Capture " + (i + 1) + " taken at " + data.ElementAt(i);
-                File.AppendAllText(targetLocation + @"\README.txt", captureTime + Environment.NewLine);
-            }       
+        public void AppendData(string data)
+        {
+            string captureTime = "\t Capture " + counter + " taken at " + data;
+            File.AppendAllText(targetLocation + @"\README.txt", captureTime + Environment.NewLine);
+
+            counter++;
         }
     }
 }
