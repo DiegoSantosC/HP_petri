@@ -50,78 +50,9 @@ namespace PetriUI
             IPcLink link = HPPC.CreateLink();
 
             Form matForm = new Form();
-            matForm.Height = 400;
-            matForm.Width = 400;
-
-            IPcWindowRegistration registration = null;
-
-            //Instantiates a FormWindowManager to Display the window through the WindowRegistration instance
-            ProjectedForm manager = new ProjectedForm(matForm);
-
-            //Requesting Sprout's HW specification
-            IPcSpecification spec = link.AccessSpecification();
-
-            IPcTouch touch = null;
-
-            //Event raised when the Form handle is created
-            matForm.HandleCreated += (sender, eventArgs) =>
-            {
-                Console.WriteLine("handle created");
-
-                // Register this window in the Sprout Platform.
-                registration = link.RegisterWindow(matForm.Handle.ToInt64());
-
-                // Loading Sprout's touch handler for this window
-                touch = link.AccessTouch(registration);
-            };
-
-            matForm.Load += (sender, eventArgs) =>
-            {
-
-                Console.WriteLine("loaded");
-
-                //Display the window using the appropriate IPcWindowManager
-                registration.Display(manager);
-
-                //Make the input layer available for the user
-                using (IPcTouchLayer layer = touch.GetTouchLayer(spec.Touch.Input))
-                {
-                    layer.Enable();
-                }
-
-                // Adding a simple UI control (button) to allow closing the application
-                System.Windows.Forms.Button btn = new System.Windows.Forms.Button();
-                matForm.Controls.Add(btn);
-                btn.Bounds = new Rectangle(2, 2, 40, 30);
-                btn.Text = "Close";
-                btn.Click += (s, e) =>
-                {
-                    matForm.Close();
-                };
-            };
-
-            //Called when the the window handle is destroyed by the application
-            matForm.HandleDestroyed += (sender, eventArgs) =>
-            {
-                // Hiding the input layer
-                using (IPcTouchLayer layer = touch.GetTouchLayer(spec.Touch.Input))
-                {
-                    layer.Disable();
-                }
-
-                //Unregister the window within the platform
-                registration.Unregister();
-            };
-
-            //When the form is disposed we dispose remaining resources allocated in this scope
-            matForm.Disposed += (sender, eventArgs) =>
-            {
-                touch.Dispose();
-                spec.Dispose();
-                registration.Dispose();
-                manager.Dispose();
-                link.Dispose();
-            };
+            matForm.StartPosition = FormStartPosition.Manual;
+            matForm.Top = 1200;
+            matForm.Left = 600;
 
             matForm.Show();
 
@@ -129,51 +60,14 @@ namespace PetriUI
 
             System.Windows.Forms.Application.Run(matForm);
 
-            PlaceContent(registration, link, matForm, touch, manager, spec);
-
         }
 
-        private void PlaceContent(IPcWindowRegistration registration, IPcLink link, Form matForm, IPcTouch touch, ProjectedForm manager, IPcSpecification spec)
-        {
-            // Register this window in the Sprout Platform.
-            registration = link.RegisterWindow(matForm.Handle.ToInt64());
-
-            // Loading Sprout's touch handler for this window
-            touch = link.AccessTouch(registration);
-
-            Console.WriteLine("Traza 3");
-            //Display the window using the appropriate IPcWindowManager
-            registration.Display(manager);
-
-            Console.WriteLine("Traza 2");
-            //Make the input layer available for the user
-
-            IPcTouchLayerOption l = spec.Touch.Input;
-
-            IPcTouchLayer layer = touch.GetTouchLayer(l);
-            
-            layer.Enable();
-            Console.WriteLine("Traza 1");
-            
-        }
-
+       
         private void LoadContent(Form matForm, System.Windows.Controls.Image img)
         {
             
-            // Adding a simple UI control (button) to allow closing the application
-            System.Windows.Forms.Button btn = new System.Windows.Forms.Button();
-            matForm.Controls.Add(btn);
-            btn.Bounds = new Rectangle(2, 2, 50, 40);
-            btn.Text = "Close";
-            btn.Click += (s, e) =>
-            {
-                matForm.Close();
-            };
-
             PictureBox pb = new PictureBox();
-            img.Width = 400;
-            img.Height = 400;
-
+         
             //Conversion form Controls.Image into Drawing.Image
 
             MemoryStream ms = new MemoryStream();
@@ -183,11 +77,17 @@ namespace PetriUI
             bmpEncoder.Save(ms);
 
             System.Drawing.Image drawingImage = System.Drawing.Image.FromStream(ms);
+
+            System.Drawing.Image resized = (System.Drawing.Image)(new Bitmap(drawingImage, new System.Drawing.Size(drawingImage.Size.Height*280/(int)System.Windows.SystemParameters.PrimaryScreenHeight, drawingImage.Size.Width*280/ (int)System.Windows.SystemParameters.PrimaryScreenHeight)));
             
-            pb.Image = drawingImage;
-            pb.Height = 400;
-            pb.Width = 400;
-            matForm.Controls.Add(pb);        
+            pb.Image = resized;
+            pb.Height = resized.Height;
+            pb.Width = resized.Width;
+         
+            matForm.Height = (int)(resized.Height * 1.2);
+            matForm.Width = (int)(resized.Width * 1.2);
+            matForm.Controls.Add(pb);
+             
         }
     }
 }

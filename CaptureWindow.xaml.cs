@@ -65,7 +65,7 @@ namespace PetriUI
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] parameters)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] parameters, string folder)
         {
             InitializeComponent();
 
@@ -78,7 +78,7 @@ namespace PetriUI
 
             // A task holds details for a capture process (See <Task> constructior definition)
             List<Uri> u = new List<Uri>();
-            t = new Task(this, parameters[0], parameters[1], parameters[2], u);
+            t = new Task(this, parameters[0], parameters[1], parameters[2], parameters[3], u, folder);
 
             // Thread initialization 
             MainCapture newCapture = new MainCapture();
@@ -177,6 +177,12 @@ namespace PetriUI
                 "Captures taken each " + t.getInterval() + " minutes" + Environment.NewLine +
                 t.getNumberOfCaptures() + " captures to be taken" + Environment.NewLine +
                 t.getNumberOfCaptures() + " captures to go";
+
+            if (t.getDelay() != 0)
+            {
+                dataLabel.Content = dataLabel.Content + Environment.NewLine +
+                "Delay of " + t.getDelay() + " minutes until start"; 
+            }
 
 
         }
@@ -358,6 +364,13 @@ namespace PetriUI
             RunningLabel.Content = "Capture Process Finished";
             SaveButton.Visibility = Visibility.Visible;
             running = false;
+        }
+
+        public void startTriggered()
+        {
+            finishedCapture.Background = Brushes.Red;
+            RunningLabel.Content = "Capture running";
+            RunningLabel.Foreground = Brushes.White;
         }
 
         // Capture focusing functionalities

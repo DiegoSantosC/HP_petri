@@ -38,17 +38,20 @@ namespace PetriUI
     class Task
     {
         private CaptureWindow captureWindow;
-        private int numberOfCaptures, interval, index;
+        private int numberOfCaptures, interval, index, delay;
         private List<Uri> captures;
+        private string folder;
 
         // Constructor
-        public Task(CaptureWindow cw, int nOfC, int inter, int ind, List<Uri> cpt)
+        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f)
         {
             captureWindow = cw;
             numberOfCaptures = nOfC;
             interval = inter;
             index = ind;
             captures = cpt;
+            delay = dl;
+            folder = f;
         }
 
         // @Override Task Constructor
@@ -58,6 +61,7 @@ namespace PetriUI
             numberOfCaptures = 0;
             interval = 0;
             index = 0;
+            delay = 0; 
         }
 
         // Getters and setters
@@ -81,6 +85,15 @@ namespace PetriUI
         {
             return this.index;
         }
+        public int getDelay()
+        {
+            return this.delay;
+        }
+        public string getFolder()
+        {
+            return this.folder;
+        }
+
         public void setCaptureWindow(CaptureWindow cp)
         {
             this.captureWindow = cp;
@@ -98,11 +111,20 @@ namespace PetriUI
         {
             this.index = ind;
         }
+
+        public void setDelay(int dl)
+        {
+            this.delay = dl;
+        }
+
         public void setCaptures(List<Uri> cpt)
         {
             this.captures = cpt;
         }
-
+        public void setFolder(string f)
+        {
+            this.folder = f;
+        }
 
     }
 }

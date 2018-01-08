@@ -97,7 +97,6 @@ namespace PetriUI
 
             Directory.Move(directoryToSave, subFolder);
 
-
             LogFile file = new LogFile(targetLocation, index, data);
 
             file.BuildAndSave();

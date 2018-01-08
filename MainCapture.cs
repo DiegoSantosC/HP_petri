@@ -52,6 +52,13 @@ namespace PetriUI
             t.setNumberOfCaptures(auxCp.getNumberOfCaptures());
             t.setInteval(auxCp.getInterval());
             t.setIndex(auxCp.getIndex());
+            t.setDelay(auxCp.getDelay());
+
+
+            Thread.Sleep(t.getDelay()*1000);
+
+            App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                     new Action(() => t.getCaptureWindow().startTriggered()));
 
             for (int i=0; i<t.getNumberOfCaptures(); i++)
             {

@@ -71,6 +71,7 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
                     <RowDefinition/>
           
                 </Grid.RowDefinitions>
@@ -86,9 +87,18 @@
                 <TextBox Grid.Column="3" Grid.Row="2" Margin="0,0,110,0" Name="minutesTextBox"   Style="{StaticResource textBoxStyle}">0</TextBox>
                 <Label Grid.Column="3" Grid.Row="2" Margin="0,0,60,0" Style="{StaticResource label1Style}">min</Label>
                 <TextBox Grid.Column="1" Grid.Row="3" Margin="0,0,30,0" Name="numberOfCapturesTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource label1Style}">Insert delay to start</Label>
+                <TextBox Grid.Column="2" Grid.Row="4" Margin="0,0,110,0" Name="delayMinTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <TextBox Grid.Column="1" Grid.Row="4" Margin="0,0,30,0" Name="delayHTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <Label Grid.Column="1" Grid.Row="4" Style="{StaticResource label1Style}">h</Label>
+                <Label Grid.Column="3" Grid.Row="4" Margin="0,0,60,0" Style="{StaticResource label1Style}">min</Label>
+
+                <!-- Folder election button -->
+                <Button Grid.Column="0" Height="25" Width="170" Grid.Row="5" FontSize="17" VerticalAlignment="Top" Margin="0,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Election_Button_Click">Choose save Folder</Button>
+                <Label Grid.Column="1" Name="FolderLabel" Grid.Row="5" VerticalAlignment="Top" Margin="20,20,0,0" FontSize="16" HorizontalAlignment="Left"></Label>
 
                 <!-- Confirm parameters button -->
-                <Button Grid.Column="2" Grid.Row="4" VerticalAlignment="Bottom" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
+                <Button Grid.Column="2" Grid.Row="5" VerticalAlignment="Bottom" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
             </Grid>
         </Border>
 

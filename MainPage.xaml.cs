@@ -38,6 +38,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.Drawing;
 using System.Windows.Navigation;
+using Microsoft.Win32;
 
 namespace PetriUI
 {
@@ -58,6 +59,7 @@ namespace PetriUI
     {
         public static List<int[]> parameters;
         private static int counter;
+        private static List<string> saveFolders;
 
         private CapturePreviews cp;
 
@@ -78,7 +80,7 @@ namespace PetriUI
             counter = 1;
 
             cp = new CapturePreviews(this);
-
+            saveFolders = new List<string>();
             capturesRunning = false;
 
             Logo_Init();
@@ -251,9 +253,10 @@ namespace PetriUI
         private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
 
-            int minutesInterval, hoursInterval, numberOfCaptures;
+            int minutesInterval, hoursInterval, numberOfCaptures, delayH, delayMin;
+            string folder;
 
-            if ((Int32.TryParse(minutesTextBox.Text, out minutesInterval)) && (Int32.TryParse(hoursTextBox.Text, out hoursInterval)) && (Int32.TryParse(numberOfCapturesTextBox.Text, out numberOfCaptures)))
+            if ((Int32.TryParse(minutesTextBox.Text, out minutesInterval)) && (Int32.TryParse(hoursTextBox.Text, out hoursInterval)) && (Int32.TryParse(numberOfCapturesTextBox.Text, out numberOfCaptures)) && Int32.TryParse(delayHTextBox.Text, out delayH) && Int32.TryParse(delayMinTextBox.Text, out delayMin))
             {
                 if (((minutesInterval == 0) && (hoursInterval == 0)) || (numberOfCaptures == 0))
                 {
@@ -261,6 +264,11 @@ namespace PetriUI
                 }
                 else
                 {
+                    if(FolderLabel.Content.ToString().Length == 0)
+                    {
+                        MessageBox.Show("Choose a valid directory to save the data");
+                        return;
+                    }
 
                     int hours, minutes;
 
@@ -277,26 +285,58 @@ namespace PetriUI
 
                     }
 
+                    int hoursDel, minutesDel;
+
+                    if (delayH == 0)
+                    {
+                        hoursDel = delayMin/ 60;
+                        minutesDel = delayMin % 60;
+                    }
+                    else
+                    {
+                        delayMin = delayMin + delayH * 60;
+                        hoursDel = delayMin/ 60;
+                        minutesDel = delayMin % 60;
+                        
+                    }
+
                     String str = hours + " hours " + minutes + " minutes";
+
+                    String str2;
+                    if (hoursDel == 0)
+                    {
+                        str2 = minutesDel + " minutes";
+                    }else
+                    {
+                        str2 = hoursDel + " hours " + minutesDel + " minutes";
+                    }
 
                     int objIndex = Int32.Parse(ParametersTitleLabel.Content.ToString().Split(' ')[1]);
 
                     CaptureDetailsLabel.Content = CaptureDetailsLabel.Content +
-                         Environment.NewLine + "Capture " + counter + ": " + str + " , " + numberOfCaptures + " captures will be made.";
+                         Environment.NewLine + "Capture " + counter + ": " + str + " , " + str2 + " until start, " + numberOfCaptures + " captures will be made.";
 
                     counter++;
+
+                    folder = (string)FolderLabel.Content;
 
                     ParametersBorder.Visibility = Visibility.Hidden;
                     CaptureConfirmButton.Visibility = Visibility.Visible;
                     minutesTextBox.Text = "0";
                     hoursTextBox.Text = "0";
                     numberOfCapturesTextBox.Text = "0";
+                    delayHTextBox.Text = "0";
+                    delayMinTextBox.Text = "0";
+                    FolderLabel.Content = "";
 
-                    int[] param = new int[3];
+                    int[] param = new int[4];
                     param[0] = numberOfCaptures;
                     param[1] = minutesInterval;
                     param[2] = objIndex;
+                    param[3] = delayMin;
                     parameters.Add(param);
+
+                    saveFolders.Add(folder);
 
                     CaptureCancelButton.Visibility = Visibility.Visible;
 
@@ -339,11 +379,12 @@ namespace PetriUI
                 indexes.Add(parameters.ElementAt(i)[2]);
             }
 
-            cp.AddCaptures(parameters, indexes);
+            cp.AddCaptures(parameters, indexes, saveFolders);
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
+            saveFolders = new List<string>();
 
             ShowButton.IsEnabled = false;
 
@@ -355,10 +396,30 @@ namespace PetriUI
         {
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
-
+            saveFolders = new List<string>();
             CaptureCancelButton.Visibility = Visibility.Hidden;
+
         }
 
-        
+        private void Folder_Election_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Title = "Choose Saving Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            if (result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+            }
+
+            FolderLabel.Content = fileLocation;
+
+        }
     }
 }
