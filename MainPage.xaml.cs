@@ -264,7 +264,9 @@ namespace PetriUI
                 }
                 else
                 {
-                    if(FolderLabel.Content.ToString().Length == 0)
+                    folder = (string)FolderLabel.Content;
+
+                    if (folder == "Not defined")
                     {
                         MessageBox.Show("Choose a valid directory to save the data");
                         return;

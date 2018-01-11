@@ -38,7 +38,7 @@
         </Border>
 
         <!-- Cancel Capture button -->
-        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,40" Width="200" Height="40" Click="Cancel_Button_Click">Stop this capture</Button>
+        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,20" Width="200" Height="40" Click="Cancel_Button_Click">Stop this capture</Button>
 
         <!-- Project into mat screen button -->
         <Button Grid.Column="0" Name="ProjectButton" Visibility ="Hidden" Grid.Row="3" Style="{StaticResource button2Style}" 
@@ -46,14 +46,18 @@
         
         
         <!-- Captures drawing Canvas -->
-        <Canvas Name="ImagesCanvas" Margin ="10" Grid.Column="1" Grid.Row="2"/>
+        <Canvas Height="550" Width="570" Margin="0,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Name="ImagesCanvas" Grid.Column="1" Grid.Row="2">
+            <ListBox Name="CapturesListBox" Height="545"/>
+
+
+        </Canvas>
 
         <!-- Last Capture drawing Canvas -->
-        <Canvas Name="LastImageCanvas" Margin ="50" Grid.Column="0" Grid.Row="2"/>
+        <Canvas Name="LastImageCanvas" Margin ="100,0,50,50" Grid.Column="0" Grid.Row="2"/>
         
         
         <!-- Capture Finished Label -->
-        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Top" Name="finishedCapture" Background="#E9DA2D"> 
+        <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Center" Name="finishedCapture" Background="#E9DA2D"> 
             <Label Name="RunningLabel" FontSize="15" Foreground="Black">Awaiting to Start</Label>
         </Border>  
      
@@ -61,7 +65,22 @@
         <Label Name="infoLabel" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden">Click capture to focus (last capture focused by default)</Label>
 
         <!-- Time label -->
-        <Label Name="timeLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden" Margin="80,0,0,30">Capture taken at:</Label>
+        <Label Name="timeLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden" Margin="80,0,0,80">Capture taken at:</Label>
+
+        <!-- Play and Stop button -->
+       
+        <Button Name="play_StopButton" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="150,0,0,20" VerticalAlignment="Bottom" Height="45" Width="45" Click="Play_StopClick">
+            <StackPanel Name="play_stopSP"/>
+        </Button>
+
+        <!--Speed Control -->
+        <Button Name="SpeedDown_Button" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="210,0,0,20" VerticalAlignment="Bottom" Height="45" Width="45" Click="SpeedUp_Click">
+            <StackPanel Name="speedDown_SP"/>
+        </Button>
+        <Button Name="SpeedUp_Button" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Margin="340,0,0,20" VerticalAlignment="Bottom" Height="45" Width="45" Click="SpeedDown_Click">
+            <StackPanel Name="speedUp_SP"/>
+        </Button>
+        <Label Name="speedLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Margin="270,0,0,30">Speed x1</Label>
 
     </Grid>
 </Window>

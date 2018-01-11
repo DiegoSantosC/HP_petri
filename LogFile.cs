@@ -63,10 +63,8 @@ namespace PetriUI
 
         public void AppendData(string data)
         {
-            string captureTime = "\t Capture " + counter + " taken at " + data;
-            File.AppendAllText(targetLocation + @"\README.txt", captureTime + Environment.NewLine);
+            File.AppendAllText(targetLocation + @"\README.txt", data + Environment.NewLine);
 
-            counter++;
-        }
+         }
     }
 }

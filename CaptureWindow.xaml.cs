@@ -60,8 +60,10 @@ namespace PetriUI
         private captureFramework cf;
         private List<captureFramework> cfs;
         private bool running;
-        private Thread newCaptureThread;
+        public bool playing;
+        private Thread newCaptureThread, playThread;
         private CapturePreviews cp;
+        private LogFile file;
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
@@ -82,7 +84,8 @@ namespace PetriUI
             t = new Task(this, param[0], param[1], param[2], param[3], u, folder);
 
             Directory.CreateDirectory(folder);
-            LogFile file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
+            file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
+
 
             file.BuildAndSave();
 
@@ -92,6 +95,20 @@ namespace PetriUI
             newCaptureThread.SetApartmentState(ApartmentState.STA);
             newCaptureThread.Start(t);
             running = true;
+            playing = false;
+
+            StackPanel aux = new StackPanel();
+            Rectangle frame = new Rectangle();
+            frame.Width = 570;
+            frame.Height = 550;
+
+            frame.Stroke = Brushes.Black;
+            frame.StrokeThickness = 4;
+            
+            aux.Children.Add(frame);
+            StackPanel.SetZIndex(aux, 10);
+
+            ImagesCanvas.Children.Add(aux);
 
             FirstCapture(img);
 
@@ -99,6 +116,75 @@ namespace PetriUI
 
             Logo_Init();
 
+            PlayNStop_Init();
+
+            CapturesListBox.SelectionChanged += new SelectionChangedEventHandler(listBoxClicked);
+            
+        }
+
+        private void listBoxClicked(object sender, SelectionChangedEventArgs e)
+        {
+            ListBox lb = (ListBox)sender;
+            ListBoxItem item = (ListBoxItem)lb.SelectedItem;
+
+            StackPanel sp = (StackPanel)item.Content;
+
+            Image img, clone = new Image();
+            foreach (object child in sp.Children)
+            {
+                img = (Image)child;
+                clone.Source = img.Source;
+            }
+
+            for (int i = 0; i < cfs.Count; i++)
+            {
+                cfs.ElementAt(i).getBorder().Background = Brushes.White;
+            }
+
+            int index = Int32.Parse(sp.Uid);
+
+            timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
+
+            cfs.ElementAt(index).getBorder().Background = Brushes.LightBlue;
+
+            cf.getCapturePanel().Children.Clear();
+
+            clone.Uid = cfs.ElementAt(index).getCapturePanel().Uid;
+            cf.getCapturePanel().Children.Add(clone);
+
+        }
+
+        private void PlayNStop_Init()
+        {
+            Image play = new Image();
+            BitmapImage src2 = new BitmapImage();
+            src2.BeginInit();
+            src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Play.png", UriKind.Absolute);
+            src2.CacheOption = BitmapCacheOption.OnLoad;
+            src2.EndInit();
+            play.Source = src2;
+            play.Stretch = Stretch.Uniform;
+            play_stopSP.Children.Add(play);
+
+            Image speedUp = new Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\SpeedUp.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            speedUp.Source = src;
+            speedUp.Stretch = Stretch.Uniform;
+            speedUp_SP.Children.Add(speedUp);
+
+            Image speedDown = new Image();
+            BitmapImage src3 = new BitmapImage();
+            src3.BeginInit();
+            src3.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\SpeedDown.png", UriKind.Absolute);
+            src3.CacheOption = BitmapCacheOption.OnLoad;
+            src3.EndInit();
+            speedDown.Source = src3;
+            speedDown.Stretch = Stretch.Uniform;
+            speedDown_SP.Children.Add(speedDown);
         }
 
         private void Logo_Init()
@@ -122,26 +208,26 @@ namespace PetriUI
             Image clone1 = new Image();
             Image clone2 = new Image();
 
+            clone1.Uid = "0";
+            clone2.Uid = "0";
+
             clone1.Source = img.Source;
             clone2.Source = img.Source;
 
             double ratio = clone1.Source.Width / clone1.Source.Height;
 
             // Adding image to group
-            cfs.Add(new captureFramework(clone1, 250, ratio));
+            cfs.Add(new captureFramework(clone1, 120, ratio));
 
-            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getBorder());
-            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getCapturePanel());
+            ListBoxItem item = new ListBoxItem();
+            item.Content = cfs.ElementAt(cfs.Count - 1).getCapturePanel();
 
-            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseEnter += new MouseEventHandler(CaptureFocused);
-            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseLeave += new MouseEventHandler(CaptureUnfocused);
-            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseDown += new MouseButtonEventHandler(captureClicked);
-
+            CapturesListBox.Items.Add(item);
 
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
-            cfs.ElementAt(cfs.Count - 1).getBorder().Background = System.Windows.Media.Brushes.LightBlue;
+            cfs.ElementAt(cfs.Count - 1).getBorder().Background = Brushes.LightBlue;
 
-            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0, 0, 0, 0));
+            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(ImagesCanvas.Width - 135, 0, 0, 0));
             
             // Setting to last image
             cf = new captureFramework(clone2, 400, ratio);
@@ -155,6 +241,14 @@ namespace PetriUI
 
             timeLabel.Content = "Capture taken at: " + cf.getTime();
             timeLabel.Visibility = Visibility.Visible;
+
+            file.AppendData("\t First capture taken at :" + cf.getTime());
+
+            file.AppendData("\t " + t.getDelay() + " minutes of delay waited");
+
+            CapturesListBox.SelectedIndex = 0;
+            CapturesListBox.Focus();
+
         }
 
         // Information
@@ -249,6 +343,10 @@ namespace PetriUI
             BitmapImage src1 = new BitmapImage();
             BitmapImage src2 = new BitmapImage();
 
+            img1.Uid = cfs.Count.ToString();
+            img2.Uid = cfs.Count.ToString();
+
+
             // Img acquisition 
 
             src1.BeginInit();
@@ -269,32 +367,21 @@ namespace PetriUI
 
             // Adding image to group
 
-            cfs.Add(new captureFramework(img1, 250, ratio));
+            cfs.Add(new captureFramework(img1, 120, ratio));
 
-            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count -1).getBorder());
-            ImagesCanvas.Children.Add(cfs.ElementAt(cfs.Count - 1).getCapturePanel());
+            ListBoxItem item = new ListBoxItem();
+            item.Content = cfs.ElementAt(cfs.Count - 1).getCapturePanel();
 
-            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseEnter += new MouseEventHandler(CaptureFocused);
-            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseLeave += new MouseEventHandler(CaptureUnfocused);
-            cfs.ElementAt(cfs.Count - 1).getCapturePanel().MouseDown += new MouseButtonEventHandler(captureClicked);
-
+            CapturesListBox.Items.Add(item);
 
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
-            cfs.ElementAt(cfs.Count - 1).getBorder().Background = System.Windows.Media.Brushes.LightBlue;
+            cfs.ElementAt(cfs.Count - 1).getBorder().Background = Brushes.LightBlue;
 
-            // Positioning management
+            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(ImagesCanvas.Width - 135, 0, 0, 0));
 
-            if (cfs.Count < 8)
+            for (int i=0; i<cfs.Count-1; i++)
             {
-
-                Thickness lastPosition = cfs.ElementAt(cfs.Count - 2).getBorder().Margin;
-                Thickness newPosition = new Thickness(lastPosition.Left + 40, lastPosition.Top + 40, lastPosition.Right, lastPosition.Bottom);
-
-                cfs.ElementAt(cfs.Count - 1).setPosition(newPosition);
-
-            }else
-            {
-                RelocateImages();
+                cfs.ElementAt(i).getBorder().Background = Brushes.White;
             }
 
             // Adding image to last
@@ -318,20 +405,11 @@ namespace PetriUI
                t.getNumberOfCaptures() + " captures to be taken" + Environment.NewLine +
                (t.getNumberOfCaptures() + 1 - cfs.Count) + " captures to go";
 
-        }
+            file.AppendData("\t Capture " + cfs.Count() + " taken at: " + cf.getTime());
 
-        private void RelocateImages()
-        {
-            double newDeplacement;
+            CapturesListBox.SelectedIndex = cfs.Count -1;
+            CapturesListBox.Focus();
 
-            newDeplacement = 7 * 40 / cfs.Count;
-
-            for (int i=0; i<cfs.Count; i++)
-            {
-                Thickness newPosition = new Thickness(i*newDeplacement, i * newDeplacement, 0, 0);
-
-                cfs.ElementAt(i).setPosition(newPosition);
-            }
         }
 
         internal void CaptureFinished()
@@ -347,62 +425,6 @@ namespace PetriUI
             finishedCapture.Background = Brushes.Red;
             RunningLabel.Content = "Capture running";
             RunningLabel.Foreground = Brushes.White;
-        }
-
-        // Capture focusing functionalities
-
-        private void CaptureFocused(object sender, MouseEventArgs e)
-        {
-            StackPanel sp = (StackPanel)sender;
-
-            sp.Width = sp.Width * 1.1;
-            sp.Height = sp.Height * 1.1;
-
-            int index = Int32.Parse(sp.Uid);
-
-            captureFramework focused = cfs.ElementAt(index);
-
-            focused.getBorder().Height = cfs.ElementAt(index).getBorder().Height * 1.1;
-            focused.getBorder().Width = cfs.ElementAt(index).getBorder().Width * 1.1;
-
-            StackPanel.SetZIndex(sp, 100);
-            
-        }
-
-        private void CaptureUnfocused(object sender, MouseEventArgs e)
-        {
-            StackPanel sp = (StackPanel)sender;
-
-            sp.Width = sp.Width / 1.1;
-            sp.Height = sp.Height / 1.1;
-
-            int index = Int32.Parse(sp.Uid);
-
-            cfs.ElementAt(index).getBorder().Height = cfs.ElementAt(index).getBorder().Height / 1.1;
-            cfs.ElementAt(index).getBorder().Width = cfs.ElementAt(index).getBorder().Width / 1.1;
-
-            StackPanel.SetZIndex(sp, 0);
-        }
-
-        private void captureClicked(object sender, MouseEventArgs e)
-        {
-            StackPanel sp = (StackPanel)sender;
-
-            Image img, clone = new Image();
-            
-            foreach (object child in sp.Children)
-            {
-                img = (Image)child;
-                clone.Source = img.Source;
-            }
-
-            int index = Int32.Parse(sp.Uid);
-
-            timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
-
-            cf.getCapturePanel().Children.Clear();
-
-            cf.getCapturePanel().Children.Add(clone);
         }
 
         // Closing handling
@@ -448,8 +470,118 @@ namespace PetriUI
                     e.Cancel = false;
       
                 }
+                if (playing)
+                {
+                    playThread.Abort();
+                }
             }
            
+        }
+
+        private void Play_StopClick(object sender, RoutedEventArgs e)
+        {
+            if (!playing)
+            {
+                Image stop = new Image();
+                BitmapImage src2 = new BitmapImage();
+                src2.BeginInit();
+                src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Stop.png", UriKind.Absolute);
+                src2.CacheOption = BitmapCacheOption.OnLoad;
+                src2.EndInit();
+                stop.Source = src2;
+                stop.Stretch = Stretch.Uniform;
+
+                play_stopSP.Children.Clear();
+                play_stopSP.Children.Add(stop);
+
+                playing = true;
+
+                PlayHandler ph = new PlayHandler();
+                playThread = new Thread(ph.StartHandler);
+                playThread.SetApartmentState(ApartmentState.STA);
+                playThread.Start(this);
+            }
+            else
+            {
+                Image play = new Image();
+                BitmapImage src2 = new BitmapImage();
+                src2.BeginInit();
+                src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\play.png", UriKind.Absolute);
+                src2.CacheOption = BitmapCacheOption.OnLoad;
+                src2.EndInit();
+                play.Source = src2;
+                play.Stretch = Stretch.Uniform;
+
+                play_stopSP.Children.Clear();
+                play_stopSP.Children.Add(play);
+
+                playing = false;
+
+            }
+
+        }
+
+        private void SpeedUp_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SpeedDown_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        internal void showNextCapture()
+        {
+            Image img, clone = new Image();
+            int index = 0;
+
+            foreach (object child in cf.getCapturePanel().Children)
+            {
+                img = (Image)child;
+                index = Int32.Parse(img.Uid);
+                
+            }
+
+            for (int i = 0; i < cfs.Count; i++)
+            {
+                cfs.ElementAt(i).getBorder().Background = Brushes.White;
+            }         
+
+            timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
+
+            if (index == cfs.Count - 1)
+            {
+                foreach (object child in cfs.ElementAt(0).getCapturePanel().Children)
+                {
+                    img = (Image)child;
+                    clone.Source = img.Source;
+                    clone.Uid = img.Uid;
+                }
+                cfs.ElementAt(0).getBorder().Background = Brushes.LightBlue;
+                CapturesListBox.SelectedIndex = 0;
+                CapturesListBox.Focus();
+            }
+            else
+            {
+                foreach (object child in cfs.ElementAt(index + 1).getCapturePanel().Children)
+                {
+                    img = (Image)child;
+                    clone.Source = img.Source;
+                    clone.Uid = img.Uid;
+                }
+
+                cfs.ElementAt(index+1).getBorder().Background = Brushes.LightBlue;
+                CapturesListBox.SelectedIndex = index+1;
+                CapturesListBox.Focus();
+            }
+
+            cf.getCapturePanel().Children.Clear();
+            cf.getCapturePanel().Children.Add(clone);
+
+            Console.WriteLine(clone.Uid);
+
         }
     }
 }

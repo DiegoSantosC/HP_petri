@@ -83,6 +83,7 @@
     <Compile Include="CapturePreviews.xaml.cs">
       <DependentUpon>CapturePreviews.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PlayHandler.cs" />
     <Compile Include="ProjectedForm.cs" />
     <Compile Include="LogFile.cs" />
     <Compile Include="Task.cs" />

@@ -62,7 +62,7 @@ namespace PetriUI
                 capturePanel.Width = size;
                 capturePanel.Height = size / ratio;
 
-                frameworkBorder.Width = size + 5;
+                frameworkBorder.Width = 565;
                 frameworkBorder.Height = (size + 5) / ratio;
 
             }
@@ -71,7 +71,7 @@ namespace PetriUI
                 capturePanel.Width = size * ratio;
                 capturePanel.Height = size;
 
-                frameworkBorder.Width = (size + 5)*ratio;
+                frameworkBorder.Width = 565;
                 frameworkBorder.Height = (size + 5);
 
             }
