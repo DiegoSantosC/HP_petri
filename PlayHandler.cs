@@ -9,15 +9,11 @@ namespace PetriUI
 {
     class PlayHandler
     {
-        public static int speed;
-
         public void StartHandler(object param)
         {
-            speed = 2;
-
             CaptureWindow cw = (CaptureWindow)param;
 
-            Thread.Sleep(speed * 1000);
+            Thread.Sleep(1000);
 
             while (true) {
 
@@ -29,7 +25,7 @@ namespace PetriUI
                     App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                      new Action(() => cw.showNextCapture()));
 
-                    Thread.Sleep(speed * 1000);
+                    Thread.Sleep((int)(cw.speed * 1000));
                 }
             }
         }

@@ -60,10 +60,14 @@ namespace PetriUI
         private captureFramework cf;
         private List<captureFramework> cfs;
         private bool running;
-        public bool playing;
+        
         private Thread newCaptureThread, playThread;
         private CapturePreviews cp;
         private LogFile file;
+
+        // Params to be shared with the PlayHandler
+        public double speed;
+        public bool playing;
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
@@ -119,6 +123,8 @@ namespace PetriUI
             PlayNStop_Init();
 
             CapturesListBox.SelectionChanged += new SelectionChangedEventHandler(listBoxClicked);
+
+            speed = 1;
             
         }
 
@@ -127,13 +133,27 @@ namespace PetriUI
             ListBox lb = (ListBox)sender;
             ListBoxItem item = (ListBoxItem)lb.SelectedItem;
 
-            StackPanel sp = (StackPanel)item.Content;
+            Grid sp = (Grid)item.Content;
 
             Image img, clone = new Image();
+
+            StackPanel childSP = new StackPanel();
+
+            int counter = 0;
             foreach (object child in sp.Children)
             {
-                img = (Image)child;
-                clone.Source = img.Source;
+                if (counter == 2)
+                {
+                    childSP = (StackPanel)child;
+
+                    foreach (object childImg in childSP.Children)
+                    {
+                        img = (Image)childImg;
+                        clone.Source = img.Source;
+                    }
+                }
+
+                counter++;
             }
 
             for (int i = 0; i < cfs.Count; i++)
@@ -141,7 +161,7 @@ namespace PetriUI
                 cfs.ElementAt(i).getBorder().Background = Brushes.White;
             }
 
-            int index = Int32.Parse(sp.Uid);
+            int index = Int32.Parse(childSP.Uid);
 
             timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
 
@@ -220,14 +240,47 @@ namespace PetriUI
             cfs.Add(new captureFramework(clone1, 120, ratio));
 
             ListBoxItem item = new ListBoxItem();
-            item.Content = cfs.ElementAt(cfs.Count - 1).getCapturePanel();
+            Grid arrangingGrid = new Grid();
+
+            arrangingGrid.Width = 560;
+            ColumnDefinition c1 = new ColumnDefinition();
+            c1.Width = new GridLength(150);
+            ColumnDefinition c2 = new ColumnDefinition();
+            c1.Width = new GridLength(350);
+            ColumnDefinition c3 = new ColumnDefinition();
+            c1.Width = new GridLength();
+
+            arrangingGrid.ColumnDefinitions.Add(c1);
+            arrangingGrid.ColumnDefinitions.Add(c2);
+            arrangingGrid.ColumnDefinitions.Add(c3);
+
+            Button commentBut = initializeButton(cfs.Count-1);
+            commentBut.HorizontalAlignment = HorizontalAlignment.Left;
+            commentBut.Margin = new Thickness(30,0,0,0);
+
+            Label emptyLabel = new Label();
+            emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            emptyLabel.VerticalAlignment = VerticalAlignment.Center;
+
+            Grid.SetColumn(commentBut, 0);
+            Grid.SetColumn(emptyLabel, 1);
+            Grid.SetColumn(cfs.ElementAt(cfs.Count - 1).getCapturePanel(), 2);
+
+            arrangingGrid.Children.Add(commentBut);
+            arrangingGrid.Children.Add(emptyLabel);
+            arrangingGrid.Children.Add(cfs.ElementAt(cfs.Count - 1).getCapturePanel());
+
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().HorizontalAlignment = HorizontalAlignment.Right;
+            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0, 0, 30, 0));
+
+
+            item.Content = arrangingGrid;
 
             CapturesListBox.Items.Add(item);
 
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
             cfs.ElementAt(cfs.Count - 1).getBorder().Background = Brushes.LightBlue;
 
-            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(ImagesCanvas.Width - 135, 0, 0, 0));
             
             // Setting to last image
             cf = new captureFramework(clone2, 400, ratio);
@@ -249,6 +302,116 @@ namespace PetriUI
             CapturesListBox.SelectedIndex = 0;
             CapturesListBox.Focus();
 
+        }
+
+        private Button initializeButton(int index)
+        {
+            Button commentBut = new Button();
+
+            commentBut.Content = "Add Comment";
+            commentBut.HorizontalAlignment = HorizontalAlignment.Center;
+            commentBut.VerticalAlignment = VerticalAlignment.Center;
+
+            commentBut.Width = 100;
+            commentBut.Height = 24;
+            commentBut.FontSize = 14;
+
+            commentBut.Click += new RoutedEventHandler(addComment);
+            commentBut.Uid = index.ToString();
+
+            return commentBut;
+        }
+
+        private void addComment(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+            string indexString = senderBut.Uid;
+
+            System.Windows.Forms.Form commentDialog = new System.Windows.Forms.Form();
+            commentDialog.Size = new System.Drawing.Size(300,200);
+
+            System.Windows.Forms.Button insertButton = new System.Windows.Forms.Button();
+
+            insertButton.Width = 50;
+            insertButton.Height = 20;
+            insertButton.Text = "Insert";
+            insertButton.Location = new System.Drawing.Point(180, 130);
+            insertButton.Name = indexString;
+            insertButton.Click += new EventHandler(insertComment);
+
+
+            System.Windows.Forms.TextBox tb = new System.Windows.Forms.TextBox();
+            tb.Width = 200;
+            tb.Height = 80;
+            tb.Multiline = true;
+            tb.Location = new System.Drawing.Point(40, 20);
+
+            commentDialog.Controls.Add(tb);
+            commentDialog.Controls.Add(insertButton);
+
+            commentDialog.Show();
+
+        }
+
+        private void insertComment(object sender, EventArgs e)
+        {
+            string content = "";
+
+            System.Windows.Forms.Button senderBut = (System.Windows.Forms.Button)sender;
+            string indexString = senderBut.Name;
+
+            Console.WriteLine(indexString);
+
+            System.Windows.Forms.Form parentForm = (System.Windows.Forms.Form)senderBut.Parent;
+
+            bool first = true;
+            foreach (object child in parentForm.Controls)
+            {
+                if(first)
+                {
+                    System.Windows.Forms.TextBox tb = (System.Windows.Forms.TextBox)child;
+                    content = tb.Text;
+                }
+                first = false;
+            }
+
+            ListBoxItem itemSelected = (ListBoxItem)CapturesListBox.Items.GetItemAt(Int32.Parse(indexString));
+
+            Grid itemGrid = (Grid)itemSelected.Content;
+
+            int counter = 0;
+
+            foreach (object child in itemGrid.Children)
+            {
+                if (counter == 0)
+                {
+                    Button commentBut = (Button)child;
+                    commentBut.Content = "Modify";
+                }
+                if (counter == 1)
+                {
+                    Label commentLabel = (Label)child;
+                    if (content.Length > 35)
+                    {
+                        string[] words = content.Split(' ');
+
+                        for(int i=0; i<words.Length; i++)
+                        {
+                            commentLabel.Content += " " + words[i];
+                            if (i % 5 == 0 && i!=0) { commentLabel.Content += Environment.NewLine; }
+                        }
+
+                    }
+                    else { commentLabel.Content = content; }
+                    
+                }
+                counter++;
+            }
+ 
+            parentForm.Close();
+
+            string textToAppend = "Comment added on capture " + indexString + Environment.NewLine + content + Environment.NewLine;
+            file.AppendData(textToAppend);
         }
 
         // Information
@@ -370,14 +533,46 @@ namespace PetriUI
             cfs.Add(new captureFramework(img1, 120, ratio));
 
             ListBoxItem item = new ListBoxItem();
-            item.Content = cfs.ElementAt(cfs.Count - 1).getCapturePanel();
+            Grid arrangingGrid = new Grid();
+
+            arrangingGrid.Width = 560;
+            ColumnDefinition c1 = new ColumnDefinition();
+            c1.Width = new GridLength(150);
+            ColumnDefinition c2 = new ColumnDefinition();
+            c1.Width = new GridLength(350);
+            ColumnDefinition c3 = new ColumnDefinition();
+            c1.Width = new GridLength();
+
+            arrangingGrid.ColumnDefinitions.Add(c1);
+            arrangingGrid.ColumnDefinitions.Add(c2);
+            arrangingGrid.ColumnDefinitions.Add(c3);
+
+            Button commentBut = initializeButton(cfs.Count - 1);
+            commentBut.HorizontalAlignment = HorizontalAlignment.Left;
+            commentBut.Margin = new Thickness(30, 0, 0, 0);
+
+            Label emptyLabel = new Label();
+            emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            emptyLabel.VerticalAlignment = VerticalAlignment.Center;
+
+            Grid.SetColumn(commentBut, 0);
+            Grid.SetColumn(emptyLabel, 1);
+            Grid.SetColumn(cfs.ElementAt(cfs.Count - 1).getCapturePanel(), 2);
+
+            arrangingGrid.Children.Add(commentBut);
+            arrangingGrid.Children.Add(emptyLabel);
+            arrangingGrid.Children.Add(cfs.ElementAt(cfs.Count - 1).getCapturePanel());
+
+            cfs.ElementAt(cfs.Count - 1).getCapturePanel().HorizontalAlignment = HorizontalAlignment.Right;
+            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(0, 0, 30, 0));
+
+
+            item.Content = arrangingGrid;
 
             CapturesListBox.Items.Add(item);
 
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
             cfs.ElementAt(cfs.Count - 1).getBorder().Background = Brushes.LightBlue;
-
-            cfs.ElementAt(cfs.Count - 1).setPosition(new Thickness(ImagesCanvas.Width - 135, 0, 0, 0));
 
             for (int i=0; i<cfs.Count-1; i++)
             {
@@ -475,7 +670,6 @@ namespace PetriUI
                     playThread.Abort();
                 }
             }
-           
         }
 
         private void Play_StopClick(object sender, RoutedEventArgs e)
@@ -523,12 +717,21 @@ namespace PetriUI
 
         private void SpeedUp_Click(object sender, RoutedEventArgs e)
         {
-
+            if (speed < 4)
+            {
+                speed = speed * 2;
+                speedLabel.Content = "Speed x" + (1/speed);
+            }
         }
 
         private void SpeedDown_Click(object sender, RoutedEventArgs e)
         {
-
+            if (speed > 0.25)
+            {
+                speed = speed / 2;
+                speedLabel.Content = "Speed x" + (1/speed);
+            }
+           
         }
 
 
@@ -579,8 +782,6 @@ namespace PetriUI
 
             cf.getCapturePanel().Children.Clear();
             cf.getCapturePanel().Children.Add(clone);
-
-            Console.WriteLine(clone.Uid);
 
         }
     }
