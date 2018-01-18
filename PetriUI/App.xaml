@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PetriUI"
              StartupUri="MainWindow.xaml">
+    
     <Application.Resources>
          
         <!-- header Style -->
@@ -45,31 +46,34 @@
 
         <!-- label Style -->
         <Style x:Key="label1Style" TargetType="{x:Type Label}">
+            
             <Setter Property="Label.FontFamily" Value="Impact"></Setter>
             <Setter Property="Label.FontSize" Value="20"></Setter>
             <Setter Property="Label.HorizontalAlignment" Value="Right"></Setter>
             <Setter Property="Label.VerticalAlignment" Value="Center"></Setter>
+            
         </Style>
 
         <!-- label Style -->
         <Style x:Key="label2Style" TargetType="{x:Type Label}">
+            
             <Setter Property="Label.FontFamily" Value="Impact"></Setter>
             <Setter Property="Label.FontSize" Value="17"></Setter>
             <Setter Property="Label.Foreground" Value="#FFAE2E2E"/>
             <Setter Property="Label.HorizontalAlignment" Value="Left"></Setter>
             <Setter Property="Label.VerticalAlignment" Value="Center"></Setter>
+            
         </Style>
 
         <!-- textBox Style -->
         <Style x:Key="textBoxStyle" TargetType="{x:Type TextBox}">
+            
             <Setter Property="TextBox.Height" Value="30"></Setter>
             <Setter Property="TextBox.Width" Value="100"></Setter>
             <Setter Property="TextBox.HorizontalAlignment" Value="Right"></Setter>
             <Setter Property="TextBox.VerticalAlignment" Value="Center"></Setter>
 
         </Style>
-
-
 
     </Application.Resources>
 </Application>

@@ -1,6 +1,4 @@
-﻿/* The MIT License(MIT)
-*
-*  © Copyright 2015 HP Inc.
+﻿/* © Copyright 2018 HP Inc.
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -14,10 +12,10 @@
 *
 *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 *  THE SOFTWARE.
 */
 
@@ -38,13 +36,18 @@ namespace PetriUI
 {
     class PictureHandling
     {
+        /// <summary>
+        /// Management of the resoults of the picture of outline extraction, either saving them
+        /// or handling them to the App
+        /// </summary>
+       
         private static int marker = 0, marker2 = 0;
 
         // This string makes a timestamped session folder for files saved that use this class.
         private static string _saveDirectory;
         public static string confirmPath;
         
-        // This loops through all the child-level images in IPcPicture and saves them as Bitmaps.
+        // Save all objects in a picture separately
         public static void SaveAllImages(IPcPicture picture)
         {
             ToolBox.EnsureDirectoryExists(_saveDirectory);
@@ -58,26 +61,25 @@ namespace PetriUI
             }
         }
 
-        internal static List<System.Windows.Controls.Image> SaveSamples(IPcPicture picture, List<int> indexes)
+        // Handle pictures given by and index to CapturePreviews
+        internal static List<System.Windows.Controls.Image> SaveSamples(IPcPicture picture, List<string> folders, List<int> indexes)
         {
             List<System.Windows.Controls.Image> imgs = new List<System.Windows.Controls.Image>();
 
-            int[] indexArray = indexes.ToArray();
-
             int i = 0;
 
-            for (int j = 0; j < indexArray.Length; j++)
+            for (int j = 0; j < folders.Count; j++)
             {
                 i = 0;
 
                 foreach (IPcPicture image in picture.Children)
                 {
-                    if (i == indexArray[j])
+                    if (i == indexes[j])
                     {
-                        _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + indexArray[j]);
-                        ToolBox.EnsureDirectoryExists(_saveDirectory);
+                        string dir = Path.Combine(folders[j], @"Captures\");
+                        ToolBox.EnsureDirectoryExists(dir);
 
-                        string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                        string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
                         ToolBox.SaveProcessedImage(image.Image, fileAndPath);
 
                         Uri u = new Uri(fileAndPath, UriKind.Relative);
@@ -99,9 +101,6 @@ namespace PetriUI
                     i++;
                 }                      
             }
-
-            
-            
 
             return imgs;
         }
@@ -133,6 +132,7 @@ namespace PetriUI
             marker++;
         }
 
+        // Saves the outlines
         public static OutlineParameters SavePicture(IPcPicture picture, IPcOutline parentOutline)
         {
             _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "ConfirmDirectory");
@@ -173,20 +173,12 @@ namespace PetriUI
             return op;
         }
 
-        public static void SweepPicture()
-        {
-            string _sweepDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "LayerObjects");
-            string _sweepPath = Path.Combine(_sweepDirectory, "objectScan" + (marker2-1) + ".bmp");
-          
-            ToolBox.deleteImage(_sweepPath);
-
-        }
-
+        // Save an image given by a task
         internal static void SaveIndexedImage(IPcPicture picture, Task t)
         {
 
-            _saveDirectory = Path.Combine(ToolBox.defaultFilePath, @"Pictures\" + "Object_" + t.getIndex());
-            ToolBox.EnsureDirectoryExists(_saveDirectory);
+            string dir = Path.Combine(t.getFolder(), @"Captures\");
+            ToolBox.EnsureDirectoryExists(dir);
 
             int i = 0;
 
@@ -194,7 +186,7 @@ namespace PetriUI
             {
                 if (i == t.getIndex())
                 {
-                    string fileAndPath = Path.Combine(_saveDirectory, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                    string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
                     ToolBox.SaveProcessedImage(image.Image, fileAndPath);
 
                     List<Uri> l = new List<Uri>();
@@ -210,8 +202,6 @@ namespace PetriUI
                 }
 
                 ++i;
-
-
             }
         }
     }
