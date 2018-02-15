@@ -69,13 +69,17 @@ namespace PetriUI
         public double speed;
         public bool playing;
 
+        public AnalysisWindow aw;
+
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis)
         {
             InitializeComponent();
 
             this.Width = 1200;
+
+
             this.Height = 900;
 
             cp = capt;
@@ -85,7 +89,7 @@ namespace PetriUI
             // A task holds details for a capture process (See <Task> constructior definition)
             List<Uri> u = new List<Uri>();
 
-            t = new Task(this, param[0], param[1], param[2], param[3], u, folder);
+            t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1]);
 
             Directory.CreateDirectory(folder);
             file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
@@ -103,8 +107,8 @@ namespace PetriUI
 
             StackPanel aux = new StackPanel();
             Rectangle frame = new Rectangle();
-            frame.Width = 570;
-            frame.Height = 550;
+            frame.Width = 565;
+            frame.Height = 400;
 
             frame.Stroke = Brushes.Black;
             frame.StrokeThickness = 4;
@@ -113,6 +117,19 @@ namespace PetriUI
             StackPanel.SetZIndex(aux, 10);
 
             ImagesCanvas.Children.Add(aux);
+
+            StackPanel aux2 = new StackPanel();
+            Rectangle frame2 = new Rectangle();
+            frame2.Width = 480;
+            frame2.Height = 80;
+
+            frame2.Stroke = Brushes.Black;
+            frame2.StrokeThickness = 4;
+
+            aux2.Children.Add(frame2);
+            StackPanel.SetZIndex(aux2, 10);
+
+            EventsCanvas.Children.Add(aux2);
 
             FirstCapture(img);
 
@@ -124,8 +141,12 @@ namespace PetriUI
 
             CapturesListBox.SelectionChanged += new SelectionChangedEventHandler(listBoxClicked);
 
+            if (analysis[0]) EventsListBox.Visibility = Visibility.Visible;
+
             speed = 1;
-            
+
+            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis());
+
         }
 
         private void listBoxClicked(object sender, SelectionChangedEventArgs e)
@@ -304,6 +325,44 @@ namespace PetriUI
 
         }
 
+        public void addEvent(int step, string eventText)
+        {
+            ListBoxItem item = new ListBoxItem();
+            Grid g = new Grid();
+
+            item.Height = 30;
+            item.Width = 480;
+
+            ColumnDefinition c1 = new ColumnDefinition();
+            c1.Width = new GridLength(80);
+            ColumnDefinition c2 = new ColumnDefinition();
+            c1.Width = new GridLength(400);
+           
+            g.ColumnDefinitions.Add(c1);
+            g.ColumnDefinitions.Add(c2);
+
+            Label l1 = new Label();
+            l1.HorizontalAlignment = HorizontalAlignment.Center;
+            l1.VerticalAlignment = VerticalAlignment.Center;
+            l1.Content = "Capture " + step;
+
+            Label l2 = new Label();
+            l2.HorizontalAlignment = HorizontalAlignment.Center;
+            l2.VerticalAlignment = VerticalAlignment.Center;
+            l2.Content = eventText;
+
+            Grid.SetColumn(l1, 0);
+            Grid.SetColumn(l2, 1);
+
+            g.Children.Add(l1);
+            g.Children.Add(l2);
+
+            item.Content = g;
+
+            EventsListBox.Items.Add(item);
+
+        }
+
         private Button initializeButton(int index)
         {
             Button commentBut = new Button();
@@ -359,8 +418,6 @@ namespace PetriUI
 
             System.Windows.Forms.Button senderBut = (System.Windows.Forms.Button)sender;
             string indexString = senderBut.Name;
-
-            Console.WriteLine(indexString);
 
             System.Windows.Forms.Form parentForm = (System.Windows.Forms.Form)senderBut.Parent;
 
@@ -465,8 +522,7 @@ namespace PetriUI
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
             newCaptureThread.Abort();
-            running = false;
-
+            CaptureFinished();
         }
 
         public void KillCaptures()
@@ -495,6 +551,20 @@ namespace PetriUI
                MomentCapture.Capture(t);
         }
 
+        public void Perform_Analysis(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+
+            if (t.getClassAnalysis() || t.getCountAnalysis())
+            {
+                senderBut.IsEnabled = false;
+                if(cfs.Count >1) aw.Show();
+                else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
+            }else{
+
+                MessageBox.Show("No analysis selected to be performed");
+            }
+        }
 
         // Management of a new taken image
 
@@ -604,6 +674,21 @@ namespace PetriUI
 
             CapturesListBox.SelectedIndex = cfs.Count -1;
             CapturesListBox.Focus();
+
+            if(cfs.Count == 3)
+            {
+                addEvent(3, " Two colonies have merged");
+            }
+
+            if (cfs.Count == 1)
+            {
+                addEvent(1, " A new colony has appeared");
+            }
+
+            if (cfs.Count == 5)
+            {
+                addEvent(5, " Abnormal colony growth");
+            }
 
         }
 

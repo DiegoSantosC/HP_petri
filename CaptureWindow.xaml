@@ -29,7 +29,8 @@
         <StackPanel Name="LogoSP" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" Height="100" Width="100"/>
 
         <!-- Title label -->
-        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture details </Label>
+        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture 
+        </Label>
 
         <!-- Data -->
         <StackPanel Name="dataSP" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="1" Width="40" Height="60" Margin="20,10,60,0"/>
@@ -46,10 +47,13 @@
         
         
         <!-- Captures drawing Canvas -->
-        <Canvas Height="550" Width="570" Margin="0,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Name="ImagesCanvas" Grid.Column="1" Grid.Row="2">
-            <ListBox Name="CapturesListBox" Height="545"/>
+        <Canvas Height="400" Width="570" Margin="0,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Name="ImagesCanvas" Grid.Column="1" Grid.Row="2">
+            <ListBox Name="CapturesListBox" Height="380"/>
+        </Canvas>
 
-
+        <!-- Event Showing Canvas -->
+        <Canvas Height="80" Width="500" Margin="30,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="EventsCanvas" Grid.Column="1" Grid.Row="2">
+            <ListBox Name="EventsListBox" Width="480" Height="80" Visibility="Hidden"/>
         </Canvas>
 
         <!-- Last Capture drawing Canvas -->
@@ -82,5 +86,8 @@
         </Button>
         <Label Name="speedLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Margin="270,0,0,30">Speed x1</Label>
 
+        <!-- Cancel Capture button -->
+        <Button Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" VerticalAlignment="Center" Margin="0,0,50,0" Width="200" Height="40" Click="Perform_Analysis">Show Analysis</Button>
+        
     </Grid>
 </Window>
