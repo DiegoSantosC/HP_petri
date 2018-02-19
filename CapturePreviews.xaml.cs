@@ -289,7 +289,7 @@ namespace PetriUI
             }
         }
 
-        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders)
+        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis)
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
@@ -297,12 +297,13 @@ namespace PetriUI
 
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i)));
+                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i)));
                 capturesList.ElementAt(i).Uid = (i).ToString();
                 samplesList.Add(samples.ElementAt(i));
                 samplesList.ElementAt(i).Uid = (i).ToString();
 
                 numberCapturesRunning++;
+
             }
 
             sampleSP.Children.Clear();

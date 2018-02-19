@@ -78,7 +78,7 @@ namespace PetriUI
 
             System.Drawing.Image drawingImage = System.Drawing.Image.FromStream(ms);
 
-            System.Drawing.Image resized = (System.Drawing.Image)(new Bitmap(drawingImage, new System.Drawing.Size(drawingImage.Size.Height*280/(int)System.Windows.SystemParameters.PrimaryScreenHeight, drawingImage.Size.Width*280/ (int)System.Windows.SystemParameters.PrimaryScreenHeight)));
+            System.Drawing.Image resized = (System.Drawing.Image)(new Bitmap(drawingImage, new System.Drawing.Size(drawingImage.Size.Width*280/(int)System.Windows.SystemParameters.PrimaryScreenWidth, drawingImage.Size.Height*280/ (int)System.Windows.SystemParameters.PrimaryScreenWidth)));
             
             pb.Image = resized;
             pb.Height = resized.Height;

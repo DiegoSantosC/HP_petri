@@ -48,12 +48,12 @@
         
         <!-- Captures drawing Canvas -->
         <Canvas Height="400" Width="570" Margin="0,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Name="ImagesCanvas" Grid.Column="1" Grid.Row="2">
-            <ListBox Name="CapturesListBox" Height="380"/>
+            <ListBox Name="CapturesListBox" Height="400"/>
         </Canvas>
 
         <!-- Event Showing Canvas -->
-        <Canvas Height="80" Width="500" Margin="30,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="EventsCanvas" Grid.Column="1" Grid.Row="2">
-            <ListBox Name="EventsListBox" Width="480" Height="80" Visibility="Hidden"/>
+        <Canvas Height="80" Width="500" Margin="30,10,10,15" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="EventsCanvas" Grid.Column="1" Grid.Row="2">
+            <ListBox Name="EventsListBox" Width="500" Height="120" Visibility="Hidden"/>
         </Canvas>
 
         <!-- Last Capture drawing Canvas -->
@@ -86,8 +86,8 @@
         </Button>
         <Label Name="speedLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Margin="270,0,0,30">Speed x1</Label>
 
-        <!-- Cancel Capture button -->
-        <Button Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" VerticalAlignment="Center" Margin="0,0,50,0" Width="200" Height="40" Click="Perform_Analysis">Show Analysis</Button>
+        <!-- Analysis button -->
+        <Button Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" VerticalAlignment="Center" Margin="0,0,50,0" Width="200" Height="40" Click="Show_Analysis">Show Analysis</Button>
         
     </Grid>
 </Window>

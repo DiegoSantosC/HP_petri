@@ -20,6 +20,7 @@
 */
 
 // .NET framework namespaces
+using AnalysisTestApp;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,8 @@ namespace PetriUI
 
             t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1]);
 
+            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis());
+
             Directory.CreateDirectory(folder);
             file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
 
@@ -107,7 +110,7 @@ namespace PetriUI
 
             StackPanel aux = new StackPanel();
             Rectangle frame = new Rectangle();
-            frame.Width = 565;
+            frame.Width = 575;
             frame.Height = 400;
 
             frame.Stroke = Brushes.Black;
@@ -120,8 +123,8 @@ namespace PetriUI
 
             StackPanel aux2 = new StackPanel();
             Rectangle frame2 = new Rectangle();
-            frame2.Width = 480;
-            frame2.Height = 80;
+            frame2.Width = 500;
+            frame2.Height = 120;
 
             frame2.Stroke = Brushes.Black;
             frame2.StrokeThickness = 4;
@@ -144,8 +147,6 @@ namespace PetriUI
             if (analysis[0]) EventsListBox.Visibility = Visibility.Visible;
 
             speed = 1;
-
-            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis());
 
         }
 
@@ -323,6 +324,18 @@ namespace PetriUI
             CapturesListBox.SelectedIndex = 0;
             CapturesListBox.Focus();
 
+            // Set image into bitmap format to be analyzed
+
+            if (t.getCountAnalysis())
+            {
+                MemoryStream ms = new MemoryStream();
+                BmpBitmapEncoder bbe = new BmpBitmapEncoder();
+                bbe.Frames.Add(BitmapFrame.Create(new Uri(img.Source.ToString(), UriKind.RelativeOrAbsolute)));
+                bbe.Save(ms);
+                System.Drawing.Image img2 = System.Drawing.Image.FromStream(ms);
+
+                aw.getCount().setBackgound(img2);
+            }
         }
 
         public void addEvent(int step, string eventText)
@@ -334,17 +347,18 @@ namespace PetriUI
             item.Width = 480;
 
             ColumnDefinition c1 = new ColumnDefinition();
-            c1.Width = new GridLength(80);
+            //c1.Width = new GridLength(80);
             ColumnDefinition c2 = new ColumnDefinition();
-            c1.Width = new GridLength(400);
+            //c1.Width = new GridLength(400);
            
             g.ColumnDefinitions.Add(c1);
             g.ColumnDefinitions.Add(c2);
 
             Label l1 = new Label();
+            l1.Width = 80;
             l1.HorizontalAlignment = HorizontalAlignment.Center;
             l1.VerticalAlignment = VerticalAlignment.Center;
-            l1.Content = "Capture " + step;
+            l1.Content = "   Capture " + step;
 
             Label l2 = new Label();
             l2.HorizontalAlignment = HorizontalAlignment.Center;
@@ -551,14 +565,14 @@ namespace PetriUI
                MomentCapture.Capture(t);
         }
 
-        public void Perform_Analysis(object sender, RoutedEventArgs e)
+        public void Show_Analysis(object sender, RoutedEventArgs e)
         {
             Button senderBut = (Button)sender;
 
             if (t.getClassAnalysis() || t.getCountAnalysis())
             {
                 senderBut.IsEnabled = false;
-                if(cfs.Count >1) aw.Show();
+                if(cfs.Count > 2) aw.Show();
                 else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
             }else{
 
@@ -583,7 +597,7 @@ namespace PetriUI
             // Img acquisition 
 
             src1.BeginInit();
-            src1.UriSource = t.getCaptures().ElementAt(t.getCaptures().Count -1);
+            src1.UriSource = t.getCaptures().ElementAt(t.getCaptures().Count - 1);
             src1.CacheOption = BitmapCacheOption.OnLoad;
             src1.EndInit();
             img1.Source = src1;
@@ -644,7 +658,7 @@ namespace PetriUI
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
             cfs.ElementAt(cfs.Count - 1).getBorder().Background = Brushes.LightBlue;
 
-            for (int i=0; i<cfs.Count-1; i++)
+            for (int i = 0; i < cfs.Count - 1; i++)
             {
                 cfs.ElementAt(i).getBorder().Background = Brushes.White;
             }
@@ -672,24 +686,26 @@ namespace PetriUI
 
             file.AppendData("\t Capture " + cfs.Count() + " taken at: " + cf.getTime());
 
-            CapturesListBox.SelectedIndex = cfs.Count -1;
+            CapturesListBox.SelectedIndex = cfs.Count - 1;
             CapturesListBox.Focus();
 
-            if(cfs.Count == 3)
-            {
-                addEvent(3, " Two colonies have merged");
-            }
+            // Set image into bitmap format to be analyzed
 
-            if (cfs.Count == 1)
+            if (t.getCountAnalysis())
             {
-                addEvent(1, " A new colony has appeared");
-            }
+                MemoryStream ms = new MemoryStream();
+                BmpBitmapEncoder bbe = new BmpBitmapEncoder();
+                bbe.Frames.Add(BitmapFrame.Create(new Uri(img1.Source.ToString(), UriKind.RelativeOrAbsolute)));
+                bbe.Save(ms);
+                System.Drawing.Image bmpImg = System.Drawing.Image.FromStream(ms);
 
-            if (cfs.Count == 5)
-            {
-                addEvent(5, " Abnormal colony growth");
-            }
+                int[] events = aw.getCount().newStep(bmpImg);
 
+                for(int i = 0; i < events.Length; i++)
+                {
+                    addEvent(cfs.Count -1, AdvancedOptions._sEventMessages[events[i]]);
+                }
+            }
         }
 
         internal void CaptureFinished()
@@ -715,6 +731,8 @@ namespace PetriUI
             {
                 newCaptureThread.Abort();
                 e.Cancel = false;
+                aw.Close();
+
             }
             else
             {
@@ -741,6 +759,8 @@ namespace PetriUI
                         CapturePreviews.DecrementCaptures();
                         newCaptureThread.Abort();
                         cp.EraseFinishedCapture(Int32.Parse(this.Uid));
+                        aw.Close();
+
                     }
 
                 }
@@ -748,7 +768,8 @@ namespace PetriUI
                 {
                     cp.EraseFinishedCapture(Int32.Parse(this.Uid));
                     e.Cancel = false;
-      
+                    aw.Close();
+
                 }
                 if (playing)
                 {

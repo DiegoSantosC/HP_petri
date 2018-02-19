@@ -1,0 +1,111 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace PetriUI
+{
+    /// <summary>
+    /// Interaction logic for Page1.xaml
+    /// </summary>
+    public partial class Picker : Page
+    {
+        private CaptureWindow captureWindow;
+        private bool countAnalysis, classAnalysis;
+        private ClassifyAnalytics clssPage;
+        private CountAnalytics countPage;
+
+        public Picker(CaptureWindow cw, bool count, bool classAn, ClassifyAnalytics clss, CountAnalytics cnt)
+        {
+            InitializeComponent();
+
+            captureWindow = cw;
+            countAnalysis = count;
+            classAnalysis = classAn;
+
+            Logo_Init();
+
+            Panel_Logic_Init();
+
+            clssPage = clss;
+            countPage = cnt;
+        }
+
+        private void Panel_Logic_Init()
+        {
+            classSP.MouseEnter += new MouseEventHandler(spEnter);
+            classSP.MouseLeave += new MouseEventHandler(spLeave);
+
+            countSP.MouseEnter += new MouseEventHandler(spEnter);
+            countSP.MouseLeave += new MouseEventHandler(spLeave);
+
+            classSP.MouseDown += new MouseButtonEventHandler(classClick);
+            countSP.MouseDown += new MouseButtonEventHandler(countClick);
+
+            Image count = new Image();
+            BitmapImage src2 = new BitmapImage();
+            src2.BeginInit();
+            src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Counting_background.jpg", UriKind.Absolute);
+            src2.CacheOption = BitmapCacheOption.OnLoad;
+            src2.EndInit();
+            count.Source = src2;
+            count.Stretch = Stretch.Uniform;
+            countSP.Children.Add(count);
+        }
+
+        private void countClick(object sender, MouseButtonEventArgs e)
+        {
+            if (countAnalysis)
+            {
+                countPage.Show(0);
+                this.NavigationService.Navigate(countPage);
+            }
+        }
+
+        private void classClick(object sender, MouseButtonEventArgs e)
+        {
+            if (classAnalysis)
+            {
+                this.NavigationService.Navigate(clssPage);
+            }
+        }
+
+        private void spLeave(object sender, MouseEventArgs e)
+        {
+            StackPanel sp = (StackPanel)sender;
+            sp.Opacity = 1;
+        }
+
+        private void spEnter(object sender, MouseEventArgs e)
+        {
+            StackPanel sp = (StackPanel)sender;
+            sp.Opacity = 0.8;
+        }
+
+        private void Logo_Init()
+        {
+            System.Windows.Controls.Image logo = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\HP_logo.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            logo.Source = src;
+            logo.Stretch = Stretch.Uniform;
+
+            LogoSp.Children.Add(logo);
+
+        }
+        
+    }
+}

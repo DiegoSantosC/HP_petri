@@ -1,0 +1,52 @@
+﻿<Page x:Class="PetriUI.CountAnalytics"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PetriUI"
+      mc:Ignorable="d" 
+      Title="CountAnalytics">
+
+    <Grid Margin="10,10,10,10">
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="600"/>
+            <ColumnDefinition Width="600"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="600"/>
+            <RowDefinition Height="150"/>
+        </Grid.RowDefinitions>
+
+        <!-- HP Aesthetics Border -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#00BFFF"/>
+        <StackPanel Name="LogoSP" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" Height="100" Width="100"/>
+
+        <!-- Title label -->
+        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}"> Analysis </Label>
+
+        <!-- Fake carrousel left and right -->
+        <StackPanel Name="leftSp" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Margin="50,0,0,0" Height="100"></StackPanel>
+        <StackPanel Name="rightSp" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Width="100" Margin="0,0,50,0" Height="100"/>
+
+        <!-- Carousel info-->
+        <Label Name="infoLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center" FontSize="25" VerticalAlignment="Top" Style="{StaticResource label1Style}">1/3</Label>
+
+        <!-- Image drawing -->
+        <Border Name="Border1" Width="300" Grid.Column="0" Grid.Row="2" Height="300" Background="LightGray">
+            <Border Name="Border2" Width="290" Height="290" Background="White">
+                <StackPanel Width="290" Height="290" Name="sampleSP"/>
+            </Border>
+        </Border>
+
+        <!-- Cluster Showing Canvas -->
+        <Canvas Height="400" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Name="EventsCanvas" Grid.Column="1" Grid.Row="2">
+            <ListBox Name="ClusterListBox" Width="500" Height="400"/>
+        </Canvas>
+        
+    </Grid>
+
+</Page>
