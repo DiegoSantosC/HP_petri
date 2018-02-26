@@ -571,8 +571,7 @@ namespace PetriUI
 
             if (t.getClassAnalysis() || t.getCountAnalysis())
             {
-                senderBut.IsEnabled = false;
-                if(cfs.Count > 2) aw.Show();
+                if (cfs.Count > 2) { aw.Show(); aw.getCount().initStatics(); senderBut.IsEnabled = false;}
                 else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
             }else{
 
@@ -699,7 +698,7 @@ namespace PetriUI
                 bbe.Save(ms);
                 System.Drawing.Image bmpImg = System.Drawing.Image.FromStream(ms);
 
-                int[] events = aw.getCount().newStep(bmpImg);
+                int[] events = aw.getCount().newStep(bmpImg, DateTime.Now.ToString("hh:mm:ss"));
 
                 for(int i = 0; i < events.Length; i++)
                 {

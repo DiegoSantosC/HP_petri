@@ -24,8 +24,11 @@ namespace PetriUI
     {
         private Bitmap background;
         private List<Bitmap> Tracking_Images;
+        private List<List<ListBoxItem>> cluster_Specs;
+        private List<List<System.Windows.Shapes.Rectangle>> cluster_locations;
         private Tracking track;
         private int step;
+        private bool changing;
 
         // Test inputs
         private Bitmap[] testBmps;
@@ -37,6 +40,11 @@ namespace PetriUI
             track = new Tracking();
 
             step = 0;
+
+            changing = false;
+
+            cluster_Specs = new List<List<ListBoxItem>>();
+            cluster_locations = new List<List<System.Windows.Shapes.Rectangle>>();
 
             // Test inputs initialization
 
@@ -71,7 +79,7 @@ namespace PetriUI
         {
             StackPanel aux = new StackPanel();
             System.Windows.Shapes.Rectangle frame = new System.Windows.Shapes.Rectangle();
-            frame.Width = 575;
+            frame.Width = 500;
             frame.Height = 400;
 
             frame.Stroke = System.Windows.Media.Brushes.Blue;
@@ -80,12 +88,15 @@ namespace PetriUI
             aux.Children.Add(frame);
             StackPanel.SetZIndex(aux, 10);
 
-            ImagesCanvas.Children.Add(aux);
-        }
+            ClusterCanvas.Children.Add(aux);
 
+            ClusterListBox.SelectionChanged += new SelectionChangedEventHandler(showLocation);
+        }
 
         public void Show(int index)
         {
+            changing = true;
+
             sampleSP.Children.Clear();
 
             System.Windows.Controls.Image img = new System.Windows.Controls.Image();
@@ -97,7 +108,23 @@ namespace PetriUI
             img.Source = src;
             sampleSP.Children.Add(img);
 
-            infoLabel.Content = index.ToString() + "/" + Tracking_Images.Count.ToString();
+            infoLabel.Content = 1 + "/" + Tracking_Images.Count.ToString();
+
+            rectanglesCanvas.Children.Clear();
+
+            ModifyListBox(index);
+
+            changing = false;
+        }
+
+        private void ModifyListBox(int index)
+        {
+            ClusterListBox.Items.Clear();
+
+            for (int i=0; i<cluster_Specs[index].Count(); i++)
+            {
+                ClusterListBox.Items.Add(cluster_Specs[index][i]);
+            }
         }
 
         // Scroll left elements and functionality
@@ -236,10 +263,196 @@ namespace PetriUI
             }
 
         }
+   
+        public void initStatics()
+        {
+            for(int i = 0; i < track.getTimelineTracking().Count; i++)
+            {
+                List<ListBoxItem> blobs = new List<ListBoxItem>();
+                List<System.Windows.Shapes.Rectangle> locations = new List<System.Windows.Shapes.Rectangle>();
 
- // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                for(int j = 0; j < track.getTimelineTracking()[i].Count; j++)
+                {
+                    Cluster c = track.getTimelineTracking()[i][j];
+
+                    ListBoxItem lbItem = createItemFromCluster(c);
+                    System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle();
+
+                    r.Stroke = System.Windows.Media.Brushes.LightGreen;
+                    r.StrokeThickness = 2;
+                    
+                    // Rectangles' size and position is scaled 
+
+                    r.Width = ((c.getBoundingBox()[2] - c.getBoundingBox()[0]) * 290 / Tracking_Images[0].Width) + 5;
+                    r.Height = ((c.getBoundingBox()[3] - c.getBoundingBox()[1]) * 290/ Tracking_Images[0].Height) + 5;
+
+                    r.Margin = new Thickness((c.getBoundingBox()[0] * 290 / Tracking_Images[0].Width)-2, (c.getBoundingBox()[1] * 290/ Tracking_Images[0].Height)-2, 0, 0);
+
+                    blobs.Add(lbItem);
+                    locations.Add(r);
+                }
+
+                cluster_Specs.Add(blobs);
+                cluster_locations.Add(locations);
+            }
+        }
+
+        private void showLocation(object sender, SelectionChangedEventArgs e)
+        {
+            if (!changing)
+            {
+                String s = infoLabel.Content.ToString();
+                String[] data = s.Split('/');
+
+                int currentCapture = Int32.Parse(data[0]);
+
+                int currentCluster = ClusterListBox.SelectedIndex;
+
+                rectanglesCanvas.Children.Clear();
+
+                rectanglesCanvas.Children.Add(cluster_locations[currentCapture - 1][currentCluster]);
+
+            }
+
+        }
+
+        private void showLocation(object sender, MouseEventArgs e)
+        {
+            String s = infoLabel.Content.ToString();
+            String[] data = s.Split('/');
+
+            int currentCapture = Int32.Parse(data[0]);
+
+            int currentCluster = ClusterListBox.SelectedIndex;
+
+            rectanglesCanvas.Children.Clear();
+
+            rectanglesCanvas.Children.Add(cluster_locations[currentCapture - 1][currentCluster]);
+
+        }
+
+        private ListBoxItem createItemFromCluster(Cluster c)
+        {
+            ListBoxItem item = new ListBoxItem();
+            Grid g = new Grid();
+           
+            item.Height = 80;
+            item.Width = 500;
+
+            ColumnDefinition c1 = new ColumnDefinition();
+            c1.Width = new GridLength(350);
+            ColumnDefinition c2 = new ColumnDefinition();
+            c1.Width = new GridLength(120);
+            ColumnDefinition c3 = new ColumnDefinition();
+            c1.Width = new GridLength(120);
+            ColumnDefinition c4 = new ColumnDefinition();
+            c1.Width = new GridLength(40);
+
+
+            g.ColumnDefinitions.Add(c1);
+            g.ColumnDefinitions.Add(c2);
+            g.ColumnDefinitions.Add(c3);
+            g.ColumnDefinitions.Add(c4);
+
+            Label l1 = new Label();
+            l1.Width = 40;
+            l1.HorizontalAlignment = HorizontalAlignment.Left;
+            l1.VerticalAlignment = VerticalAlignment.Center;
+            l1.Content = " Id : " + c.getId().ToString();
+      
+            Label l2 = new Label();
+            l2.Width = 120;
+            l2.HorizontalAlignment = HorizontalAlignment.Left;
+            l2.VerticalAlignment = VerticalAlignment.Center;
+            l2.Content = " Size : " + c.getSize().ToString() + " pixels";
+
+            Label l3 = new Label();
+            l3.Width = 120;
+            l3.HorizontalAlignment = HorizontalAlignment.Left;
+            l3.VerticalAlignment = VerticalAlignment.Center;
+            l3.Content = " Taken at : " + c.getTime();
+
+            Label l4 = new Label();
+            l4.Width = 350;
+            l4.HorizontalAlignment = HorizontalAlignment.Left;
+            l4.VerticalAlignment = VerticalAlignment.Center;
+            l4.Content = "";
+
+            if (c.isFirst())
+            {
+                l4.Content = " New colony appearance";
+            }
+            if (c.hasMerged())
+            {
+                if(l4.Content.ToString().Length > 0)
+                {
+                    l4.Content += Environment.NewLine + "Will merge with Colony " + c.getFather().ToString();
+
+                    if (c.hasMergedWithDifferent()) l4.Content += " of a different class";
+                    else l4.Content += " of the same class";
+                }
+                else
+                {
+                    l4.Content = " This colony will merge " + Environment.NewLine +  "with Colony " + c.getFather().ToString();
+
+                    if (c.hasMergedWithDifferent()) l4.Content += " of a different class";
+                    else l4.Content += " of the same class";
+                }
+            }
+            if (c.getBranches().Count > 0)
+            {
+                if (l4.Content.ToString().Length > 0)
+                {
+                    l4.Content += Environment.NewLine + "Will have merged ";
+
+                    if (c.getBranches().Count == 1) l4.Content += "Colony " + c.getBranches()[0][0].getId();
+                    else
+                    {
+                        l4.Content += "Colonies: ";
+
+                        for (int i = 0; i < c.getBranches().Count; i++)
+                        {
+                            l4.Content += c.getBranches()[0][0].getId() + " ";
+                        }
+                    }
+                }
+                else
+                {
+                    l4.Content += "This colony will have" + Environment.NewLine + " merged ";
+
+                    if (c.getBranches().Count == 1) l4.Content += "colony " + c.getBranches()[0][0].getId();
+                    else
+                    {
+                        l4.Content += "colonies: ";
+
+                        for (int i = 0; i < c.getBranches().Count; i++)
+                        {
+                            l4.Content += c.getBranches()[i][0].getId() + " ";
+                        }
+                    }
+                }
+            }
+           
+
+            Grid.SetColumn(l1, 0);
+            Grid.SetColumn(l2, 1);
+            Grid.SetColumn(l3, 2);
+            Grid.SetColumn(l4, 3);
+
+            g.Children.Add(l4);
+            g.Children.Add(l3);
+            g.Children.Add(l2);
+            g.Children.Add(l1);
+
+            item.Content = g;
+
+            return item;
+
+        }
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analysis functions
- // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         public void setBackgound(System.Drawing.Image backgroundImg)
         {
@@ -250,7 +463,7 @@ namespace PetriUI
             background = testBmps[0];
         }
 
-        public int[] newStep(System.Drawing.Image img)
+        public int[] newStep(System.Drawing.Image img, string time)
         {
             //Bitmap bmp = new Bitmap(img);
 
@@ -264,7 +477,7 @@ namespace PetriUI
 
             Map resultDifference = DifferenceComputation.getManhattan(background, bmp, positions);
 
-            List<Cluster> frameBlobs = FindObjects(resultDifference);
+            List<Cluster> frameBlobs = FindObjects(resultDifference, time);
 
             Console.WriteLine();
             Console.WriteLine("Tracking " + step + ": " + frameBlobs.Count + " blobs encountered");
@@ -319,9 +532,9 @@ namespace PetriUI
             return newEvents;
         }
 
-        private List<Cluster> FindObjects(Map resultDifference)
+        private List<Cluster> FindObjects(Map resultDifference, string time)
         {
-            ConnectedComponents cc = new ConnectedComponents(resultDifference, " ", new ROI(AdvancedOptions._nROIMargin, resultDifference.getGreyMap()), "");
+            ConnectedComponents cc = new ConnectedComponents(resultDifference, " ", new ROI(AdvancedOptions._nROIMargin, resultDifference.getGreyMap()), time);
 
             // Drawing the image will result in acquiring visual feedback of the blobs detected via their bounding boxes
 
@@ -329,6 +542,5 @@ namespace PetriUI
 
             return cc.getIdentifiedBlobs();
         }
-
     }
 }

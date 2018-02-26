@@ -14,7 +14,7 @@ namespace AnalysisTestApp
         private string timelapse;
         private int mergedToBranch;
         private List<List<Cluster>> mergeBranches;
-        private bool differentMerging;
+        private bool differentMerging, firstColony;
 
         public Cluster(int given_ID, string time)
         {
@@ -40,11 +40,28 @@ namespace AnalysisTestApp
 
             differentMerging = false;
 
+            firstColony = false;
+
         }
 
         public int getId()
         {
             return id;
+        }
+
+        public string getTime()
+        {
+            return timelapse;
+        }
+
+        public void setFirst()
+        {
+            firstColony = true;
+        }
+
+        public bool isFirst()
+        {
+            return firstColony;
         }
 
         public int getStep()
@@ -54,7 +71,7 @@ namespace AnalysisTestApp
 
         public bool hasMerged()
         {
-            if (mergedToBranch == -1) return true;
+            if (mergedToBranch != -1) return true;
 
             else return false;
         }

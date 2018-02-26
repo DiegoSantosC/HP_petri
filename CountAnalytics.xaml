@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       Title="CountAnalytics">
 
-    <Grid Margin="10,10,10,10">
+    <Grid>
         
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="600"/>
@@ -16,9 +16,9 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="600"/>
-            <RowDefinition Height="150"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <!-- HP Aesthetics Border -->
@@ -37,13 +37,18 @@
 
         <!-- Image drawing -->
         <Border Name="Border1" Width="300" Grid.Column="0" Grid.Row="2" Height="300" Background="LightGray">
-            <Border Name="Border2" Width="290" Height="290" Background="White">
+            <Canvas Width="290" Height="290">
+                <Border Name="Border2" Width="290" Height="290" Background="White"/>
                 <StackPanel Width="290" Height="290" Name="sampleSP"/>
-            </Border>
+                <Canvas Width="290" Height="290" Name="rectanglesCanvas" Opacity="1"/>
+            </Canvas>
         </Border>
 
+        <!-- Info label -->
+        <Label Name="infoLabel2" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50, 60, 0, 0">(click a cluster for it to be highlighted in the capture)</Label>
+
         <!-- Cluster Showing Canvas -->
-        <Canvas Height="400" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Name="EventsCanvas" Grid.Column="1" Grid.Row="2">
+        <Canvas Height="400" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Name="ClusterCanvas" Grid.Column="1" Grid.Row="2">
             <ListBox Name="ClusterListBox" Width="500" Height="400"/>
         </Canvas>
         

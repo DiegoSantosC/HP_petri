@@ -23,6 +23,31 @@ namespace AnalysisTestApp
             return blobTrack;
         }
 
+        public List<List<Cluster>> getTimelineTracking()
+        {
+            List<List<Cluster>> timeTracking = new List<List<Cluster>>();
+
+            for(int i = 0; i < blobTrack.Count; i++)
+            {
+                for(int j = 0; j < blobTrack[i].Count; j++)
+                {
+                    if (blobTrack[i][j].getStep() + 1 > timeTracking.Count)
+                    {
+                        List<Cluster> stepList = new List<Cluster>();
+                        stepList.Add(blobTrack[i][j]);
+
+                        timeTracking.Add(stepList);
+                    }
+                    else
+                    {
+                        timeTracking[blobTrack[i][j].getStep()].Add(blobTrack[i][j]);
+                    }
+                }
+            }
+
+            return timeTracking;
+        }
+
         public bool isEmpty()
         {
             return blobTrack.Count == 0 ? true : false; 
@@ -38,6 +63,8 @@ namespace AnalysisTestApp
             for (int i = 0; i < blobs.Count; i++)
             {
                 blobs.ElementAt(i).setStep(step);
+                blobs[i].setFirst();
+
                 List<Cluster> initialList = new List<Cluster>();
                 initialList.Add(blobs.ElementAt(i));
 
@@ -103,6 +130,8 @@ namespace AnalysisTestApp
                                 Console.WriteLine("New colony considered to be appeared");
 
                                 List<Cluster> newlist = new List<Cluster>();
+                                blobs[i].setFirst();
+
                                 blobs.ElementAt(i).setIndex(blobTrack.Count);
                                 newlist.Add(blobs.ElementAt(i));
                                 blobTrack.Add(newlist);
