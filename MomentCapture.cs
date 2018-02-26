@@ -32,7 +32,7 @@ using hp.pc;
 namespace PetriUI
 {
     /// <summary>
-    /// Interaction between the App and the Sprout hadrware via IPcLinks
+    /// Interaction between the App and the Sprout hardware via IPcLinks
     /// </summary>
     class MomentCapture
     {

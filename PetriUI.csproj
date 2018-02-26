@@ -60,7 +60,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DataVisualization" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -79,9 +81,32 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnalysisWindow.xaml.cs">
+      <DependentUpon>AnalysisWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="captureFramework.cs" />
     <Compile Include="CapturePreviews.xaml.cs">
       <DependentUpon>CapturePreviews.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChartPage.xaml.cs">
+      <DependentUpon>ChartPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClassifyAnalytics.xaml.cs">
+      <DependentUpon>ClassifyAnalytics.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CountAlgorithms\AdvancedOptions.cs" />
+    <Compile Include="CountAlgorithms\Cluster.cs" />
+    <Compile Include="CountAlgorithms\ConnectedComponents.cs" />
+    <Compile Include="CountAlgorithms\DifferenceComputation.cs" />
+    <Compile Include="CountAlgorithms\Map.cs" />
+    <Compile Include="CountAlgorithms\Matching-Robinson.cs" />
+    <Compile Include="CountAlgorithms\ROI.cs" />
+    <Compile Include="CountAlgorithms\Tracking.cs" />
+    <Compile Include="CountAnalytics.xaml.cs">
+      <DependentUpon>CountAnalytics.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Picker.xaml.cs">
+      <DependentUpon>Picker.xaml</DependentUpon>
     </Compile>
     <Compile Include="PlayHandler.cs" />
     <Compile Include="ProjectedForm.cs" />
@@ -96,7 +121,23 @@
       <DependentUpon>CaptureWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolBox.cs" />
+    <Page Include="AnalysisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CapturePreviews.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClassifyAnalytics.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CountAnalytics.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -119,6 +160,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CaptureWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Picker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -163,6 +208,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

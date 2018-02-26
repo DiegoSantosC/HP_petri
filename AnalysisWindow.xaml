@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:PetriUI"
         mc:Ignorable="d"
         Title="AnalysisWindow"
-        Source="Picker.xaml">
+        Source="Picker.xaml"
+        Closing="CaptureWindow_Closing">
     
 </NavigationWindow>

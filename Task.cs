@@ -41,9 +41,9 @@ namespace PetriUI
         private int numberOfCaptures, interval, index, delay;
         private List<Uri> captures;
         private string folder;
-
+        private bool countAnalysis, classAnalysis;
         // Constructor
-        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f)
+        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f, bool count, bool classAn)
         {
             captureWindow = cw;
             numberOfCaptures = nOfC;
@@ -52,6 +52,10 @@ namespace PetriUI
             captures = cpt;
             delay = dl;
             folder = f;
+            countAnalysis = count;
+            classAnalysis = classAn;
+
+            Console.WriteLine(countAnalysis + " " + classAnalysis);
         }
 
         // @Override Task Constructor
@@ -93,6 +97,14 @@ namespace PetriUI
         {
             return this.folder;
         }
+        public bool getCountAnalysis()
+        {
+            return countAnalysis;
+        }
+        public bool getClassAnalysis()
+        {
+            return classAnalysis;
+        }
 
         public void setCaptureWindow(CaptureWindow cp)
         {
@@ -125,6 +137,13 @@ namespace PetriUI
         {
             this.folder = f;
         }
-
+        public void setCountAnalysis(bool count)
+        {
+            countAnalysis = count;
+        }
+        public void setClassAnalysis(bool classAn)
+        {
+            classAnalysis = classAn;
+        }
     }
 }

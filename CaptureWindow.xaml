@@ -58,8 +58,13 @@
 
         <!-- Last Capture drawing Canvas -->
         <Canvas Name="LastImageCanvas" Margin ="100,0,50,50" Grid.Column="0" Grid.Row="2"/>
-        
-        
+
+        <!-- Analysis button -->
+        <Button Name="CountAnalysisBut" Grid.Column="0" Grid.Row="3" HorizontalAlignment ="Center" Visibility ="Hidden" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="250,0,50,40" Width="200" Height="40" Click="Show_Analysis">Show Analysis</Button>
+
+        <!-- General analysis button -->
+        <Button Name="generalAnalysisBut" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" Visibility ="Visible" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="350,0,50,40" Width="200" Height="40" Click="General_Analysis">General Analysis</Button>
+
         <!-- Capture Finished Label -->
         <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Center" Name="finishedCapture" Background="#E9DA2D"> 
             <Label Name="RunningLabel" FontSize="15" Foreground="Black">Awaiting to Start</Label>
@@ -68,8 +73,11 @@
         <!-- Information label -->
         <Label Name="infoLabel" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden">Click capture to focus (last capture focused by default)</Label>
 
+        <!-- Event Information label -->
+        <Label Name="infoLabel2" Grid.Column="1" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Margin="80, 0, 0, 95">Click event to view</Label>
+
         <!-- Time label -->
-        <Label Name="timeLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden" Margin="80,0,0,80">Capture taken at:</Label>
+        <Label Name="timeLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Visibility="Hidden" Margin="150,0,0,80">Capture taken at:</Label>
 
         <!-- Play and Stop button -->
        
@@ -85,9 +93,5 @@
             <StackPanel Name="speedUp_SP"/>
         </Button>
         <Label Name="speedLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment ="Left" VerticalAlignment="Bottom" Margin="270,0,0,30">Speed x1</Label>
-
-        <!-- Analysis button -->
-        <Button Grid.Column="1" Grid.Row="1" Style="{StaticResource button2Style}" VerticalAlignment="Center" Margin="0,0,50,0" Width="200" Height="40" Click="Show_Analysis">Show Analysis</Button>
-        
     </Grid>
 </Window>

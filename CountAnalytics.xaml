@@ -47,6 +47,9 @@
         <!-- Info label -->
         <Label Name="infoLabel2" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50, 60, 0, 0">(click a cluster for it to be highlighted in the capture)</Label>
 
+        <!-- Time label -->
+        <Label Name="timeLabel" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0, 0, 0, 80">Capture taken at: </Label>
+
         <!-- Cluster Showing Canvas -->
         <Canvas Height="400" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Name="ClusterCanvas" Grid.Column="1" Grid.Row="2">
             <ListBox Name="ClusterListBox" Width="500" Height="400"/>

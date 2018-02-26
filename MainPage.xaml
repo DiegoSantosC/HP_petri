@@ -36,6 +36,9 @@
         <!-- Show objects button -->
         <Button Grid.Column="0" Name="ShowButton" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="objectShow_Button_Click" Margin="50,0,0,0"> Show Objects </Button>
 
+        <!-- Show objects button -->
+        <Button Grid.Column="0" Name="ImportButton" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="import_Button_Click" Margin="300,0,0,0">Import captures</Button>
+
         <!-- Navigation label and "button"-->
         <Label Name="navLabel" Grid.Column="1"  Visibility="Hidden" FontSize="14" Grid.Row="2" Margin="0,80,20,0" Style="{StaticResource label1Style}">Capture Previews</Label>
         <StackPanel Name="navigationSp" Grid.Column="1" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="2" Width="80" Height="80" Margin="0,20,35,0"/>
@@ -101,11 +104,57 @@
                 <Button Grid.Column="2" Grid.Row="5" VerticalAlignment="Bottom" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
                
                 <!-- Enable different analysis options -->
-                <CheckBox Name="Chk1" Grid.Column="0" Grid.Row="6" Margin="150,78,0,0"/>
-                <Label Grid.Column="0" Grid.Row="6" Margin="165,70,0,0" FontSize="16">Analysis1</Label>
+                <CheckBox Name="Chk1" Grid.Column="0" Grid.Row="6" Margin="125,78,0,0"/>
+                <Label Grid.Column="0" Grid.Row="6" Margin="137,70,0,0" FontSize="16">Count Analysis</Label>
 
-                <CheckBox Name="Chk2" Grid.Column="1" Grid.Row="6" Margin="0,78,0,0"/>
-                <Label Grid.Column="1" Grid.Row="6" Margin="15,70,0,0" FontSize="16">Analysis2</Label>
+                <CheckBox Name="Chk2" Grid.Column="1" Grid.Row="6" Margin="5,78,0,0"/>
+                <Label Grid.Column="1" Grid.Row="6" Margin="20,70,0,0" FontSize="16">Class Analysis</Label>
+            </Grid>
+        </Border>
+
+        <!-- Import input structure -->
+
+        <Border Name ="ImportBorder" Width ="700" Height="500" Margin="50,0,0,0" HorizontalAlignment="Center" 
+                Grid.Column="1" Grid.Row="3" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" Visibility="Hidden">
+
+            <Grid Width ="700" Height="500" Background="White">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+
+                </Grid.RowDefinitions>
+
+                <Label Name="ImportLabel" Grid.Row="0" HorizontalAlignment ="Center" Style="{StaticResource label1Style}">Import Settings</Label>
+                
+                <!-- Folder election button -->
+                <Button Height="25" Width="170" HorizontalAlignment ="Left" Grid.Row="2" FontSize="17" VerticalAlignment="Top" Margin="30,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Import_Button_Click">Choose Import Folder</Button>
+                <Label Name="FolderImportLabel" Grid.Row="2" VerticalAlignment="Top" Margin="230,20,0,0" FontSize="16" HorizontalAlignment="Left">Not defined</Label>
+
+                <!-- Confirm parameters button -->
+                <Button Grid.Row="5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
+
+                <!-- Enable different analysis options -->
+                <Label FontWeight="Bold" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="16">Analysis to be performed: </Label>
+
+                <CheckBox Name="ImportChck1" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="230,0,0,0"/>
+                <Label Grid.Column="0" Grid.Row="3" Margin="245,0,0,0" VerticalAlignment="Center" FontSize="16">Count Analysis</Label>
+
+                <CheckBox Name="ImportChck2" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="380,0,0,0"/>
+                <Label Grid.Column="1" Grid.Row="3" Margin="395,0,0,0" VerticalAlignment="Center" FontSize="16">Class Analysis</Label>
+
+                <!-- Folder election button -->
+                <Button Height="25" Width="170" HorizontalAlignment ="Left" Grid.Row="4" FontSize="17" VerticalAlignment="Top" Margin="30,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Save_Button_Click">Save Folder</Button>
+                <Label Name="FolderSaveLabel" Grid.Row="4" VerticalAlignment="Top" Margin="230,20,0,0" FontSize="16" HorizontalAlignment="Left">Not defined</Label>
+                
             </Grid>
         </Border>
 

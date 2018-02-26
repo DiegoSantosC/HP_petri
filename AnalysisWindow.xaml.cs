@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace PetriUI
         private Picker pick;
         private ClassifyAnalytics clssPage;
         private CountAnalytics countPage;
+        private ChartPage chartPage;
+        private bool closeRequest;
 
         public AnalysisWindow(CaptureWindow cw, bool countAnalysis, bool classAnalysis)
         {
@@ -32,14 +35,18 @@ namespace PetriUI
             this.Height = 900;
 
             if (classAnalysis) clssPage = new ClassifyAnalytics();
-            if (countAnalysis) countPage = new CountAnalytics();
+            if (countAnalysis) { countPage = new CountAnalytics(); chartPage = new ChartPage(); }
 
-            pick = new Picker(cw, countAnalysis, classAnalysis, clssPage, countPage);
+            pick = new Picker(cw, countAnalysis, classAnalysis, clssPage, countPage, chartPage);
 
             Navigate(pick);
 
+            closeRequest = false;
         }
-
+        public void requestClosing()
+        {
+            closeRequest = true;
+        }
         public CountAnalytics getCount()
         {
             return countPage;
@@ -48,6 +55,25 @@ namespace PetriUI
         public ClassifyAnalytics getClass()
         {
             return clssPage;
+        }
+
+        public Picker getPicker()
+        {
+            return pick;
+        }
+
+        private void CaptureWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (!closeRequest)
+            {
+                this.Hide();
+                e.Cancel = true;
+            }
+        }
+
+        public ChartPage getChart()
+        {
+            return chartPage;
         }
     }
 }

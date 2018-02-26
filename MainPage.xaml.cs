@@ -60,6 +60,7 @@ namespace PetriUI
         public static List<int[]> parameters;
         private static int counter;
         private static List<string> saveFolders;
+        private static List<bool[]> analysisToPerform;
 
         private CapturePreviews cp;
 
@@ -76,6 +77,8 @@ namespace PetriUI
             objectShowStackPanel.Visibility = Visibility.Collapsed;
 
             parameters = new List<int[]>();
+
+            analysisToPerform = new List<bool[]>();
 
             counter = 1;
 
@@ -183,6 +186,14 @@ namespace PetriUI
 
             ShowButton.Content = "Scan new Layout";
             ParametersBorder.Visibility = Visibility.Hidden;
+
+            ImportButton.IsEnabled = false;
+        }
+
+        private void import_Button_Click(object sender, RoutedEventArgs e)
+        {
+            ShowButton.IsEnabled = false;
+            ImportBorder.Visibility = Visibility.Visible;
         }
 
         // Definition of outlines functionalities
@@ -252,7 +263,6 @@ namespace PetriUI
         // Settings confirm
         private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
-
             int minutesInterval, hoursInterval, numberOfCaptures, delayH, delayMin;
             string folder;
 
@@ -340,6 +350,18 @@ namespace PetriUI
 
                     saveFolders.Add(folder);
 
+                    bool[] analysis = new bool[2];
+                    if (Chk1.IsChecked.GetValueOrDefault()) { analysis[0] = true; }
+                    else { analysis[0] = false; }
+
+                    if (Chk2.IsChecked.GetValueOrDefault()) { analysis[1] = true; }
+                    else { analysis[1] = false; }
+
+                    Chk1.IsChecked = false;
+                    Chk2.IsChecked = false;
+
+                    analysisToPerform.Add(analysis);
+
                     CaptureCancelButton.Visibility = Visibility.Visible;
 
                 }
@@ -353,7 +375,6 @@ namespace PetriUI
         // Launch captures
         private void CaptureConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
-
             // The navigaton is now enabled
             System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
             BitmapImage src = new BitmapImage();
@@ -381,16 +402,19 @@ namespace PetriUI
                 indexes.Add(parameters.ElementAt(i)[2]);
             }
 
-            cp.AddCaptures(parameters, indexes, saveFolders);
+            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform);
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
             saveFolders = new List<string>();
+            analysisToPerform = new List<bool[]>();
 
             ShowButton.IsEnabled = false;
 
             CaptureCancelButton.Visibility = Visibility.Hidden;
+
+            ImportButton.IsEnabled = true;
 
         }
 
@@ -422,6 +446,47 @@ namespace PetriUI
 
             FolderLabel.Content = fileLocation;
 
+        }
+
+        private void Folder_Import_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Title = "Choose Import Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            if (result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+            }
+
+            FolderImportLabel.Content = fileLocation;
+
+        }
+
+        private void Folder_Save_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Title = "Choose Import Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            if (result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+            }
+
+            FolderSaveLabel.Content = fileLocation;
         }
     }
 }

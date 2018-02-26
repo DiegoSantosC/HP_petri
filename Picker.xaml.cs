@@ -24,8 +24,9 @@ namespace PetriUI
         private bool countAnalysis, classAnalysis;
         private ClassifyAnalytics clssPage;
         private CountAnalytics countPage;
+        private ChartPage chartPage;
 
-        public Picker(CaptureWindow cw, bool count, bool classAn, ClassifyAnalytics clss, CountAnalytics cnt)
+        public Picker(CaptureWindow cw, bool count, bool classAn, ClassifyAnalytics clss, CountAnalytics cnt, ChartPage chp)
         {
             InitializeComponent();
 
@@ -39,6 +40,8 @@ namespace PetriUI
 
             clssPage = clss;
             countPage = cnt;
+
+            chartPage = chp;
         }
 
         private void Panel_Logic_Init()
@@ -49,8 +52,12 @@ namespace PetriUI
             countSP.MouseEnter += new MouseEventHandler(spEnter);
             countSP.MouseLeave += new MouseEventHandler(spLeave);
 
+            chartSP.MouseEnter += new MouseEventHandler(spEnter);
+            chartSP.MouseLeave += new MouseEventHandler(spLeave);
+
             classSP.MouseDown += new MouseButtonEventHandler(classClick);
             countSP.MouseDown += new MouseButtonEventHandler(countClick);
+            chartSP.MouseDown += new MouseButtonEventHandler(chartClick);
 
             Image count = new Image();
             BitmapImage src2 = new BitmapImage();
@@ -61,6 +68,24 @@ namespace PetriUI
             count.Source = src2;
             count.Stretch = Stretch.Uniform;
             countSP.Children.Add(count);
+
+            Image chart = new Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\ClassIcon.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            chart.Source = src;
+            chart.Stretch = Stretch.Uniform;
+            chartSP.Children.Add(chart);
+        }
+
+        private void chartClick(object sender, MouseButtonEventArgs e)
+        {
+            if (countAnalysis)
+            {
+                this.NavigationService.Navigate(chartPage);
+            }
         }
 
         private void countClick(object sender, MouseButtonEventArgs e)

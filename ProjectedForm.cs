@@ -78,14 +78,14 @@ namespace PetriUI
 
             System.Drawing.Image drawingImage = System.Drawing.Image.FromStream(ms);
 
-            System.Drawing.Image resized = (System.Drawing.Image)(new Bitmap(drawingImage, new System.Drawing.Size(drawingImage.Size.Width*280/(int)System.Windows.SystemParameters.PrimaryScreenWidth, drawingImage.Size.Height*280/ (int)System.Windows.SystemParameters.PrimaryScreenWidth)));
+            System.Drawing.Image resized = (System.Drawing.Image)(new Bitmap(drawingImage, new System.Drawing.Size(drawingImage.Size.Width*320/(int)System.Windows.SystemParameters.PrimaryScreenWidth, drawingImage.Size.Height*320/ (int)System.Windows.SystemParameters.PrimaryScreenWidth)));
             
             pb.Image = resized;
             pb.Height = resized.Height;
             pb.Width = resized.Width;
          
-            matForm.Height = (int)(resized.Height * 1.2);
-            matForm.Width = (int)(resized.Width * 1.2);
+            matForm.Height = (int)(resized.Height * 1.3);
+            matForm.Width = (int)(resized.Width * 1.3);
             matForm.Controls.Add(pb);
              
         }

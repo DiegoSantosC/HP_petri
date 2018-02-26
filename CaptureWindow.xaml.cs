@@ -144,10 +144,32 @@ namespace PetriUI
 
             CapturesListBox.SelectionChanged += new SelectionChangedEventHandler(listBoxClicked);
 
-            if (analysis[0]) EventsListBox.Visibility = Visibility.Visible;
+            EventsListBox.SelectionChanged += new SelectionChangedEventHandler(eventClicked);
+
+            if (analysis[0]) { EventsListBox.Visibility = Visibility.Visible; CountAnalysisBut.Visibility = Visibility.Visible;}
 
             speed = 1;
 
+        }
+
+        private void eventClicked(object sender, SelectionChangedEventArgs e)
+        {
+            int selectedChild = EventsListBox.SelectedIndex;
+            int counter = 0;
+            Console.WriteLine(selectedChild);
+
+            foreach (ListBoxItem item in EventsListBox.Items)
+            {
+                if(counter == selectedChild)
+                {
+                    aw.Show();
+                    aw.Navigate(aw.getCount());
+                    aw.getCount().initStatics();
+                    aw.getCount().Show(Int32.Parse(item.Uid)-1);
+                    CountAnalysisBut.IsEnabled = false;
+
+                }
+            }
         }
 
         private void listBoxClicked(object sender, SelectionChangedEventArgs e)
@@ -372,6 +394,7 @@ namespace PetriUI
             g.Children.Add(l2);
 
             item.Content = g;
+            item.Uid = step.ToString();
 
             EventsListBox.Items.Add(item);
 
@@ -569,15 +592,52 @@ namespace PetriUI
         {
             Button senderBut = (Button)sender;
 
-            if (t.getClassAnalysis() || t.getCountAnalysis())
+            if (t.getCountAnalysis())
             {
-                if (cfs.Count > 2) { aw.Show(); aw.getCount().initStatics(); senderBut.IsEnabled = false;}
+                if (cfs.Count > 2) {
+
+                    aw.Show();
+                    aw.getCount().initStatics();
+                    senderBut.IsEnabled = false;
+
+                    aw.Navigate(aw.getCount());
+
+                    if (CapturesListBox.SelectedIndex == 0)
+                    {
+                        aw.getCount().Show(0);
+                    }else { aw.getCount().Show(CapturesListBox.SelectedIndex -1); }
+                }
                 else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
             }else{
 
                 MessageBox.Show("No analysis selected to be performed");
             }
         }
+
+        public void General_Analysis(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+
+            if (cfs.Count > 2)
+            {
+                if (t.getClassAnalysis() || t.getCountAnalysis())
+                {
+                    aw.Show();
+                    aw.getCount().initStatics();
+                    aw.Navigate(aw.getPicker());
+                    aw.getChart().initCharts(aw.getCount(),  t.getFolder());
+                    senderBut.IsEnabled = false;
+
+                }
+                else
+                {
+                    MessageBox.Show("No analysis selected to be performed");
+                }
+            }
+            else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
+
+        }
+
 
         // Management of a new taken image
 
@@ -700,10 +760,15 @@ namespace PetriUI
 
                 int[] events = aw.getCount().newStep(bmpImg, DateTime.Now.ToString("hh:mm:ss"));
 
+                if (events.Length > 0) file.AppendData("\t\t Events happened : ");
+                     
                 for(int i = 0; i < events.Length; i++)
                 {
                     addEvent(cfs.Count -1, AdvancedOptions._sEventMessages[events[i]]);
+                    file.AppendData("\t\t\t " + AdvancedOptions._sEventMessages[events[i]]);
+                    
                 }
+                if (events.Length > 0) file.AppendData(" ");
             }
         }
 
@@ -713,6 +778,8 @@ namespace PetriUI
             finishedCapture.Background = Brushes.Green;
             RunningLabel.Content = "Capture Process Finished";
             running = false;
+
+            aw.getChart().initCharts(aw.getCount(), t.getFolder());
         }
 
         public void startTriggered()
@@ -758,6 +825,7 @@ namespace PetriUI
                         CapturePreviews.DecrementCaptures();
                         newCaptureThread.Abort();
                         cp.EraseFinishedCapture(Int32.Parse(this.Uid));
+                        aw.requestClosing();
                         aw.Close();
 
                     }
@@ -767,6 +835,7 @@ namespace PetriUI
                 {
                     cp.EraseFinishedCapture(Int32.Parse(this.Uid));
                     e.Cancel = false;
+                    aw.requestClosing();
                     aw.Close();
 
                 }
