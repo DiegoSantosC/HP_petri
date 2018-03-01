@@ -34,16 +34,17 @@
         <Label Name="CaptureDetailsLabel" Margin="20,0,0,0" Grid.Column="1" Grid.Row="2" Style="{StaticResource label2Style}"></Label>
 
         <!-- Show objects button -->
-        <Button Grid.Column="0" Name="ShowButton" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="objectShow_Button_Click" Margin="50,0,0,0"> Show Objects </Button>
+        <Button Grid.Column="0" Name="ShowButton" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="objectShow_Button_Click" Margin="50,30,0,0"> Start Capturing </Button>
 
         <!-- Show objects button -->
-        <Button Grid.Column="0" Name="ImportButton" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="import_Button_Click" Margin="300,0,0,0">Import captures</Button>
+        <Button Grid.Column="0" Name="ImportButton" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="2" Style="{StaticResource button1Style}" Click="import_Button_Click" Margin="300,30,0,0">Import captures</Button>
 
         <!-- Navigation label and "button"-->
         <Label Name="navLabel" Grid.Column="1"  Visibility="Hidden" FontSize="14" Grid.Row="2" Margin="0,80,20,0" Style="{StaticResource label1Style}">Capture Previews</Label>
         <StackPanel Name="navigationSp" Grid.Column="1" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="2" Width="80" Height="80" Margin="0,20,35,0"/>
 
 
+        <Label Name="objShowLabel" Grid.Column="0" Grid.Row="2" Visibility="Hidden" HorizontalAlignment="Center" FontSize="15" VerticalAlignment="Bottom">Select a target object</Label>
         <!-- Object Show Canvas -->
 
         <Border Name ="ImageBorder" Grid.Column="0" Grid.Row="3" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" Visibility="Hidden">
@@ -58,8 +59,8 @@
 
         <!-- Settings input structure -->
         
-        <Border Name ="ParametersBorder" Width ="800" Height="500" Margin="0,100,0,0" HorizontalAlignment="Center" 
-                Grid.Column="1" Grid.Row="3" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" Visibility="Hidden">
+        <Border Name ="ParametersBorder" Width ="800" Height="500" Margin="0,50,0,0" HorizontalAlignment="Center" 
+                Grid.Column="1" Grid.Row="3" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" Visibility="Visible">
 
             <Grid Width ="800" Height="500" Background="White">
 
@@ -71,6 +72,7 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50"/>
+                    <RowDefinition Height="20"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
@@ -80,25 +82,29 @@
                 </Grid.RowDefinitions>
 
                 <Label Name="ParametersTitleLabel" Grid.Column="1" Grid.Row="0" HorizontalAlignment ="Center" Style="{StaticResource label1Style}"> Object 1 capture parameters</Label>
-                <Label Grid.Column="0" Grid.Row="2"  Style="{StaticResource label1Style}">Insert time interval (min)</Label>
-                <Label Grid.Column="0" Grid.Row="3" Style="{StaticResource label1Style}">Insert number of captures </Label>
+                <Label Grid.Column="0" Grid.Row="3"  Style="{StaticResource label1Style}">Insert time interval (min)</Label>
+                <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource label1Style}">Insert number of captures </Label>
 
+                <!-- Name label and textbox-->
+                <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource label1Style}">Insert process name</Label>
+                <TextBox Grid.Column="1" Grid.Row="2" Name="NameTextBox" Height="30" Width="200" Margin="45,0,0,0">Process 0</TextBox>               
+                 
                 <!-- TextBoxes for parameter insertion -->
-
-                <TextBox Grid.Column="1" Grid.Row="2" Margin="0,0,30,0" Name="hoursTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
-                <Label Grid.Column="1" Grid.Row="2" Style="{StaticResource label1Style}">h</Label>
-                <TextBox Grid.Column="3" Grid.Row="2" Margin="0,0,110,0" Name="minutesTextBox"   Style="{StaticResource textBoxStyle}">0</TextBox>
-                <Label Grid.Column="3" Grid.Row="2" Margin="0,0,60,0" Style="{StaticResource label1Style}">min</Label>
-                <TextBox Grid.Column="1" Grid.Row="3" Margin="0,0,30,0" Name="numberOfCapturesTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
-                <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource label1Style}">Insert delay to start</Label>
-                <TextBox Grid.Column="2" Grid.Row="4" Margin="0,0,110,0" Name="delayMinTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
-                <TextBox Grid.Column="1" Grid.Row="4" Margin="0,0,30,0" Name="delayHTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
-                <Label Grid.Column="1" Grid.Row="4" Style="{StaticResource label1Style}">h</Label>
-                <Label Grid.Column="3" Grid.Row="4" Margin="0,0,60,0" Style="{StaticResource label1Style}">min</Label>
+                
+                <TextBox Grid.Column="1" Grid.Row="3" Margin="0,0,30,0" Name="hoursTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <Label Grid.Column="1" Grid.Row="3" Style="{StaticResource label1Style}">h</Label>
+                <TextBox Grid.Column="3" Grid.Row="3" Margin="0,0,110,0" Name="minutesTextBox"   Style="{StaticResource textBoxStyle}">0</TextBox>
+                <Label Grid.Column="3" Grid.Row="3" Margin="0,0,60,0" Style="{StaticResource label1Style}">min</Label>
+                <TextBox Grid.Column="1" Grid.Row="4" Margin="0,0,30,0" Name="numberOfCapturesTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <Label Grid.Column="0" Grid.Row="5" Style="{StaticResource label1Style}">Insert delay to start</Label>
+                <TextBox Grid.Column="2" Grid.Row="5" Margin="0,0,110,0" Name="delayMinTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <TextBox Grid.Column="1" Grid.Row="5" Margin="0,0,30,0" Name="delayHTextBox" Style="{StaticResource textBoxStyle}">0</TextBox>
+                <Label Grid.Column="1" Grid.Row="5" Style="{StaticResource label1Style}">h</Label>
+                <Label Grid.Column="3" Grid.Row="5" Margin="0,0,60,0" Style="{StaticResource label1Style}">min</Label>
 
                 <!-- Folder election button -->
-                <Button Grid.Column="0" Height="25" Width="170" Grid.Row="5" FontSize="17" VerticalAlignment="Top" Margin="0,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Election_Button_Click">Choose save Folder</Button>
-                <Label Grid.Column="1" Name="FolderLabel" Grid.Row="5" VerticalAlignment="Top" Margin="20,20,0,0" FontSize="16" HorizontalAlignment="Left"> Not defined </Label>
+                <Button Grid.Column="0" Height="25" Width="170" Grid.Row="6" FontSize="17" VerticalAlignment="Top" Margin="0,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Election_Button_Click">Choose save Folder</Button>
+                <Label Grid.Column="1" Name="FolderLabel" Grid.Row="6" VerticalAlignment="Top" Margin="20,20,0,0" FontSize="16" HorizontalAlignment="Left"> Not defined </Label>
 
                 <!-- Confirm parameters button -->
                 <Button Grid.Column="2" Grid.Row="5" VerticalAlignment="Bottom" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
@@ -108,7 +114,7 @@
                 <Label Grid.Column="0" Grid.Row="6" Margin="137,70,0,0" FontSize="16">Count Analysis</Label>
 
                 <CheckBox Name="Chk2" Grid.Column="1" Grid.Row="6" Margin="5,78,0,0"/>
-                <Label Grid.Column="1" Grid.Row="6" Margin="20,70,0,0" FontSize="16">Class Analysis</Label>
+                <Label Grid.Column="1" Grid.Row="6" Margin="20,70,0,0" FontSize="16">Classification Analysis</Label>
             </Grid>
         </Border>
 
@@ -140,7 +146,7 @@
                 <Label Name="FolderImportLabel" Grid.Row="2" VerticalAlignment="Top" Margin="230,20,0,0" FontSize="16" HorizontalAlignment="Left">Not defined</Label>
 
                 <!-- Confirm parameters button -->
-                <Button Grid.Row="5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
+                <Button Grid.Row="5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ImportConfirm_Button_Click">Confirm Parameters</Button>
 
                 <!-- Enable different analysis options -->
                 <Label FontWeight="Bold" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="16">Analysis to be performed: </Label>
@@ -149,13 +155,18 @@
                 <Label Grid.Column="0" Grid.Row="3" Margin="245,0,0,0" VerticalAlignment="Center" FontSize="16">Count Analysis</Label>
 
                 <CheckBox Name="ImportChck2" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="380,0,0,0"/>
-                <Label Grid.Column="1" Grid.Row="3" Margin="395,0,0,0" VerticalAlignment="Center" FontSize="16">Class Analysis</Label>
+                <Label Grid.Column="1" Grid.Row="3" Margin="395,0,0,0" VerticalAlignment="Center" FontSize="16">Classificaction Analysis</Label>
 
                 <!-- Folder election button -->
                 <Button Height="25" Width="170" HorizontalAlignment ="Left" Grid.Row="4" FontSize="17" VerticalAlignment="Top" Margin="30,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Save_Button_Click">Save Folder</Button>
                 <Label Name="FolderSaveLabel" Grid.Row="4" VerticalAlignment="Top" Margin="230,20,0,0" FontSize="16" HorizontalAlignment="Left">Not defined</Label>
                 
             </Grid>
+        </Border>
+
+        <!-- Performing analysis label-->
+        <Border Name="AnalysisBorder" Grid.Column="2" Grid.Row="3" HorizontalAlignment ="Center" VerticalAlignment="Bottom" Visibility="Hidden">
+            <Label Margin="4" Grid.Column="2" Grid.Row="3"  Style="{StaticResource label2Style}">Analysis being performed</Label>
         </Border>
 
         <!-- Confirm capture button -->

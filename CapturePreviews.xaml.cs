@@ -200,7 +200,8 @@ namespace PetriUI
         private void scrollRight(object sender, MouseButtonEventArgs e)
         {
             String s = infoLabel.Content.ToString();
-            String[] data = s.Split('/');
+            String[] data1 = s.Split(' ');
+            String[] data = data1[1].Split('/');
 
             int current = Int32.Parse(data[0]);
             int total = Int32.Parse(data[1]);
@@ -214,7 +215,7 @@ namespace PetriUI
                 }
                 catch (ArgumentOutOfRangeException ex) { }
 
-                infoLabel.Content = "1/" + capturesList.Count.ToString();
+                infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
             }else
             {
                 sampleSP.Children.Clear();
@@ -224,7 +225,7 @@ namespace PetriUI
                 }
                 catch (ArgumentOutOfRangeException ex) { }
 
-                infoLabel.Content = (current+1) + "/" + capturesList.Count.ToString();
+                infoLabel.Content = "Process " + (current+1) + "/" + capturesList.Count.ToString();
             }
 
         }
@@ -232,7 +233,8 @@ namespace PetriUI
         private void scrollLeft(object sender, MouseButtonEventArgs e)
         {
             String s = infoLabel.Content.ToString();
-            String[] data = s.Split('/');
+            String[] data1 = s.Split(' ');
+            String[] data = data1[1].Split('/');
 
             int current = Int32.Parse(data[0]);
             int total = Int32.Parse(data[1]);
@@ -247,7 +249,7 @@ namespace PetriUI
                 }
                 catch (ArgumentOutOfRangeException ex) { }
 
-                infoLabel.Content = total + "/" + capturesList.Count.ToString();
+                infoLabel.Content = "Process " + total + "/" + capturesList.Count.ToString();
             }
             else
             {
@@ -259,7 +261,7 @@ namespace PetriUI
                 }
                 catch (ArgumentOutOfRangeException ex) { }
 
-                infoLabel.Content = (current - 1) + "/" + capturesList.Count.ToString();
+                infoLabel.Content = "Process " + (current - 1) + "/" + capturesList.Count.ToString();
             }
 
         }
@@ -267,7 +269,8 @@ namespace PetriUI
         private void ArtficialScroll()
         {
             String s = infoLabel.Content.ToString();
-            String[] data = s.Split('/');
+            String[] data1 = s.Split(' ');
+            String[] data = data1[1].Split('/');
 
             int current = Int32.Parse(data[0]);
             int total = Int32.Parse(data[1]);
@@ -276,20 +279,21 @@ namespace PetriUI
             sampleSP.Children.Clear();
             sampleSP.Children.Add(samplesList.ElementAt(0));
 
-            infoLabel.Content = "1/" + capturesList.Count.ToString();
+            infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
         }
 
         // Captures management
         public static void DecrementCaptures()
         {
             numberCapturesRunning--;
+
             if (numberCapturesRunning == 0)
             {
                 MainPage.capturesRunning = false;
             }
         }
 
-        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis)
+        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis, List<string> names)
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
@@ -297,19 +301,25 @@ namespace PetriUI
 
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i)));
+                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i)), names.ElementAt(analysis.Count - 1 - i));
                 capturesList.ElementAt(i).Uid = (i).ToString();
                 samplesList.Add(samples.ElementAt(i));
                 samplesList.ElementAt(i).Uid = (i).ToString();
 
                 numberCapturesRunning++;
-
             }
 
             sampleSP.Children.Clear();
             sampleSP.Children.Add(samplesList.ElementAt(0));
 
-            infoLabel.Content = "1/" + capturesList.Count.ToString();
+            infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
+
+            if(capturesList.Count > 2)
+            {
+                rightSp.Visibility = Visibility.Visible;
+                leftSp.Visibility = Visibility.Visible;
+
+            }
 
             MainPage.capturesRunning = true;
 
@@ -368,6 +378,12 @@ namespace PetriUI
 
                     ShowButton.IsEnabled = false;
                 }
+            }
+
+            if(capturesList.Count < 2)
+            {
+                rightSp.Visibility = Visibility.Hidden;
+                leftSp.Visibility = Visibility.Hidden;
             }
         }
 

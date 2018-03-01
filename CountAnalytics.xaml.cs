@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,15 +28,18 @@ namespace PetriUI
         private List<List<ListBoxItem>> cluster_Specs;
         private List<List<System.Windows.Shapes.Rectangle>> cluster_locations;
         private Tracking track;
+        private AnalysisWindow aw;
         private int step;
         private bool changing;
 
         // Test inputs
         private Bitmap[] testBmps;
 
-        public CountAnalytics()
+        public CountAnalytics(AnalysisWindow a)
         {
             InitializeComponent();
+
+            aw = a;
 
             track = new Tracking();
 
@@ -368,7 +372,7 @@ namespace PetriUI
             l2.Width = 120;
             l2.HorizontalAlignment = HorizontalAlignment.Left;
             l2.VerticalAlignment = VerticalAlignment.Center;
-            l2.Content = " Size : " + c.getSize().ToString() + " pixels";
+            l2.Content = " Size : " + c.getcmSize().ToString() + " cm";
 
             Label l3 = new Label();
             l3.Width = 120;
@@ -469,12 +473,11 @@ namespace PetriUI
 
         public int[] newStep(System.Drawing.Image img, string time)
         {
-            //Bitmap bmp = new Bitmap(img);
+            Bitmap bmp = new Bitmap(img);
 
             // For testing purposes, taken images will be replaced for static ones
 
-            Bitmap bmp = testBmps[step + 1];
-            if (step == 1) Console.WriteLine("wtf");
+            //Bitmap bmp = testBmps[step + 1];
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
@@ -501,6 +504,27 @@ namespace PetriUI
             events = checkBounds(events, track.getLast(), bmp);
 
             return events;
+        }
+
+        public void staticAnalysis(object param)
+        {
+            List<object> Params = (List<object>)param;
+
+            List<System.Drawing.Image> images = (List < System.Drawing.Image > )Params.ElementAt(0);
+            MainPage mp = (MainPage)Params.ElementAt(1);
+            string folder = (string)Params.ElementAt(2);
+
+            setBackgound(images[0]);
+
+            for(int i = 1; i < images.Count; i++)
+            {
+                newStep(images[i], DateTime.Now.ToString());
+            }
+
+            Directory.CreateDirectory(folder);
+
+            App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+                  new Action(() => mp.finished_Analysis(aw, folder)));
         }
 
         private int[] checkBounds(int[] events, List<Cluster> list, Bitmap bmp)
@@ -580,7 +604,7 @@ namespace PetriUI
 
                 for(int j = 0; j<clusters[i].Count; j++)
                 {
-                    sizes[i][j] = clusters[i][j].getSize();
+                    sizes[i][j] = clusters[i][j].getcmSize();
                 }
             }
 

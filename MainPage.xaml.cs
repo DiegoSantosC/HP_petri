@@ -39,6 +39,8 @@ using System.Threading;
 using System.Drawing;
 using System.Windows.Navigation;
 using Microsoft.Win32;
+using System.Windows.Forms;
+using System.IO;
 
 namespace PetriUI
 {
@@ -47,11 +49,11 @@ namespace PetriUI
     /// Interaction logic for MainPage.xaml
     /// 
     /// Functionality : First Mat Screen scan to choose captures to be started
-    /// as well as the settings related to them
+    /// as well as the settings related to them, importing captures for analysis
     /// 
     /// Launched by : MainWindow (starting interface)
     /// 
-    /// Launches : CapturePreview when captures start running
+    /// Launches : CapturePreview when captures start running, AnalysisWindow when import mode
     /// 
     /// </summary>
 
@@ -61,12 +63,19 @@ namespace PetriUI
         private static int counter;
         private static List<string> saveFolders;
         private static List<bool[]> analysisToPerform;
+        private static List<string> processNames;
 
         private CapturePreviews cp;
 
         public static bool capturesRunning;
 
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      UI related functions
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         // The interface is initialized blank until a scan is made
+
         public MainPage()
         {
             InitializeComponent();
@@ -84,6 +93,7 @@ namespace PetriUI
 
             cp = new CapturePreviews(this);
             saveFolders = new List<string>();
+            processNames = new List<string>();
             capturesRunning = false;
 
             Logo_Init();
@@ -104,10 +114,294 @@ namespace PetriUI
             LogoSP.Children.Add(logo);
         }
 
-        // Object scan. This method can be called repeatedly 
-        private void objectShow_Button_Click(object sender, RoutedEventArgs e)
+        // Definition of outlines functionalities
+
+        private void BorderMouseEnterHandlerEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Border senderBut = (Border)sender;
+            senderBut.Opacity = 0.3;
+        }
+
+        private void BorderMouseEnterHandlerLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Border senderBut = (Border)sender;
+            senderBut.Opacity = 0;
+        }
+
+        void RectangleClickedHandler(object sender, EventArgs e)
+        {
+            SelectionBorder sb = (SelectionBorder)sender;
+            MonitoringParametersShow(sb.getIndex());
+
+        }
+
+        // Navigation functionalities definition
+
+        private void navigationArrowEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            StackPanel senderBut = (StackPanel)sender;
+
+            foreach (object child in senderBut.Children)
+            {
+                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
+
+                childImg.Opacity = 0.7;
+            }
+
+        }
+
+        private void navigationArrowLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            StackPanel senderBut = (StackPanel)sender;
+
+            foreach (object child in senderBut.Children)
+            {
+                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
+
+                childImg.Opacity = 1;
+            }
+        }
+
+        private void navigationArrowClick(object sender, System.Windows.Input.MouseEventArgs e)
         {
 
+            this.NavigationService.Navigate(cp);
+
+        }
+
+        // Erase pending captures data
+
+        private void CaptureCancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            parameters = new List<int[]>();
+            CaptureDetailsLabel.Content = "";
+            saveFolders = new List<string>();
+            CaptureCancelButton.Visibility = Visibility.Hidden;
+
+        }
+
+        // Folder election for saving captures and analysis in a made capture process
+
+        private void Folder_Election_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
+            sfd.Title = "Choose Saving Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            if (result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+            }
+
+            FolderLabel.Content = fileLocation;
+
+        }
+
+        // Folder election from which analysis input will be extracted in import mode
+
+        private void Folder_Import_Button_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog sfd = new FolderBrowserDialog();
+
+            DialogResult res = sfd.ShowDialog();
+
+            if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
+            {
+                FolderImportLabel.Content = sfd.SelectedPath;
+            }
+
+        }
+
+        // Folder electon in which analysis results will be saved in import mode
+
+        private void Folder_Save_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
+            sfd.Title = "Choose Import Location";
+
+            Nullable<bool> result = sfd.ShowDialog();
+
+            string fileLocation = "";
+
+            if (result == true)
+            {
+                if (sfd.FileName != "")
+                {
+                    fileLocation = sfd.FileName;
+                }
+            }
+
+            FolderSaveLabel.Content = fileLocation;
+        }
+
+        private void enableNavigation()
+        {
+            // The navigaton is now enabled
+
+            System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\FlechaDcha.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            navImg.Source = src;
+            navImg.Stretch = Stretch.Uniform;
+
+            navigationSp.Children.Add(navImg);
+
+            navigationSp.MouseEnter += new System.Windows.Input.MouseEventHandler(navigationArrowEnter);
+            navigationSp.MouseLeave += new System.Windows.Input.MouseEventHandler(navigationArrowLeave);
+
+            navigationSp.MouseDown += new MouseButtonEventHandler(navigationArrowClick);
+
+            navigationSp.Visibility = Visibility.Visible;
+            navLabel.Visibility = Visibility.Visible;
+
+        }
+
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      Importing for analysis
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        private void import_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            ImportBorder.Visibility = Visibility.Visible;
+            ImageBorder.Visibility = Visibility.Hidden;
+
+            objShowLabel.Visibility = Visibility.Visible;
+
+        }
+
+        // Import parameters being extracted from the UI
+
+        private void ImportConfirm_Button_Click(object sender, RoutedEventArgs e)
+        {
+            string folderImport = (string)FolderImportLabel.Content;
+            string folderSave = (string)FolderSaveLabel.Content;
+
+            if (folderImport == "Not defined" || folderSave == "Not defined")
+            {
+                System.Windows.MessageBox.Show(" Invalid directory path");
+                return;
+            }
+
+            string[] files = Directory.GetFiles(folderImport);
+
+            if (files.Length == 0) { System.Windows.MessageBox.Show(folderImport + " is empty"); return; }
+
+            List<System.Drawing.Image> images = new List<System.Drawing.Image>();
+
+            // Import mode does only have the analysis functionality and thus, an analysis must be selected to be done
+
+            if (!ImportChck1.IsChecked.GetValueOrDefault() && !ImportChck2.IsChecked.GetValueOrDefault())
+            {
+                System.Windows.MessageBox.Show(" Select an analysis to be performed ");
+                return;
+            }
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (File.Exists(files[i]))
+                {
+                    string[] extension = files[i].Split('.');
+                    
+                    // We will only accept as viable files for the analysis images (of a wide range of extensions)
+
+                    if (extension[extension.Length - 1] != "png" && extension[extension.Length - 1] != "jpg" && extension[extension.Length - 1] != "jpeg" &&
+                        extension[extension.Length - 1] != "bmp")
+                    {
+                        System.Windows.MessageBox.Show(files[i] + " has not the right file extension");
+                        return;
+
+                    }
+                    else
+                    {
+                        images.Add(getImageFromFile(files[i]));
+                    }
+                }
+                else
+                {
+
+                    System.Windows.MessageBox.Show(files[i] + " is not a valid file");
+                    return;
+                }
+            }
+
+            if (images.Count == 1) { System.Windows.MessageBox.Show("Not enough images for an analysis to be done"); return; }
+
+            bool countA = ImportChck1.IsChecked.GetValueOrDefault(), classA = ImportChck2.IsChecked.GetValueOrDefault();
+
+            // UI Reset
+
+            AnalysisWindow aw = new AnalysisWindow(null, countA, classA);
+
+            ImportBorder.Visibility = Visibility.Hidden;
+            ImportChck1.IsChecked = false;
+            ImportChck2.IsChecked = false;
+
+            FolderImportLabel.Content = "Not defined";
+            FolderSaveLabel.Content = "Not defined";
+
+            // Count analysis is launched in a separated thread
+
+            if (countA)
+            {
+                Thread analysisThread = new Thread(aw.getCount().staticAnalysis);
+
+                List<object> list = new List<object>();
+                list.Add(images);
+                list.Add(this);
+                list.Add(folderSave);
+
+                analysisThread.Start(list);
+
+            }
+
+            AnalysisBorder.Visibility = Visibility.Visible;
+            AnalysisBorder.Background = System.Windows.Media.Brushes.LightGray;
+
+            ShowButton.IsEnabled = true;
+        }
+
+        private System.Drawing.Image getImageFromFile(string path)
+        {
+            System.Drawing.Image img = System.Drawing.Image.FromFile(path);
+
+            return img;
+        }
+
+        // Event function to unlock analysis functionalities when it is done
+
+        public void finished_Analysis(AnalysisWindow aw, string folder)
+        {
+            aw.getCount().initStatics();
+
+            aw.getChart().initCharts(aw.getCount(), folder);
+
+            aw.Show();
+
+            AnalysisBorder.Visibility = Visibility.Hidden;
+        }
+
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      Capturing process functions
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Object scan. This method can be called repeatedly 
+
+        private void objectShow_Button_Click(object sender, RoutedEventArgs e)
+        {
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
 
@@ -120,35 +414,38 @@ namespace PetriUI
 
             if ((op.getSize(op).ElementAt(0).X > 4000) && (op.getSize(op).ElementAt(0).Y > 3000))
             {
-                MessageBox.Show("No objects could be found");
+                System.Windows.MessageBox.Show("No objects could be found");
                 return;
             }
 
             List<System.Windows.Shapes.Rectangle> outlineDefinitionList = new List<System.Windows.Shapes.Rectangle>();
 
             // Selection border holds a definition for an object and it's showing structure. (See SelectionBorder constructor definition)
+
             List<SelectionBorder> transparentCanvasList = new List<SelectionBorder>();
 
             System.Drawing.Point globalPicSize = op.getGlobalSize(op);
 
             ImageBorder.Visibility = Visibility.Visible;
+            objShowLabel.Visibility = Visibility.Visible;
 
             ImageCanvas.Children.Clear();
             ImageCanvas.Children.Add(objectShowStackPanel);
 
             // Definiton of objects by their outlines
+
             for (int i = 0; i < numberObjects; i++)
             {
                 // Rectangle definition
 
                 outlineDefinitionList.Add(new System.Windows.Shapes.Rectangle());
-                outlineDefinitionList.ElementAt(i).Width = (op.getSize(op).ElementAt(i).X *790)/globalPicSize.X; // Window/Canvas ratio
-                outlineDefinitionList.ElementAt(i).Height = (op.getSize(op).ElementAt(i).Y *590)/ globalPicSize.Y;
+                outlineDefinitionList.ElementAt(i).Width = (op.getSize(op).ElementAt(i).X * 790) / globalPicSize.X; // Window/Canvas ratio
+                outlineDefinitionList.ElementAt(i).Height = (op.getSize(op).ElementAt(i).Y * 590) / globalPicSize.Y;
 
                 ImageCanvas.Children.Add(outlineDefinitionList.ElementAt(i));
                 outlineDefinitionList.ElementAt(i).Stroke = System.Windows.Media.Brushes.LightGreen;
                 outlineDefinitionList.ElementAt(i).StrokeThickness = 3;
-                outlineDefinitionList.ElementAt(i).Margin = 
+                outlineDefinitionList.ElementAt(i).Margin =
                     new Thickness((op.getLocation(op).ElementAt(i).X * 790) / globalPicSize.X, (op.getLocation(op).ElementAt(i).Y * 590) / globalPicSize.Y, 0, 0);
 
                 // Canvas definition
@@ -161,15 +458,15 @@ namespace PetriUI
                 ImageCanvas.Children.Add(transparentCanvasList.ElementAt(i));
                 transparentCanvasList.ElementAt(i).Opacity = 0;
                 transparentCanvasList.ElementAt(i).Background = System.Windows.Media.Brushes.Green;
-                transparentCanvasList.ElementAt(i).MouseEnter += new MouseEventHandler(BorderMouseEnterHandlerEnter);
-                transparentCanvasList.ElementAt(i).MouseLeave += new MouseEventHandler(BorderMouseEnterHandlerLeave);
+                transparentCanvasList.ElementAt(i).MouseEnter += new System.Windows.Input.MouseEventHandler(BorderMouseEnterHandlerEnter);
+                transparentCanvasList.ElementAt(i).MouseLeave += new System.Windows.Input.MouseEventHandler(BorderMouseEnterHandlerLeave);
 
                 transparentCanvasList.ElementAt(i).Margin =
                     new Thickness((op.getLocation(op).ElementAt(i).X * 790) / globalPicSize.X, (op.getLocation(op).ElementAt(i).Y * 590) / globalPicSize.Y, 0, 0);
             }
 
             objectShowStackPanel.Visibility = Visibility.Visible;
-            
+
             // Global scan of the mat screen acquisition
 
             System.Windows.Controls.Image globalImg = new System.Windows.Controls.Image();
@@ -186,74 +483,16 @@ namespace PetriUI
 
             ShowButton.Content = "Scan new Layout";
             ParametersBorder.Visibility = Visibility.Hidden;
-
-            ImportButton.IsEnabled = false;
-        }
-
-        private void import_Button_Click(object sender, RoutedEventArgs e)
-        {
-            ShowButton.IsEnabled = false;
-            ImportBorder.Visibility = Visibility.Visible;
-        }
-
-        // Definition of outlines functionalities
-
-        private void BorderMouseEnterHandlerEnter(object sender, MouseEventArgs e)
-        {
-            Border senderBut = (Border)sender;
-            senderBut.Opacity = 0.3;
-        }
-
-        private void BorderMouseEnterHandlerLeave(object sender, MouseEventArgs e)
-        {
-            Border senderBut = (Border)sender;
-            senderBut.Opacity = 0;
-        }
-
-        void RectangleClickedHandler(object sender, EventArgs e)
-        {
-            SelectionBorder sb = (SelectionBorder)sender;
-            MonitoringParametersShow(sb.getIndex());
-
-        }
-
-        // Navigation functionalities definition
-        private void navigationArrowEnter(object sender, MouseEventArgs e)
-        {
-            StackPanel senderBut = (StackPanel)sender;
-
-            foreach (object child in senderBut.Children)
-            {
-                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
-
-                childImg.Opacity = 0.7;
-            }
-
-        }
-
-        private void navigationArrowLeave(object sender, MouseEventArgs e)
-        {
-            StackPanel senderBut = (StackPanel)sender;
-
-            foreach (object child in senderBut.Children)
-            {
-                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
-
-                childImg.Opacity = 1;
-            }
-        }
-
-        private void navigationArrowClick(object sender, MouseEventArgs e)
-        {
-
-            this.NavigationService.Navigate(cp);
-
         }
 
         // Settings showing
+
         private void MonitoringParametersShow(int objectToParameterize)
         {
-            
+            ImportButton.IsEnabled = false;
+
+            NameTextBox.Text = "Process " + parameters.Count;
+
             ParametersBorder.Visibility = Visibility.Visible;
 
             ParametersTitleLabel.Content = "Object " + objectToParameterize + " capture parameters";
@@ -261,26 +500,39 @@ namespace PetriUI
         }
 
         // Settings confirm
+
         private void ParameterConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
             int minutesInterval, hoursInterval, numberOfCaptures, delayH, delayMin;
-            string folder;
+            string folder, name;
+
+            // Input format check
 
             if ((Int32.TryParse(minutesTextBox.Text, out minutesInterval)) && (Int32.TryParse(hoursTextBox.Text, out hoursInterval)) && (Int32.TryParse(numberOfCapturesTextBox.Text, out numberOfCaptures)) && Int32.TryParse(delayHTextBox.Text, out delayH) && Int32.TryParse(delayMinTextBox.Text, out delayMin))
             {
                 if (((minutesInterval == 0) && (hoursInterval == 0)) || (numberOfCaptures == 0))
                 {
-                    MessageBox.Show("Insert valid parameter values");
+                    System.Windows.MessageBox.Show("Insert valid parameter values");
                 }
                 else
                 {
+                    if(NameTextBox.Text.Length == 0)
+                    {
+                        name = "Process " + parameters.Count;
+                    }else
+                    {
+                        name = NameTextBox.Text;
+                    }
+
                     folder = (string)FolderLabel.Content;
 
                     if (folder == "Not defined")
                     {
-                        MessageBox.Show("Choose a valid directory to save the data");
+                        System.Windows.MessageBox.Show("Choose a valid directory to save the data");
                         return;
                     }
+
+                    // Conversion to capture minutes
 
                     int hours, minutes;
 
@@ -301,15 +553,15 @@ namespace PetriUI
 
                     if (delayH == 0)
                     {
-                        hoursDel = delayMin/ 60;
+                        hoursDel = delayMin / 60;
                         minutesDel = delayMin % 60;
                     }
                     else
                     {
                         delayMin = delayMin + delayH * 60;
-                        hoursDel = delayMin/ 60;
+                        hoursDel = delayMin / 60;
                         minutesDel = delayMin % 60;
-                        
+
                     }
 
                     String str = hours + " hours " + minutes + " minutes";
@@ -318,28 +570,22 @@ namespace PetriUI
                     if (hoursDel == 0)
                     {
                         str2 = minutesDel + " minutes";
-                    }else
+                    }
+                    else
                     {
                         str2 = hoursDel + " hours " + minutesDel + " minutes";
                     }
 
                     int objIndex = Int32.Parse(ParametersTitleLabel.Content.ToString().Split(' ')[1]);
 
+                    // Pending capture building
+
                     CaptureDetailsLabel.Content = CaptureDetailsLabel.Content +
-                         Environment.NewLine + "Capture " + counter + ": " + str + " , " + str2 + " until start, " + numberOfCaptures + " captures will be made.";
+                         Environment.NewLine + name + ": " + str + " , " + str2 + " until start, " + numberOfCaptures + " captures will be made.";
 
                     counter++;
 
                     folder = (string)FolderLabel.Content;
-
-                    ParametersBorder.Visibility = Visibility.Hidden;
-                    CaptureConfirmButton.Visibility = Visibility.Visible;
-                    minutesTextBox.Text = "0";
-                    hoursTextBox.Text = "0";
-                    numberOfCapturesTextBox.Text = "0";
-                    delayHTextBox.Text = "0";
-                    delayMinTextBox.Text = "0";
-                    FolderLabel.Content = "";
 
                     int[] param = new int[4];
                     param[0] = numberOfCaptures;
@@ -349,6 +595,19 @@ namespace PetriUI
                     parameters.Add(param);
 
                     saveFolders.Add(folder);
+                    processNames.Add(name);
+
+                    // UI reset
+
+                    ParametersBorder.Visibility = Visibility.Hidden;
+                    CaptureConfirmButton.Visibility = Visibility.Visible;
+                    minutesTextBox.Text = "0";
+                    hoursTextBox.Text = "0";
+                    numberOfCapturesTextBox.Text = "0";
+                    delayHTextBox.Text = "0";
+                    delayMinTextBox.Text = "0";
+                    FolderLabel.Content = "";
+                                       
 
                     bool[] analysis = new bool[2];
                     if (Chk1.IsChecked.GetValueOrDefault()) { analysis[0] = true; }
@@ -364,37 +623,25 @@ namespace PetriUI
 
                     CaptureCancelButton.Visibility = Visibility.Visible;
 
+                    ImportButton.IsEnabled = true;
                 }
             }
             else
             {
-                MessageBox.Show("Parameter parsing error");
+                System.Windows.MessageBox.Show("Parameter parsing error");
             }
         }
 
         // Launch captures
+
         private void CaptureConfirm_Button_Click(object sender, RoutedEventArgs e)
         {
-            // The navigaton is now enabled
-            System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
-            BitmapImage src = new BitmapImage();
-            src.BeginInit();
-            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\FlechaDcha.png", UriKind.Absolute);
-            src.CacheOption = BitmapCacheOption.OnLoad;
-            src.EndInit();
-            navImg.Source = src;
-            navImg.Stretch = Stretch.Uniform;
+            // Enable navigation
 
-            navigationSp.Children.Add(navImg);
+            enableNavigation();
 
-            navigationSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
-            navigationSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
-
-            navigationSp.MouseDown += new MouseButtonEventHandler(navigationArrowClick);
-
-            navigationSp.Visibility = Visibility.Visible;
-            navLabel.Visibility = Visibility.Visible;
-
+            // Launch pending captures
+            
             List<int> indexes = new List<int>();
 
             for (int i = 0; i < parameters.Count; i++)
@@ -402,91 +649,19 @@ namespace PetriUI
                 indexes.Add(parameters.ElementAt(i)[2]);
             }
 
-            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform);
+            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform, processNames);
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
             CaptureDetailsLabel.Content = "";
             saveFolders = new List<string>();
             analysisToPerform = new List<bool[]>();
+            processNames = new List<string>();
 
             ShowButton.IsEnabled = false;
 
             CaptureCancelButton.Visibility = Visibility.Hidden;
 
-            ImportButton.IsEnabled = true;
-
-        }
-
-        private void CaptureCancel_Button_Click(object sender, RoutedEventArgs e)
-        {
-            parameters = new List<int[]>();
-            CaptureDetailsLabel.Content = "";
-            saveFolders = new List<string>();
-            CaptureCancelButton.Visibility = Visibility.Hidden;
-
-        }
-
-        private void Folder_Election_Button_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Title = "Choose Saving Location";
-
-            Nullable<bool> result = sfd.ShowDialog();
-
-            string fileLocation = "";
-
-            if (result == true)
-            {
-                if (sfd.FileName != "")
-                {
-                    fileLocation = sfd.FileName;
-                }
-            }
-
-            FolderLabel.Content = fileLocation;
-
-        }
-
-        private void Folder_Import_Button_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Title = "Choose Import Location";
-
-            Nullable<bool> result = sfd.ShowDialog();
-
-            string fileLocation = "";
-
-            if (result == true)
-            {
-                if (sfd.FileName != "")
-                {
-                    fileLocation = sfd.FileName;
-                }
-            }
-
-            FolderImportLabel.Content = fileLocation;
-
-        }
-
-        private void Folder_Save_Button_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Title = "Choose Import Location";
-
-            Nullable<bool> result = sfd.ShowDialog();
-
-            string fileLocation = "";
-
-            if (result == true)
-            {
-                if (sfd.FileName != "")
-                {
-                    fileLocation = sfd.FileName;
-                }
-            }
-
-            FolderSaveLabel.Content = fileLocation;
         }
     }
 }

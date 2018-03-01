@@ -72,9 +72,14 @@ namespace PetriUI
 
         public AnalysisWindow aw;
 
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      UI related functions
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name)
         {
             InitializeComponent();
 
@@ -90,23 +95,25 @@ namespace PetriUI
             // A task holds details for a capture process (See <Task> constructior definition)
             List<Uri> u = new List<Uri>();
 
-            t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1]);
+            t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1], name);
 
             aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis());
 
             Directory.CreateDirectory(folder);
             file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
 
-
             file.BuildAndSave();
 
-            // Thread initialization 
+            // Thread initialization for triggering the captures
+
             MainCapture newCapture = new MainCapture();
             newCaptureThread = new Thread(newCapture.StartCapture);
             newCaptureThread.SetApartmentState(ApartmentState.STA);
             newCaptureThread.Start(t);
             running = true;
             playing = false;
+
+            // UI elements initialization
 
             StackPanel aux = new StackPanel();
             Rectangle frame = new Rectangle();
@@ -152,25 +159,7 @@ namespace PetriUI
 
         }
 
-        private void eventClicked(object sender, SelectionChangedEventArgs e)
-        {
-            int selectedChild = EventsListBox.SelectedIndex;
-            int counter = 0;
-            Console.WriteLine(selectedChild);
-
-            foreach (ListBoxItem item in EventsListBox.Items)
-            {
-                if(counter == selectedChild)
-                {
-                    aw.Show();
-                    aw.Navigate(aw.getCount());
-                    aw.getCount().initStatics();
-                    aw.getCount().Show(Int32.Parse(item.Uid)-1);
-                    CountAnalysisBut.IsEnabled = false;
-
-                }
-            }
-        }
+        // When a listBoxItem is clicked, it's capture is focused
 
         private void listBoxClicked(object sender, SelectionChangedEventArgs e)
         {
@@ -217,6 +206,8 @@ namespace PetriUI
             cf.getCapturePanel().Children.Add(clone);
 
         }
+
+        // UI elements initialization
 
         private void PlayNStop_Init()
         {
@@ -265,8 +256,456 @@ namespace PetriUI
             LogoSP.Children.Add(logo);
         }
 
+        // Comment button is initialized
+
+        private Button initializeButton(int index)
+        {
+            Button commentBut = new Button();
+
+            commentBut.Content = "Add Comment";
+            commentBut.HorizontalAlignment = HorizontalAlignment.Center;
+            commentBut.VerticalAlignment = VerticalAlignment.Center;
+
+            commentBut.Width = 100;
+            commentBut.Height = 24;
+            commentBut.FontSize = 14;
+
+            commentBut.Click += new RoutedEventHandler(addComment);
+            commentBut.Uid = index.ToString();
+
+            return commentBut;
+        }
+
+        // A user made comment is added for a specific capture
+
+        private void addComment(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+            string indexString = senderBut.Uid;
+
+            System.Windows.Forms.Form commentDialog = new System.Windows.Forms.Form();
+            commentDialog.Size = new System.Drawing.Size(300, 200);
+
+            System.Windows.Forms.Button insertButton = new System.Windows.Forms.Button();
+
+            insertButton.Width = 50;
+            insertButton.Height = 20;
+            insertButton.Text = "Insert";
+            insertButton.Location = new System.Drawing.Point(180, 130);
+            insertButton.Name = indexString;
+            insertButton.Click += new EventHandler(insertComment);
+
+
+            System.Windows.Forms.TextBox tb = new System.Windows.Forms.TextBox();
+            tb.Width = 200;
+            tb.Height = 80;
+            tb.Multiline = true;
+            tb.Location = new System.Drawing.Point(40, 20);
+
+            commentDialog.Controls.Add(tb);
+            commentDialog.Controls.Add(insertButton);
+
+            commentDialog.Show();
+
+        }
+
+        // Comment inserting handler
+
+        private void insertComment(object sender, EventArgs e)
+        {
+            string content = "";
+
+            // A form is created to receive user's input
+
+            System.Windows.Forms.Button senderBut = (System.Windows.Forms.Button)sender;
+            string indexString = senderBut.Name;
+
+            System.Windows.Forms.Form parentForm = (System.Windows.Forms.Form)senderBut.Parent;
+
+            bool first = true;
+            foreach (object child in parentForm.Controls)
+            {
+                if (first)
+                {
+                    System.Windows.Forms.TextBox tb = (System.Windows.Forms.TextBox)child;
+                    content = tb.Text;
+                }
+                first = false;
+            }
+
+            ListBoxItem itemSelected = (ListBoxItem)CapturesListBox.Items.GetItemAt(Int32.Parse(indexString));
+
+            Grid itemGrid = (Grid)itemSelected.Content;
+
+            int counter = 0;
+
+            // UI is modified after the comment being inserted
+
+            foreach (object child in itemGrid.Children)
+            {
+                if (counter == 0)
+                {
+                    Button commentBut = (Button)child;
+                    commentBut.Content = "Modify";
+                }
+                if (counter == 1)
+                {
+                    Label commentLabel = (Label)child;
+                    if (content.Length > 35)
+                    {
+                        string[] words = content.Split(' ');
+
+                        for (int i = 0; i < words.Length; i++)
+                        {
+                            commentLabel.Content += " " + words[i];
+                            if (i % 5 == 0 && i != 0) { commentLabel.Content += Environment.NewLine; }
+                        }
+
+                    }
+                    else { commentLabel.Content = content; }
+
+                }
+                counter++;
+            }
+
+            parentForm.Close();
+
+            string textToAppend = "Comment added on capture " + indexString + Environment.NewLine + content + Environment.NewLine;
+            file.AppendData(textToAppend);
+        }
+
+        // Buttons functionalities
+
+        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            newCaptureThread.Abort();
+            CaptureFinished();
+        }
+
+        public void KillCaptures()
+        {
+            MainCapture.stopRequested = true;
+        }
+
+        private void Project_IntoMat(object sender, RoutedEventArgs e)
+        {
+            Image img = null;
+
+            foreach (Image childImg in cf.getCapturePanel().Children)
+            {
+                img = childImg;
+            }
+
+            ProjectedFormHandler handler = new ProjectedFormHandler();
+
+            handler.HandleProjection(img);
+        }
+
+        // UI Closing handling
+
+        private void CaptureWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (MainWindow.killRequest)
+            {
+                newCaptureThread.Abort();
+                e.Cancel = false;
+                aw.Close();
+
+            }
+            else
+            {
+                if (running)
+                {
+                    string msg = "Kill capture process?";
+
+                    MessageBoxResult res =
+                      MessageBox.Show(
+                          msg,
+                          "Closing Dialog",
+                          MessageBoxButton.YesNo,
+                          MessageBoxImage.Warning);
+
+                    if (res == MessageBoxResult.No)
+                    {
+                        e.Cancel = true;
+                        this.Hide();
+
+                    }
+                    else
+                    {
+                        e.Cancel = false;
+                        CapturePreviews.DecrementCaptures();
+                        newCaptureThread.Abort();
+                        cp.EraseFinishedCapture(Int32.Parse(this.Uid));
+                        aw.requestClosing();
+                        aw.Close();
+
+                    }
+
+                }
+                else
+                {
+                    cp.EraseFinishedCapture(Int32.Parse(this.Uid));
+                    e.Cancel = false;
+                    aw.requestClosing();
+                    aw.Close();
+
+                }
+                if (playing)
+                {
+                    playThread.Abort();
+                }
+            }
+        }
+
+        // User made player that switches from capture to capture initialization and button handlers
+
+        private void Play_StopClick(object sender, RoutedEventArgs e)
+        {
+            if (!playing)
+            {
+                Image stop = new Image();
+                BitmapImage src2 = new BitmapImage();
+                src2.BeginInit();
+                src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Stop.png", UriKind.Absolute);
+                src2.CacheOption = BitmapCacheOption.OnLoad;
+                src2.EndInit();
+                stop.Source = src2;
+                stop.Stretch = Stretch.Uniform;
+
+                play_stopSP.Children.Clear();
+                play_stopSP.Children.Add(stop);
+
+                playing = true;
+
+                PlayHandler ph = new PlayHandler();
+                playThread = new Thread(ph.StartHandler);
+                playThread.SetApartmentState(ApartmentState.STA);
+                playThread.Start(this);
+            }
+            else
+            {
+                Image play = new Image();
+                BitmapImage src2 = new BitmapImage();
+                src2.BeginInit();
+                src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\play.png", UriKind.Absolute);
+                src2.CacheOption = BitmapCacheOption.OnLoad;
+                src2.EndInit();
+                play.Source = src2;
+                play.Stretch = Stretch.Uniform;
+
+                play_stopSP.Children.Clear();
+                play_stopSP.Children.Add(play);
+
+                playing = false;
+
+            }
+
+        }
+
+        private void SpeedUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (speed < 4)
+            {
+                speed = speed * 2;
+                speedLabel.Content = "Speed x" + (1 / speed);
+            }
+        }
+
+        private void SpeedDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (speed > 0.25)
+            {
+                speed = speed / 2;
+                speedLabel.Content = "Speed x" + (1 / speed);
+            }
+
+        }
+
+        internal void showNextCapture()
+        {
+            Image img, clone = new Image();
+            int index = 0;
+
+            foreach (object child in cf.getCapturePanel().Children)
+            {
+                img = (Image)child;
+                index = Int32.Parse(img.Uid);
+
+            }
+
+            for (int i = 0; i < cfs.Count; i++)
+            {
+                cfs.ElementAt(i).getBorder().Background = Brushes.White;
+            }
+
+            timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
+
+            if (index == cfs.Count - 1)
+            {
+                foreach (object child in cfs.ElementAt(0).getCapturePanel().Children)
+                {
+                    img = (Image)child;
+                    clone.Source = img.Source;
+                    clone.Uid = img.Uid;
+                }
+                cfs.ElementAt(0).getBorder().Background = Brushes.LightBlue;
+                CapturesListBox.SelectedIndex = 0;
+                CapturesListBox.Focus();
+            }
+            else
+            {
+                foreach (object child in cfs.ElementAt(index + 1).getCapturePanel().Children)
+                {
+                    img = (Image)child;
+                    clone.Source = img.Source;
+                    clone.Uid = img.Uid;
+                }
+
+                cfs.ElementAt(index + 1).getBorder().Background = Brushes.LightBlue;
+                CapturesListBox.SelectedIndex = index + 1;
+                CapturesListBox.Focus();
+            }
+
+            cf.getCapturePanel().Children.Clear();
+            cf.getCapturePanel().Children.Add(clone);
+
+        }
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      Analysis related functions
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Show analysis of the instant in which an event appeared
+
+        private void eventClicked(object sender, SelectionChangedEventArgs e)
+        {
+            int selectedChild = EventsListBox.SelectedIndex;
+            int counter = 0;
+            Console.WriteLine(selectedChild);
+
+            foreach (ListBoxItem item in EventsListBox.Items)
+            {
+                if(counter == selectedChild)
+                {
+                    aw.Show();
+                    aw.Navigate(aw.getCount());
+                    aw.getCount().initStatics();
+                    aw.getCount().Show(Int32.Parse(item.Uid)-1);
+
+                }
+            }
+        }
+
+        // An even has raised from the analysis 
+
+        public void addEvent(int step, string eventText)
+        {
+            ListBoxItem item = new ListBoxItem();
+            Grid g = new Grid();
+
+            item.Height = 30;
+            item.Width = 480;
+
+            ColumnDefinition c1 = new ColumnDefinition();
+            //c1.Width = new GridLength(80);
+            ColumnDefinition c2 = new ColumnDefinition();
+            //c1.Width = new GridLength(400);
+
+            g.ColumnDefinitions.Add(c1);
+            g.ColumnDefinitions.Add(c2);
+
+            Label l1 = new Label();
+            l1.Width = 80;
+            l1.HorizontalAlignment = HorizontalAlignment.Center;
+            l1.VerticalAlignment = VerticalAlignment.Center;
+            l1.Content = "   Capture " + step;
+
+            Label l2 = new Label();
+            l2.HorizontalAlignment = HorizontalAlignment.Center;
+            l2.VerticalAlignment = VerticalAlignment.Center;
+            l2.Content = eventText;
+
+            Grid.SetColumn(l1, 0);
+            Grid.SetColumn(l2, 1);
+
+            g.Children.Add(l1);
+            g.Children.Add(l2);
+
+            item.Content = g;
+            item.Uid = step.ToString();
+
+            EventsListBox.Items.Add(item);
+
+        }
+
+        // Show the specific anlysis for a capture
+
+        public void Show_Analysis(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+
+            if (t.getCountAnalysis())
+            {
+                if (cfs.Count > 2)
+                {
+
+                    aw.Show();
+                    aw.getCount().initStatics();
+
+                    aw.Navigate(aw.getCount());
+
+                    if (CapturesListBox.SelectedIndex == 0)
+                    {
+                        aw.getCount().Show(0);
+                    }
+                    else { aw.getCount().Show(CapturesListBox.SelectedIndex - 1); }
+                }
+                else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
+            }
+            else
+            {
+
+                MessageBox.Show("No analysis selected to be performed");
+            }
+        }
+
+        // Show general analysis
+
+        public void General_Analysis(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+
+            if (cfs.Count > 2)
+            {
+                if (t.getClassAnalysis() || t.getCountAnalysis())
+                {
+                    aw.Show();
+                    aw.getCount().initStatics();
+                    aw.Navigate(aw.getPicker());
+                    aw.getChart().initCharts(aw.getCount(), t.getFolder());
+
+                }
+                else
+                {
+                    MessageBox.Show("No analysis selected to be performed");
+                }
+            }
+            else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
+
+        }
+
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      Capture related functions
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
         // This Window will be initialized with an image taken from CapturePreviews 
         // featuring the state of the object to capture prior to the capture process
+
         private void FirstCapture(Image img)
         {
             Image clone1 = new Image();
@@ -281,6 +720,7 @@ namespace PetriUI
             double ratio = clone1.Source.Width / clone1.Source.Height;
 
             // Adding image to group
+
             cfs.Add(new captureFramework(clone1, 120, ratio));
 
             ListBoxItem item = new ListBoxItem();
@@ -327,6 +767,7 @@ namespace PetriUI
 
             
             // Setting to last image
+
             cf = new captureFramework(clone2, 400, ratio);
 
             LastImageCanvas.Children.Clear();
@@ -358,157 +799,9 @@ namespace PetriUI
 
                 aw.getCount().setBackgound(img2);
             }
-        }
+        }     
 
-        public void addEvent(int step, string eventText)
-        {
-            ListBoxItem item = new ListBoxItem();
-            Grid g = new Grid();
-
-            item.Height = 30;
-            item.Width = 480;
-
-            ColumnDefinition c1 = new ColumnDefinition();
-            //c1.Width = new GridLength(80);
-            ColumnDefinition c2 = new ColumnDefinition();
-            //c1.Width = new GridLength(400);
-           
-            g.ColumnDefinitions.Add(c1);
-            g.ColumnDefinitions.Add(c2);
-
-            Label l1 = new Label();
-            l1.Width = 80;
-            l1.HorizontalAlignment = HorizontalAlignment.Center;
-            l1.VerticalAlignment = VerticalAlignment.Center;
-            l1.Content = "   Capture " + step;
-
-            Label l2 = new Label();
-            l2.HorizontalAlignment = HorizontalAlignment.Center;
-            l2.VerticalAlignment = VerticalAlignment.Center;
-            l2.Content = eventText;
-
-            Grid.SetColumn(l1, 0);
-            Grid.SetColumn(l2, 1);
-
-            g.Children.Add(l1);
-            g.Children.Add(l2);
-
-            item.Content = g;
-            item.Uid = step.ToString();
-
-            EventsListBox.Items.Add(item);
-
-        }
-
-        private Button initializeButton(int index)
-        {
-            Button commentBut = new Button();
-
-            commentBut.Content = "Add Comment";
-            commentBut.HorizontalAlignment = HorizontalAlignment.Center;
-            commentBut.VerticalAlignment = VerticalAlignment.Center;
-
-            commentBut.Width = 100;
-            commentBut.Height = 24;
-            commentBut.FontSize = 14;
-
-            commentBut.Click += new RoutedEventHandler(addComment);
-            commentBut.Uid = index.ToString();
-
-            return commentBut;
-        }
-
-        private void addComment(object sender, RoutedEventArgs e)
-        {
-            Button senderBut = (Button)sender;
-            string indexString = senderBut.Uid;
-
-            System.Windows.Forms.Form commentDialog = new System.Windows.Forms.Form();
-            commentDialog.Size = new System.Drawing.Size(300,200);
-
-            System.Windows.Forms.Button insertButton = new System.Windows.Forms.Button();
-
-            insertButton.Width = 50;
-            insertButton.Height = 20;
-            insertButton.Text = "Insert";
-            insertButton.Location = new System.Drawing.Point(180, 130);
-            insertButton.Name = indexString;
-            insertButton.Click += new EventHandler(insertComment);
-
-
-            System.Windows.Forms.TextBox tb = new System.Windows.Forms.TextBox();
-            tb.Width = 200;
-            tb.Height = 80;
-            tb.Multiline = true;
-            tb.Location = new System.Drawing.Point(40, 20);
-
-            commentDialog.Controls.Add(tb);
-            commentDialog.Controls.Add(insertButton);
-
-            commentDialog.Show();
-
-        }
-
-        private void insertComment(object sender, EventArgs e)
-        {
-            string content = "";
-
-            System.Windows.Forms.Button senderBut = (System.Windows.Forms.Button)sender;
-            string indexString = senderBut.Name;
-
-            System.Windows.Forms.Form parentForm = (System.Windows.Forms.Form)senderBut.Parent;
-
-            bool first = true;
-            foreach (object child in parentForm.Controls)
-            {
-                if(first)
-                {
-                    System.Windows.Forms.TextBox tb = (System.Windows.Forms.TextBox)child;
-                    content = tb.Text;
-                }
-                first = false;
-            }
-
-            ListBoxItem itemSelected = (ListBoxItem)CapturesListBox.Items.GetItemAt(Int32.Parse(indexString));
-
-            Grid itemGrid = (Grid)itemSelected.Content;
-
-            int counter = 0;
-
-            foreach (object child in itemGrid.Children)
-            {
-                if (counter == 0)
-                {
-                    Button commentBut = (Button)child;
-                    commentBut.Content = "Modify";
-                }
-                if (counter == 1)
-                {
-                    Label commentLabel = (Label)child;
-                    if (content.Length > 35)
-                    {
-                        string[] words = content.Split(' ');
-
-                        for(int i=0; i<words.Length; i++)
-                        {
-                            commentLabel.Content += " " + words[i];
-                            if (i % 5 == 0 && i!=0) { commentLabel.Content += Environment.NewLine; }
-                        }
-
-                    }
-                    else { commentLabel.Content = content; }
-                    
-                }
-                counter++;
-            }
- 
-            parentForm.Close();
-
-            string textToAppend = "Comment added on capture " + indexString + Environment.NewLine + content + Environment.NewLine;
-            file.AppendData(textToAppend);
-        }
-
-        // Information
+        // Information about the capture is initialized and updated
 
         private void Info_Init()
         {
@@ -554,90 +847,13 @@ namespace PetriUI
             dataBorder.Visibility = Visibility.Visible;
         }
 
-        // Buttons functionalities
-
-        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
-        {
-            newCaptureThread.Abort();
-            CaptureFinished();
-        }
-
-        public void KillCaptures()
-        {
-            MainCapture.stopRequested = true;
-        }
-
-        private void Project_IntoMat(object sender, RoutedEventArgs e)
-        {
-            Image img = null;
-
-            foreach (Image childImg in cf.getCapturePanel().Children)
-            {
-                img = childImg;
-            }
-
-            ProjectedFormHandler handler = new ProjectedFormHandler();
-
-            handler.HandleProjection(img);
-        }
-
-
+        
         // Function called from MainCapture each time counter is trigged
+
         public void Trigger_Capture()
         {
                MomentCapture.Capture(t);
         }
-
-        public void Show_Analysis(object sender, RoutedEventArgs e)
-        {
-            Button senderBut = (Button)sender;
-
-            if (t.getCountAnalysis())
-            {
-                if (cfs.Count > 2) {
-
-                    aw.Show();
-                    aw.getCount().initStatics();
-                    senderBut.IsEnabled = false;
-
-                    aw.Navigate(aw.getCount());
-
-                    if (CapturesListBox.SelectedIndex == 0)
-                    {
-                        aw.getCount().Show(0);
-                    }else { aw.getCount().Show(CapturesListBox.SelectedIndex -1); }
-                }
-                else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
-            }else{
-
-                MessageBox.Show("No analysis selected to be performed");
-            }
-        }
-
-        public void General_Analysis(object sender, RoutedEventArgs e)
-        {
-            Button senderBut = (Button)sender;
-
-            if (cfs.Count > 2)
-            {
-                if (t.getClassAnalysis() || t.getCountAnalysis())
-                {
-                    aw.Show();
-                    aw.getCount().initStatics();
-                    aw.Navigate(aw.getPicker());
-                    aw.getChart().initCharts(aw.getCount(),  t.getFolder());
-                    senderBut.IsEnabled = false;
-
-                }
-                else
-                {
-                    MessageBox.Show("No analysis selected to be performed");
-                }
-            }
-            else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
-
-        }
-
 
         // Management of a new taken image
 
@@ -771,6 +987,8 @@ namespace PetriUI
                 if (events.Length > 0) file.AppendData(" ");
             }
         }
+        
+        // Capture starting and finished handlers
 
         internal void CaptureFinished()
         {
@@ -787,176 +1005,6 @@ namespace PetriUI
             finishedCapture.Background = Brushes.Red;
             RunningLabel.Content = "Capture running";
             RunningLabel.Foreground = Brushes.White;
-        }
-
-        // Closing handling
-
-        private void CaptureWindow_Closing(object sender, CancelEventArgs e)
-        {
-            if (MainWindow.killRequest)
-            {
-                newCaptureThread.Abort();
-                e.Cancel = false;
-                aw.Close();
-
-            }
-            else
-            {
-                if (running)
-                {
-                    string msg = "Kill capture process?";
-
-                    MessageBoxResult res =
-                      MessageBox.Show(
-                          msg,
-                          "Closing Dialog",
-                          MessageBoxButton.YesNo,
-                          MessageBoxImage.Warning);
-
-                    if (res == MessageBoxResult.No)
-                    {
-                        e.Cancel = true;
-                        this.Hide();
-
-                    }
-                    else
-                    {
-                        e.Cancel = false;
-                        CapturePreviews.DecrementCaptures();
-                        newCaptureThread.Abort();
-                        cp.EraseFinishedCapture(Int32.Parse(this.Uid));
-                        aw.requestClosing();
-                        aw.Close();
-
-                    }
-
-                }
-                else
-                {
-                    cp.EraseFinishedCapture(Int32.Parse(this.Uid));
-                    e.Cancel = false;
-                    aw.requestClosing();
-                    aw.Close();
-
-                }
-                if (playing)
-                {
-                    playThread.Abort();
-                }
-            }
-        }
-
-        private void Play_StopClick(object sender, RoutedEventArgs e)
-        {
-            if (!playing)
-            {
-                Image stop = new Image();
-                BitmapImage src2 = new BitmapImage();
-                src2.BeginInit();
-                src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Stop.png", UriKind.Absolute);
-                src2.CacheOption = BitmapCacheOption.OnLoad;
-                src2.EndInit();
-                stop.Source = src2;
-                stop.Stretch = Stretch.Uniform;
-
-                play_stopSP.Children.Clear();
-                play_stopSP.Children.Add(stop);
-
-                playing = true;
-
-                PlayHandler ph = new PlayHandler();
-                playThread = new Thread(ph.StartHandler);
-                playThread.SetApartmentState(ApartmentState.STA);
-                playThread.Start(this);
-            }
-            else
-            {
-                Image play = new Image();
-                BitmapImage src2 = new BitmapImage();
-                src2.BeginInit();
-                src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\play.png", UriKind.Absolute);
-                src2.CacheOption = BitmapCacheOption.OnLoad;
-                src2.EndInit();
-                play.Source = src2;
-                play.Stretch = Stretch.Uniform;
-
-                play_stopSP.Children.Clear();
-                play_stopSP.Children.Add(play);
-
-                playing = false;
-
-            }
-
-        }
-
-        private void SpeedUp_Click(object sender, RoutedEventArgs e)
-        {
-            if (speed < 4)
-            {
-                speed = speed * 2;
-                speedLabel.Content = "Speed x" + (1/speed);
-            }
-        }
-
-        private void SpeedDown_Click(object sender, RoutedEventArgs e)
-        {
-            if (speed > 0.25)
-            {
-                speed = speed / 2;
-                speedLabel.Content = "Speed x" + (1/speed);
-            }
-           
-        }
-
-
-        internal void showNextCapture()
-        {
-            Image img, clone = new Image();
-            int index = 0;
-
-            foreach (object child in cf.getCapturePanel().Children)
-            {
-                img = (Image)child;
-                index = Int32.Parse(img.Uid);
-                
-            }
-
-            for (int i = 0; i < cfs.Count; i++)
-            {
-                cfs.ElementAt(i).getBorder().Background = Brushes.White;
-            }         
-
-            timeLabel.Content = "Capture taken at: " + cfs.ElementAt(index).getTime();
-
-            if (index == cfs.Count - 1)
-            {
-                foreach (object child in cfs.ElementAt(0).getCapturePanel().Children)
-                {
-                    img = (Image)child;
-                    clone.Source = img.Source;
-                    clone.Uid = img.Uid;
-                }
-                cfs.ElementAt(0).getBorder().Background = Brushes.LightBlue;
-                CapturesListBox.SelectedIndex = 0;
-                CapturesListBox.Focus();
-            }
-            else
-            {
-                foreach (object child in cfs.ElementAt(index + 1).getCapturePanel().Children)
-                {
-                    img = (Image)child;
-                    clone.Source = img.Source;
-                    clone.Uid = img.Uid;
-                }
-
-                cfs.ElementAt(index+1).getBorder().Background = Brushes.LightBlue;
-                CapturesListBox.SelectedIndex = index+1;
-                CapturesListBox.Focus();
-            }
-
-            cf.getCapturePanel().Children.Clear();
-            cf.getCapturePanel().Children.Add(clone);
-
         }
     }
 }

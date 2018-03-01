@@ -42,8 +42,11 @@ namespace PetriUI
         private List<Uri> captures;
         private string folder;
         private bool countAnalysis, classAnalysis;
+        private string name;
+
+
         // Constructor
-        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f, bool count, bool classAn)
+        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f, bool count, bool classAn, string n)
         {
             captureWindow = cw;
             numberOfCaptures = nOfC;
@@ -54,8 +57,7 @@ namespace PetriUI
             folder = f;
             countAnalysis = count;
             classAnalysis = classAn;
-
-            Console.WriteLine(countAnalysis + " " + classAnalysis);
+            name = n;
         }
 
         // @Override Task Constructor
@@ -65,7 +67,8 @@ namespace PetriUI
             numberOfCaptures = 0;
             interval = 0;
             index = 0;
-            delay = 0; 
+            delay = 0;
+            name = "";
         }
 
         // Getters and setters

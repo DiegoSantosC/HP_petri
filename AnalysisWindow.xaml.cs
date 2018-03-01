@@ -35,7 +35,7 @@ namespace PetriUI
             this.Height = 900;
 
             if (classAnalysis) clssPage = new ClassifyAnalytics();
-            if (countAnalysis) { countPage = new CountAnalytics(); chartPage = new ChartPage(); }
+            if (countAnalysis) { countPage = new CountAnalytics(this); chartPage = new ChartPage(); }
 
             pick = new Picker(cw, countAnalysis, classAnalysis, clssPage, countPage, chartPage);
 

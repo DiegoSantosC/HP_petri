@@ -38,17 +38,17 @@ namespace PetriUI
             for (int i=0; i < sizeYData.Count; i++)
             {
                 StackPanel sp = new StackPanel();
-                sp.Width = 310;
-                sp.Height = 245;
+                sp.Width = 300;
+                sp.Height = 230;
 
-                sp.Margin = new Thickness(305 * (i/3), 250 * (i%3), 0, 0);
+                sp.Margin = new Thickness(305 * (i/3), 235 * (i%3), 0, 0);
 
                 Rectangle r = new Rectangle();
 
                 r.Width = 310;
                 r.Height = 245;
 
-                r.Margin = new Thickness(305 * (i / 3), 250 * (i % 3), 0, 0);
+                r.Margin = new Thickness(305 * (i / 3), 235 * (i % 3), 0, 0);
 
                 r.Stroke = Brushes.Gray;
                 r.StrokeThickness = 3;
@@ -56,7 +56,7 @@ namespace PetriUI
                 ColonySizesCanvas.Children.Add(sp);
                 ColonySizesCanvas.Children.Add(r);
 
-                barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony Size Chart", "Size (pixels)", "Step" }, sp);
+                barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony Size Chart", "Size (cm)", "Step" }, sp);
             }
         }
 
