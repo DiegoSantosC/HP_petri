@@ -21,6 +21,7 @@
 
 // .NET framework namespaces
 using AnalysisTestApp;
+using hp.pc;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -79,7 +80,7 @@ namespace PetriUI
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name, PcPhysicalPoint location, System.Drawing.Point size)
         {
             InitializeComponent();
 
@@ -95,12 +96,12 @@ namespace PetriUI
             // A task holds details for a capture process (See <Task> constructior definition)
             List<Uri> u = new List<Uri>();
 
-            t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1], name);
+            t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1], name, location, size);
 
             aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis());
 
             Directory.CreateDirectory(folder);
-            file = new LogFile(t.getFolder(), t.getIndex(), t.getNumberOfCaptures());
+            file = new LogFile(t.getFolder(), t.getIndex(), t.getName(), t.getNumberOfCaptures());
 
             file.BuildAndSave();
 
@@ -852,12 +853,22 @@ namespace PetriUI
 
         public void Trigger_Capture()
         {
-               MomentCapture.Capture(t);
+            MomentCapture.Capture(t, false);
+        }
+
+        // An error has occurred during capture process
+
+        public void CaptureError()
+        {
+            MessageBox.Show("Error during the capture process, no object matching target could be found");
+            CaptureFinished();
+            newCaptureThread.Abort();
+
         }
 
         // Management of a new taken image
 
-        public void DrawImage()
+        public void DrawImage(bool moved)
         {
             Image img1 = new Image();
             Image img2 = new Image();
@@ -964,6 +975,11 @@ namespace PetriUI
             CapturesListBox.SelectedIndex = cfs.Count - 1;
             CapturesListBox.Focus();
 
+            if (moved)
+            {
+                emptyLabel.Content = "Object deplacement detected";
+            }
+
             // Set image into bitmap format to be analyzed
 
             if (t.getCountAnalysis())
@@ -987,7 +1003,7 @@ namespace PetriUI
                 if (events.Length > 0) file.AppendData(" ");
             }
         }
-        
+
         // Capture starting and finished handlers
 
         internal void CaptureFinished()
@@ -997,7 +1013,7 @@ namespace PetriUI
             RunningLabel.Content = "Capture Process Finished";
             running = false;
 
-            aw.getChart().initCharts(aw.getCount(), t.getFolder());
+            if(t.getCountAnalysis())aw.getChart().initCharts(aw.getCount(), t.getFolder());
         }
 
         public void startTriggered()

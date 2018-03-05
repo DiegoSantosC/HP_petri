@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 // Sprout SDK namespace
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
+using hp.pc;
 
 namespace PetriUI
 {
@@ -43,10 +44,12 @@ namespace PetriUI
         private string folder;
         private bool countAnalysis, classAnalysis;
         private string name;
+        private PcPhysicalPoint location;
+        private System.Drawing.Point size;
 
 
         // Constructor
-        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f, bool count, bool classAn, string n)
+        public Task(CaptureWindow cw, int nOfC, int inter, int ind, int dl, List<Uri> cpt, string f, bool count, bool classAn, string n, PcPhysicalPoint loc, System.Drawing.Point s)
         {
             captureWindow = cw;
             numberOfCaptures = nOfC;
@@ -58,6 +61,8 @@ namespace PetriUI
             countAnalysis = count;
             classAnalysis = classAn;
             name = n;
+            location = loc;
+            size = s;
         }
 
         // @Override Task Constructor
@@ -69,6 +74,8 @@ namespace PetriUI
             index = 0;
             delay = 0;
             name = "";
+            location = null;
+            size = new System.Drawing.Point(); 
         }
 
         // Getters and setters
@@ -76,34 +83,56 @@ namespace PetriUI
         {
             return this.captureWindow;
         }
+        public string getName()
+        {
+            return name;
+        }
+
+        public System.Drawing.Point getSize()
+        {
+            return size;
+        }
+
+        public PcPhysicalPoint getLocation()
+        {
+            return location;
+        }
+
         public List<Uri> getCaptures()
         {
             return this.captures;
         }
+
         public int getNumberOfCaptures()
         {
             return this.numberOfCaptures;
         }
+
         public int getInterval()
         {
             return this.interval;
         }
+
         public int getIndex()
         {
             return this.index;
         }
+
         public int getDelay()
         {
             return this.delay;
         }
+
         public string getFolder()
         {
             return this.folder;
         }
+
         public bool getCountAnalysis()
         {
             return countAnalysis;
         }
+
         public bool getClassAnalysis()
         {
             return classAnalysis;
@@ -113,10 +142,12 @@ namespace PetriUI
         {
             this.captureWindow = cp;
         }
+
         public void setNumberOfCaptures(int nOfC)
         {
             this.numberOfCaptures = nOfC;
         }
+
         public void setInteval(int inter)
         {
             this.interval = inter;
@@ -136,14 +167,17 @@ namespace PetriUI
         {
             this.captures = cpt;
         }
+
         public void setFolder(string f)
         {
             this.folder = f;
         }
+
         public void setCountAnalysis(bool count)
         {
             countAnalysis = count;
         }
+
         public void setClassAnalysis(bool classAn)
         {
             classAnalysis = classAn;

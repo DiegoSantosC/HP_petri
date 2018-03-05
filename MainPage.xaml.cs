@@ -98,6 +98,7 @@ namespace PetriUI
 
             Logo_Init();
 
+            CloseStatics_Init();
         }
 
         private void Logo_Init()
@@ -178,6 +179,74 @@ namespace PetriUI
             saveFolders = new List<string>();
             CaptureCancelButton.Visibility = Visibility.Hidden;
 
+        }
+
+        // Settings interface close init and handlers
+
+        private void CloseStatics_Init()
+        {
+            System.Windows.Controls.Image img = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Close_Image.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            img.Source = src;
+            img.Stretch = Stretch.Uniform;
+
+            CloseSP.Children.Add(img);
+
+            System.Windows.Controls.Image img2 = new System.Windows.Controls.Image();
+            BitmapImage src2 = new BitmapImage();
+            src2.BeginInit();
+            src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Close_Image.png", UriKind.Absolute);
+            src2.CacheOption = BitmapCacheOption.OnLoad;
+            src2.EndInit();
+            img2.Source = src;
+            img2.Stretch = Stretch.Uniform;
+
+            CloseSP2.Children.Add(img2);
+
+            CloseSP.MouseEnter += new System.Windows.Input.MouseEventHandler(navigationArrowEnter);
+            CloseSP.MouseLeave += new System.Windows.Input.MouseEventHandler(navigationArrowLeave);
+
+            CloseSP.MouseDown += new MouseButtonEventHandler(closeCapturesClick);
+
+            CloseSP2.MouseEnter += new System.Windows.Input.MouseEventHandler(navigationArrowEnter);
+            CloseSP2.MouseLeave += new System.Windows.Input.MouseEventHandler(navigationArrowLeave);
+
+            CloseSP2.MouseDown += new MouseButtonEventHandler(closeImportClick);
+        }
+
+        // Close and erase content
+
+        private void closeCapturesClick(object sender, MouseButtonEventArgs e)
+        {
+            ParametersBorder.Visibility = Visibility.Hidden;
+
+            minutesTextBox.Text = "0";
+            hoursTextBox.Text = "0";
+            numberOfCapturesTextBox.Text = "0";
+            delayHTextBox.Text = "0";
+            delayMinTextBox.Text = "0";
+            FolderLabel.Content = "Not defined";
+
+            Chk1.IsChecked = false;
+            Chk2.IsChecked = false;
+
+            ImportButton.IsEnabled = true;
+        }
+
+        private void closeImportClick(object sender, MouseButtonEventArgs e)
+        {
+            ImportBorder.Visibility = Visibility.Hidden;
+            ImportChck1.IsChecked = false;
+            ImportChck2.IsChecked = false;
+
+            FolderImportLabel.Content = "Not defined";
+            FolderSaveLabel.Content = "Not defined";
+
+            ShowButton.IsEnabled = true;
         }
 
         // Folder election for saving captures and analysis in a made capture process
@@ -272,12 +341,11 @@ namespace PetriUI
 
         private void import_Button_Click(object sender, RoutedEventArgs e)
         {
-
             ImportBorder.Visibility = Visibility.Visible;
             ImageBorder.Visibility = Visibility.Hidden;
+            objShowLabel.Visibility = Visibility.Hidden;
 
-            objShowLabel.Visibility = Visibility.Visible;
-
+            ShowButton.IsEnabled = false;
         }
 
         // Import parameters being extracted from the UI
@@ -606,7 +674,7 @@ namespace PetriUI
                     numberOfCapturesTextBox.Text = "0";
                     delayHTextBox.Text = "0";
                     delayMinTextBox.Text = "0";
-                    FolderLabel.Content = "";
+                    FolderLabel.Content = "Not defined";
                                        
 
                     bool[] analysis = new bool[2];

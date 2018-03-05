@@ -37,14 +37,17 @@ namespace PetriUI
     class MomentCapture
     {
         // Picture by index capture
-        public static void Capture(Task t)
+        public static void Capture(Task t, bool repetition)
         {
            using (IPcLink link = HPPC.CreateLink())
            {
               using (IPcMoment moment = link.CaptureMoment())
               {
                   IPcPicture picture = link.ExtractPicture(moment);
-                  PictureHandling.SaveIndexedImage(picture, t);
+                  IPcOutline outline = link.ExtractOutline(moment);
+
+                    if (!repetition) PictureHandling.SaveIndexedImage(picture, outline, t);
+                    else { PictureHandling.SaveIndexedImageRep(picture, outline, t); }
               }
            }
         }
@@ -77,7 +80,7 @@ namespace PetriUI
         }
 
         // Several pictures extracted by index
-        internal static List<Image> getSamples(List<string> folders, List<int> indexes)
+        internal static object[] getSamples(List<string> folders, List<int> indexes)
         {
             try
             {
@@ -86,9 +89,17 @@ namespace PetriUI
                     using (IPcMoment moment = link.CaptureMoment())
                     {
                         IPcPicture picture = link.ExtractPicture(moment);
+                        IPcOutline outlines = link.ExtractOutline(moment);
 
                         List<Image> img = PictureHandling.SaveSamples(picture, folders, indexes);
-                        return img;
+                        OutlineParameters op = PictureHandling.getOutlines(outlines, indexes);
+
+                        object[] returnable = new object[2];
+
+                        returnable[0] = img;
+                        returnable[1] = op;
+
+                        return returnable;
                     }
                 }
 

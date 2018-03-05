@@ -55,6 +55,7 @@ namespace PetriUI
         private MainPage mainPage;
         private static List<CaptureWindow> capturesList;
         private static List<Image> samplesList;
+        private static List<string> capturesNames;
         private static int numberCapturesRunning;
 
         // This Page is initialized without content, and thus will be shown and made avaliable 
@@ -81,6 +82,7 @@ namespace PetriUI
 
             emptyLabel.Visibility = Visibility.Hidden;
             emptyLabel.Content = emptyLabel.Content + Environment.NewLine + "Go to Capture Settings for new Captures";
+
         }
 
         private void Logo_Init()
@@ -95,6 +97,7 @@ namespace PetriUI
             logo.Stretch = Stretch.Uniform;
 
             LogoSP.Children.Add(logo);
+
         }
 
 
@@ -193,6 +196,7 @@ namespace PetriUI
 
             capturesList = new List<CaptureWindow>();
             samplesList = new List<Image>();
+            capturesNames = new List<string>();
         }
 
 
@@ -216,6 +220,7 @@ namespace PetriUI
                 catch (ArgumentOutOfRangeException ex) { }
 
                 infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
+                nameLabel.Content = capturesNames.ElementAt(0);
             }else
             {
                 sampleSP.Children.Clear();
@@ -226,6 +231,7 @@ namespace PetriUI
                 catch (ArgumentOutOfRangeException ex) { }
 
                 infoLabel.Content = "Process " + (current+1) + "/" + capturesList.Count.ToString();
+                nameLabel.Content = capturesNames.ElementAt(current);
             }
 
         }
@@ -250,6 +256,8 @@ namespace PetriUI
                 catch (ArgumentOutOfRangeException ex) { }
 
                 infoLabel.Content = "Process " + total + "/" + capturesList.Count.ToString();
+                nameLabel.Content = capturesNames.ElementAt(capturesNames.Count - 1);
+
             }
             else
             {
@@ -262,11 +270,13 @@ namespace PetriUI
                 catch (ArgumentOutOfRangeException ex) { }
 
                 infoLabel.Content = "Process " + (current - 1) + "/" + capturesList.Count.ToString();
+                nameLabel.Content = capturesNames.ElementAt(current -2);
+
             }
 
         }
 
-        private void ArtficialScroll()
+        private void ArtificialScroll()
         {
             String s = infoLabel.Content.ToString();
             String[] data1 = s.Split(' ');
@@ -280,6 +290,7 @@ namespace PetriUI
             sampleSP.Children.Add(samplesList.ElementAt(0));
 
             infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
+            nameLabel.Content = capturesNames.ElementAt(capturesNames.Count -1);
         }
 
         // Captures management
@@ -297,16 +308,26 @@ namespace PetriUI
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
-            samples = mc.Samples(folders, ind);
+            OutlineParameters op;
+
+            object[] returnable = new object[2];
+
+            returnable = mc.Samples(folders, ind);
+
+            samples = (List<Image>) returnable[0];
+
+            op = (OutlineParameters)returnable[1];
 
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i)), names.ElementAt(analysis.Count - 1 - i));
+                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count -1 -i), op.getLocation(op).ElementAt(op.getLocation(op).Count -1 -i), op.getSize(op).ElementAt(op.getSize(op).Count -1 -i)));
                 capturesList.ElementAt(i).Uid = (i).ToString();
                 samplesList.Add(samples.ElementAt(i));
                 samplesList.ElementAt(i).Uid = (i).ToString();
+                capturesNames.Add(names.ElementAt(names.Count -1 -i));
 
                 numberCapturesRunning++;
+
             }
 
             sampleSP.Children.Clear();
@@ -314,7 +335,7 @@ namespace PetriUI
 
             infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
 
-            if(capturesList.Count > 2)
+            if(capturesList.Count >= 2)
             {
                 rightSp.Visibility = Visibility.Visible;
                 leftSp.Visibility = Visibility.Visible;
@@ -327,8 +348,13 @@ namespace PetriUI
             Border2.Visibility = Visibility.Visible;
             sampleSP.Visibility = Visibility.Visible;
             infoLabel.Visibility = Visibility.Visible;
+            nameLabel.Visibility = Visibility.Visible;
 
             ShowButton.IsEnabled = true;
+
+            // If this is the first time 
+
+            if (parameters.Count == capturesList.Count) ArtificialScroll();
         }
         
         public static void killAllCaptures()
@@ -342,9 +368,11 @@ namespace PetriUI
 
         public void EraseFinishedCapture(int index)
         {
+            int target = index;
+
             for(int j=0; j<capturesList.Count; j++)
             {
-                if (Int32.Parse(capturesList.ElementAt(j).Uid) == index) capturesList.RemoveAt(j);
+                if (Int32.Parse(capturesList.ElementAt(j).Uid) == index) { capturesList.RemoveAt(j); target = j; }
 
             }
             for (int j = 0; j < samplesList.Count; j++)
@@ -352,6 +380,8 @@ namespace PetriUI
                 if (Int32.Parse(samplesList.ElementAt(j).Uid) == index) samplesList.RemoveAt(j);
 
             }
+
+            capturesNames.RemoveAt(target);
 
             int i = 0;
 
@@ -365,13 +395,14 @@ namespace PetriUI
             {
                 if (capturesList.Count > 0)
                 {
-                    ArtficialScroll();
+                    ArtificialScroll();
                 }
                 else
                 {
                     emptyLabel.Visibility = Visibility.Visible;
                     infoLabel.Visibility = Visibility.Hidden;
                     sampleSP.Visibility = Visibility.Hidden;
+                    nameLabel.Visibility = Visibility.Hidden;
 
                     Border1.Visibility = Visibility.Hidden;
                     Border2.Visibility = Visibility.Hidden;

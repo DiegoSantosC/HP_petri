@@ -34,16 +34,17 @@ namespace PetriUI
     /// </summary>
     class LogFile
     {
-        private int index, nOfC, counter;
+        private int index, nOfC;
+        private string name;
         private string targetLocation;
 
         // File creation
-        public LogFile(string targetLocation, int ind, int number)
+        public LogFile(string targetLocation, int ind, string n, int number)
         {
             this.targetLocation = targetLocation;
             this.index = ind;
             nOfC = number;
-            counter = 1;
+            name = n;
         }
 
         // File content building
@@ -51,7 +52,8 @@ namespace PetriUI
         {
             string[] header =
             {
-                "Log File for object " + index,
+                "Log File for process " + name,
+                "   Capture of object " + index,
                 " ",
                 nOfC + " captures have been taken:",
 
