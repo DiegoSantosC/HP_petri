@@ -80,7 +80,7 @@ namespace PetriUI
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name, PcPhysicalPoint location, System.Drawing.Point size)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name, PcPhysicalPoint location, System.Drawing.Point size, bool moved)
         {
             InitializeComponent();
 
@@ -142,7 +142,7 @@ namespace PetriUI
 
             EventsCanvas.Children.Add(aux2);
 
-            FirstCapture(img);
+            FirstCapture(img, moved);
 
             Info_Init();
 
@@ -285,23 +285,44 @@ namespace PetriUI
             string indexString = senderBut.Uid;
 
             System.Windows.Forms.Form commentDialog = new System.Windows.Forms.Form();
-            commentDialog.Size = new System.Drawing.Size(300, 200);
+            commentDialog.Name = "Instert comment";
+
+            commentDialog.Size = new System.Drawing.Size(400, 300);
 
             System.Windows.Forms.Button insertButton = new System.Windows.Forms.Button();
 
-            insertButton.Width = 50;
-            insertButton.Height = 20;
+            insertButton.Width = 60;
+            insertButton.Height = 23;
             insertButton.Text = "Insert";
-            insertButton.Location = new System.Drawing.Point(180, 130);
+            insertButton.Location = new System.Drawing.Point(200, 160);
             insertButton.Name = indexString;
             insertButton.Click += new EventHandler(insertComment);
 
+            // Comments content acquisition;
+
+            Grid parentGrid = (Grid)senderBut.Parent;
+
+            int counter = 0; string content = "";
+
+            foreach (object child in parentGrid.Children)
+            {
+               if (counter == 1)
+                {
+                    Label commentLabel = (Label)child;
+
+                    content = commentLabel.Content.ToString();
+
+                }
+                counter++;
+            }
+
 
             System.Windows.Forms.TextBox tb = new System.Windows.Forms.TextBox();
-            tb.Width = 200;
-            tb.Height = 80;
+            tb.Width = 220;
+            tb.Height = 100;
             tb.Multiline = true;
             tb.Location = new System.Drawing.Point(40, 20);
+            tb.Text = content;
 
             commentDialog.Controls.Add(tb);
             commentDialog.Controls.Add(insertButton);
@@ -707,7 +728,7 @@ namespace PetriUI
         // This Window will be initialized with an image taken from CapturePreviews 
         // featuring the state of the object to capture prior to the capture process
 
-        private void FirstCapture(Image img)
+        private void FirstCapture(Image img, bool moved)
         {
             Image clone1 = new Image();
             Image clone2 = new Image();
@@ -787,6 +808,15 @@ namespace PetriUI
 
             CapturesListBox.SelectedIndex = 0;
             CapturesListBox.Focus();
+
+            if (moved)
+            {
+                emptyLabel.Content = "Capture #" + (cfs.Count - 1) + " " + cf.getTime() + ": " + "Object deplacement detected";
+            }
+            else
+            {
+                emptyLabel.Content = "Capture #" + (cfs.Count - 1) + " " + cf.getTime() + ": " + "Success capture";
+            }
 
             // Set image into bitmap format to be analyzed
 
@@ -977,7 +1007,11 @@ namespace PetriUI
 
             if (moved)
             {
-                emptyLabel.Content = "Object deplacement detected";
+                emptyLabel.Content = "Capture #" + (cfs.Count -1) + " " + cf.getTime() + ": " +  "Object deplacement detected";
+            }
+            else
+            {
+                emptyLabel.Content = "Capture #" + (cfs.Count - 1) + " " + cf.getTime() + ": " + "Success capture";
             }
 
             // Set image into bitmap format to be analyzed

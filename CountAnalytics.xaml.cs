@@ -263,7 +263,7 @@ namespace PetriUI
             l2.Width = 120;
             l2.HorizontalAlignment = HorizontalAlignment.Left;
             l2.VerticalAlignment = VerticalAlignment.Center;
-            l2.Content = " Size : " + c.getcmSize().ToString() + " cm";
+            l2.Content = " Size : " + c.getcmSize().ToString() + " mm";
 
             Label l3 = new Label();
             l3.Width = 120;
@@ -504,9 +504,9 @@ namespace PetriUI
         {
             Console.WriteLine("Background set");
 
-            //background = new Bitmap(backgroundImg);
+            background = new Bitmap(backgroundImg);
 
-            background = testBmps[0];
+            //background = testBmps[0];
         }
 
         // In each step, colony tracking is performed by comparing the current taken image with the
@@ -514,11 +514,11 @@ namespace PetriUI
 
         public int[] newStep(System.Drawing.Image img, string time)
         {
-            //Bitmap bmp = new Bitmap(img);
+            Bitmap bmp = new Bitmap(img);
 
             // For testing purposes, taken images will be replaced for static ones
 
-            Bitmap bmp = testBmps[step + 1];
+            //Bitmap bmp = testBmps[step + 1];
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");

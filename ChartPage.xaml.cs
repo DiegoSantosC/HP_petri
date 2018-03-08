@@ -71,7 +71,7 @@ namespace PetriUI
                 ColonySizesCanvas.Children.Add(sp);
                 ColonySizesCanvas.Children.Add(r);
 
-                barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony Size Chart", "Size (cm)", "Step" }, sp);
+                barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony Size Chart", "Size (mm)", "Step" }, sp);
             }
         }
 

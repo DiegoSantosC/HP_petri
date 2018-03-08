@@ -66,11 +66,15 @@ namespace PetriUI
 
         // Handle pictures given by and index to CapturePreviews
 
-        internal static List<System.Windows.Controls.Image> SaveSamples(IPcPicture picture, List<string> folders, List<int> indexes)
+        internal static object[] SaveSamples(IPcPicture picture, IPcOutline outline, List<string> folders, List<int> indexes, List<PcPhysicalPoint> locations, List<System.Drawing.Point> sizes)
         {
             List<System.Windows.Controls.Image> imgs = new List<System.Windows.Controls.Image>();
-
+            List<int> results = new List<int>();
+            List<IPcOutline> outlines = new List<IPcOutline>();
+           
             int i = 0;
+            bool found = false;
+
 
             for (int j = 0; j < folders.Count; j++)
             {
@@ -80,33 +84,137 @@ namespace PetriUI
                 {
                     if (i == indexes[j])
                     {
-                        string dir = Path.Combine(folders[j], @"Captures\");
-                        ToolBox.EnsureDirectoryExists(dir);
+                        if(ConfirmMatch(locations[j], sizes[j], outline, i))
+                        {
+                            string dir = Path.Combine(folders[j], @"Captures\");
+                            ToolBox.EnsureDirectoryExists(dir);
 
-                        string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
-                        ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+                            string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                            ToolBox.SaveProcessedImage(image.Image, fileAndPath);
 
-                        Uri u = new Uri(fileAndPath, UriKind.Relative);
-                        System.Windows.Controls.Image im = new System.Windows.Controls.Image();
-                        BitmapImage src = new BitmapImage();
+                            Uri u = new Uri(fileAndPath, UriKind.Relative);
+                            System.Windows.Controls.Image im = new System.Windows.Controls.Image();
+                            BitmapImage src = new BitmapImage();
 
-                        src.BeginInit();
-                        src.UriSource = u;
-                        src.CacheOption = BitmapCacheOption.OnLoad;
-                        src.EndInit();
-                        im.Source = src;
-                        im.Stretch = Stretch.Uniform;
-                        im.Stretch = Stretch.Uniform;
+                            src.BeginInit();
+                            src.UriSource = u;
+                            src.CacheOption = BitmapCacheOption.OnLoad;
+                            src.EndInit();
+                            im.Source = src;
+                            im.Stretch = Stretch.Uniform;
+                            im.Stretch = Stretch.Uniform;
 
-                        imgs.Insert(0, im);
+                            imgs.Insert(0, im);
+                            outlines.Insert(0, getOutline(i, outline));
 
+                            // No problem
+                            results.Insert(0, 0);
+
+                            found = true;
+                        }
                     }
+
+                    if (!found)
+                    {
+                        List<int> locationDifferences = new List<int>();
+
+                        foreach (IPcOutline outlineChild in outline.Children)
+                        {
+                            if (ConfirmSize(outlineChild, sizes[j]))
+                            {
+                                locationDifferences.Add(FindCloser(outline, locations[j]));
+                            }
+                            else { locationDifferences.Add(Int32.MaxValue); }
+                        }
+
+                        int[] minIndex = new int[] { Int32.MaxValue, Int32.MaxValue };
+
+                        for (int n = 0; n < locationDifferences.Count; n++)
+                        {
+                            if (locationDifferences[n] < minIndex[0]) { minIndex[0] = locationDifferences[n]; minIndex[1] = n; }
+                        }
+
+                        // An object has found inside the minimum location difference
+
+                        if (minIndex[0] < AdvancedOptions._nLocationThreshold)
+                        {
+                            string dir = Path.Combine(folders[j], @"Captures\");
+                            ToolBox.EnsureDirectoryExists(dir);
+
+                            string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                            ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+
+                            Uri u = new Uri(fileAndPath, UriKind.Relative);
+                            System.Windows.Controls.Image im = new System.Windows.Controls.Image();
+                            BitmapImage src = new BitmapImage();
+
+                            src.BeginInit();
+                            src.UriSource = u;
+                            src.CacheOption = BitmapCacheOption.OnLoad;
+                            src.EndInit();
+                            im.Source = src;
+                            im.Stretch = Stretch.Uniform;
+                            im.Stretch = Stretch.Uniform;
+
+                            imgs.Insert(0, im);
+                            outlines.Insert(0, getOutline(i, outline));
+
+                            results.Insert(0, 0);
+
+                        }
+
+                        // No object in the expected range: we capture a deplaced one and inform the user
+
+                        else if (minIndex[0] < Int32.MaxValue)
+                        {
+                            string dir = Path.Combine(folders[j], @"Captures\");
+                            ToolBox.EnsureDirectoryExists(dir);
+
+                            string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                            ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+
+                            Uri u = new Uri(fileAndPath, UriKind.Relative);
+                            System.Windows.Controls.Image im = new System.Windows.Controls.Image();
+                            BitmapImage src = new BitmapImage();
+
+                            src.BeginInit();
+                            src.UriSource = u;
+                            src.CacheOption = BitmapCacheOption.OnLoad;
+                            src.EndInit();
+                            im.Source = src;
+                            im.Stretch = Stretch.Uniform;
+                            im.Stretch = Stretch.Uniform;
+
+                            imgs.Insert(0, im);
+                            outlines.Insert(0, getOutline(i, outline));
+
+                            results.Insert(0, 1);
+
+                        }
+
+                        // The object is not present in the mat as sizes don't match: stop capture process and inform the user
+
+                        else
+                        {
+                            imgs.Insert(0, null);
+                            outlines.Insert(0, null);
+
+                            results.Insert(0, 0);
+
+                        }
+                    }                  
 
                     i++;
                 }
             }
 
-            return imgs;
+            object[] returnable = new object[3];
+
+            returnable[0] = imgs;
+            returnable[1] = outlines;
+            returnable[2] = results;
+            
+            return returnable;
         }
 
         // Gets the outlines that match a given index list 
@@ -290,6 +398,7 @@ namespace PetriUI
                 Uri u = new Uri(fileAndPath, UriKind.Relative);
                 l.Add(u);
                 t.getCaptureWindow().DrawImage(false);
+
             }
 
             // No object in the expected range: we capture a deplaced one and inform the user
@@ -306,7 +415,9 @@ namespace PetriUI
                 Uri u = new Uri(fileAndPath, UriKind.Relative);
                 l.Add(u);
                 t.getCaptureWindow().DrawImage(true);
-            
+
+                t.setLocation(getOutlineLocation(minIndex[1], outline));
+                t.setSize(getOutlineSize(minIndex[1], outline));          
             }
 
             // The object is not present in the mat as sizes don't match: stop capture process and inform the user
@@ -315,6 +426,34 @@ namespace PetriUI
             {
                 t.getCaptureWindow().CaptureError();
             }
+        }
+
+        private static Point getOutlineSize(int index, IPcOutline outlineParent)
+        {
+            int counter = 0;
+
+            foreach (IPcOutline outline in outlineParent.Children)
+            {
+                if (counter == index) return new Point(Convert.ToInt32(GetOutlineWidth(outline)), Convert.ToInt32(GetOutlineHeight(outline))); ;
+
+                counter++;
+            }
+
+            return new Point();
+        }
+
+        private static PcPhysicalPoint getOutlineLocation(int index, IPcOutline outlineParent)
+        {
+            int counter = 0;
+
+            foreach (IPcOutline outline in outlineParent.Children)
+            {
+                if (counter == index) return new PcPhysicalPoint(outline.PhysicalBoundaries.Location.X * (outline.PixelDensity.X), outline.PhysicalBoundaries.Location.Y * (outline.PixelDensity.Y));
+
+                counter++;
+            }
+
+            return new PcPhysicalPoint();
         }
 
         private static PcImage getImage(int index, IPcPicture pic)
@@ -330,6 +469,21 @@ namespace PetriUI
 
             return null;
         }
+
+        private static IPcOutline getOutline(int index, IPcOutline parent)
+        {
+            int counter = 0;
+
+            foreach (IPcOutline img in parent.Children)
+            {
+                if (counter == index) return img;
+
+                counter++;
+            }
+
+            return null;
+        }
+
 
         // Outlines match
 
@@ -351,6 +505,41 @@ namespace PetriUI
             }
 
             return false;
+        }
+
+        private static bool ConfirmMatch(PcPhysicalPoint loc, Point size, IPcOutline outline, int i)
+        {
+            int counter = 0;
+
+            foreach (IPcOutline childOutline in outline.Children)
+            {
+                if (counter == i)
+                {
+                    if (CompareOutlines(childOutline, loc, size))
+                    {
+                        return true;
+                    }
+                    else return false;
+                }
+                counter++;
+            }
+
+            return false;
+        }
+
+        private static bool CompareOutlines(IPcOutline childOutline, PcPhysicalPoint loc, Point size)
+        {
+            // Size is considered to be a knockout feature
+
+            Point size2 = new Point(Convert.ToInt32(GetOutlineWidth(childOutline)), Convert.ToInt32(GetOutlineHeight(childOutline)));
+
+            if (Math.Abs(size.X - size2.X) > AdvancedOptions._nSizeThreshold || Math.Abs(size.Y - size2.Y) > AdvancedOptions._nSizeThreshold) return false;
+
+            PcPhysicalPoint location2 = new PcPhysicalPoint(childOutline.PhysicalBoundaries.Location.X * (childOutline.PixelDensity.X), childOutline.PhysicalBoundaries.Location.Y * (childOutline.PixelDensity.Y));
+
+            if (Math.Abs(loc.X - location2.X) > AdvancedOptions._nLocationThreshold || Math.Abs(loc.Y - location2.Y) > AdvancedOptions._nLocationThreshold) return false;
+
+            return true;
         }
 
         private static bool CompareOutlines(IPcOutline childOutline, Task t)
@@ -377,6 +566,15 @@ namespace PetriUI
             return true;
         }
 
+        private static bool ConfirmSize(IPcOutline childOutline, System.Drawing.Point size)
+        {
+            Point size2 = new Point(Convert.ToInt32(GetOutlineWidth(childOutline)), Convert.ToInt32(GetOutlineHeight(childOutline)));
+
+            if (Math.Abs(size.X - size2.X) > AdvancedOptions._nSizeThreshold || Math.Abs(size.Y - size2.Y) > AdvancedOptions._nSizeThreshold) return false;
+
+            return true;
+        }
+
         private static int FindCloser(IPcOutline outline, Task t)
         {
 
@@ -385,6 +583,18 @@ namespace PetriUI
             // Euclidean distance between the object and the target
 
             int dist = (int)Math.Sqrt(Math.Pow(location.X - t.getLocation().X, 2) + Math.Pow(location.Y - t.getLocation().Y, 2));
+
+            return dist;
+        }
+
+        private static int FindCloser(IPcOutline outline, PcPhysicalPoint location)
+        {
+
+            PcPhysicalPoint location2 = new PcPhysicalPoint(outline.PhysicalBoundaries.Location.X * (outline.PixelDensity.X), outline.PhysicalBoundaries.Location.Y * (outline.PixelDensity.Y));
+
+            // Euclidean distance between the object and the target
+
+            int dist = (int)Math.Sqrt(Math.Pow(location.X - location2.X, 2) + Math.Pow(location.Y - location2.Y, 2));
 
             return dist;
         }

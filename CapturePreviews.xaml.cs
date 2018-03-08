@@ -20,6 +20,7 @@
 */
 
 // .NET framework namespaces
+using hp.pc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -328,25 +329,31 @@ namespace PetriUI
         // Parameters are received from MainPage listing the features of the new captures to be built
         // In this method they are built and added to the UI
 
-        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis, List<string> names)
+        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis, List<string> names, List<PcPhysicalPoint> locations, List<System.Drawing.Point> sizes)
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
             OutlineParameters op;
 
-            object[] returnable = new object[2];
+            object[] returnable = new object[3];
 
-            returnable = mc.Samples(folders, ind);
+            returnable = mc.Samples(folders, ind, locations, sizes);
+
+            // Returnable parameters shown in momentCapture
+
+            // Make captures according to returned shit
 
             samples = (List<Image>) returnable[0];
 
             op = (OutlineParameters)returnable[1];
 
+            List<bool> moved = (List<bool>)returnable[2];
+
             // Capture Window holds the control of a process. 
 
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count -1 -i), op.getLocation(op).ElementAt(op.getLocation(op).Count -1 -i), op.getSize(op).ElementAt(op.getSize(op).Count -1 -i)));
+                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count -1 -i), op.getLocation(op).ElementAt(op.getLocation(op).Count -1 -i), op.getSize(op).ElementAt(op.getSize(op).Count -1 -i), moved.ElementAt(folders.Count - 1 - i)));
                 capturesList.ElementAt(i).Uid = (i).ToString();
                 samplesList.Add(samples.ElementAt(i));
                 samplesList.ElementAt(i).Uid = (i).ToString();
@@ -465,7 +472,9 @@ namespace PetriUI
 
                 foreach (CaptureWindow element in capturesList)
                 {
-                    if(Int32.Parse(element.Uid) == index) element.Show();
+                    int uid = Int32.Parse(element.Uid);
+
+                    if (uid == index) element.Show();
                 }                     
             }   
         }        

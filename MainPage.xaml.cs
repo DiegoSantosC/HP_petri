@@ -41,6 +41,7 @@ using System.Windows.Navigation;
 using Microsoft.Win32;
 using System.Windows.Forms;
 using System.IO;
+using hp.pc;
 
 namespace PetriUI
 {
@@ -64,6 +65,8 @@ namespace PetriUI
         private static List<string> saveFolders;
         private static List<bool[]> analysisToPerform;
         private static List<string> processNames;
+        private static List<System.Drawing.Point> sizes;
+        private static List<PcPhysicalPoint> locations;
 
         private CapturePreviews cp;
 
@@ -95,6 +98,8 @@ namespace PetriUI
             saveFolders = new List<string>();
             processNames = new List<string>();
             capturesRunning = false;
+            sizes = new List<System.Drawing.Point>();
+            locations = new List<PcPhysicalPoint>();
 
             Logo_Init();
 
@@ -488,6 +493,9 @@ namespace PetriUI
                 return;
             }
 
+            sizes = op.getSize(op);
+            locations = op.getLocation(op);
+
             List<System.Windows.Shapes.Rectangle> outlineDefinitionList = new List<System.Windows.Shapes.Rectangle>();
 
             // Selection border holds a definition for an object and it's showing structure. (See SelectionBorder constructor definition)
@@ -714,13 +722,18 @@ namespace PetriUI
             // Launch pending captures
             
             List<int> indexes = new List<int>();
+            List<PcPhysicalPoint> sendingLocs = new List<PcPhysicalPoint>();
+            List<System.Drawing.Point> sendingSizes = new List<System.Drawing.Point>(); 
 
             for (int i = 0; i < parameters.Count; i++)
             {
                 indexes.Add(parameters.ElementAt(i)[2]);
+                sendingLocs.Add(locations[parameters.ElementAt(i)[2]]);
+                sendingSizes.Add(sizes[parameters.ElementAt(i)[2]]);
+
             }
 
-            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform, processNames);
+            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform, processNames, sendingLocs, sendingSizes);
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();

@@ -80,7 +80,7 @@ namespace PetriUI
         }
 
         // Several pictures extracted by index
-        internal static object[] getSamples(List<string> folders, List<int> indexes)
+        internal static object[] getSamples(List<string> folders, List<int> indexes, List<PcPhysicalPoint> locations, List<System.Drawing.Point> sizes)
         {
             try
             {
@@ -91,15 +91,9 @@ namespace PetriUI
                         IPcPicture picture = link.ExtractPicture(moment);
                         IPcOutline outlines = link.ExtractOutline(moment);
 
-                        List<Image> img = PictureHandling.SaveSamples(picture, folders, indexes);
-                        OutlineParameters op = PictureHandling.getOutlines(outlines, indexes);
-
-                        object[] returnable = new object[2];
-
-                        returnable[0] = img;
-                        returnable[1] = op;
-
-                        return returnable;
+                        object[] returned = PictureHandling.SaveSamples(picture, outlines, folders, indexes, locations, sizes);
+                        
+                        return returned;
                     }
                 }
 

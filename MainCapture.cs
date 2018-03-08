@@ -85,9 +85,9 @@ namespace PetriUI
         }    
 
         // Image captures samples 
-        public object[] Samples(List<string> folders, List<int> indexes)
+        public object[] Samples(List<string> folders, List<int> indexes, List<PcPhysicalPoint> locations, List<System.Drawing.Point> sizes)
         {
-            object[] returnable = MomentCapture.getSamples(folders, indexes);
+            object[] returnable = MomentCapture.getSamples(folders, indexes, locations, sizes);
 
             return returnable;
         }
