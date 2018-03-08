@@ -7,8 +7,19 @@ using System.Threading.Tasks;
 
 namespace PetriUI
 {
+    /// <summary>
+    /// 
+    /// Thread that holds the user made player that toggles between the taken captures of a process
+    /// 
+    /// Launched and handled by CaptureWindow whenever the play button is pressed
+    /// 
+    /// </summary>
+
     class PlayHandler
     {
+        // As long as the parameter "playing" is active in Capture Window, this thread will trigger the function CaptureWindow.showNextCapture at a 
+        // speed rate given by the mentioned window
+
         public void StartHandler(object param)
         {
             CaptureWindow cw = (CaptureWindow)param;

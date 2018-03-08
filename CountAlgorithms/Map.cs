@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    ///
+    /// User made class representing a bitmap's pixel information as a grey values array and RGB values array
+    /// 
+    /// </summary>
+
     class Map
     {
         private int[,] greyMap;

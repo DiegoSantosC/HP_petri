@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    ///
+    /// This class holds the different algorithms created for Difference Computation, called by CountAnalytics
+    /// Every algorithm receives a positions[] array containing the computed deplacement for the bitmaps to obtain the best match
+    /// 
+    /// </summary>
+     
     class DifferenceComputation
     {
         private static bool drawing;
@@ -15,6 +22,8 @@ namespace AnalysisTestApp
 
         public static Map getManhattan(Bitmap bmp1, Bitmap bmp2, int[] positions)
         {
+            // Information regarding the deplacement is managed
+
             int x0 = Math.Max(0, positions[0]);
             int x1 = Math.Min(bmp1.Width, bmp2.Width + positions[0]);
             int y0 = Math.Max(0, positions[1]);
@@ -57,6 +66,8 @@ namespace AnalysisTestApp
 
         public static Map getEuclidean(Bitmap bmp1, Bitmap bmp2, int[] positions)
         {
+            // Information regarding the deplacement is managed
+
             int x0 = Math.Max(0, positions[0]);
             int x1 = Math.Min(bmp1.Width, bmp2.Width + positions[0]);
             int y0 = Math.Max(0, positions[1]);
@@ -92,7 +103,7 @@ namespace AnalysisTestApp
             return new Map(colorMap, RGBSource);
         }
 
-        // Difference computation using the pearson coefficient parameter
+        // Difference computation using Pearson's coefficient parameter
 
         private static Map getGlobalCorrelation(Bitmap bmp1, Bitmap bmp2, int[] positions)
         {
@@ -101,12 +112,16 @@ namespace AnalysisTestApp
             long[] accXX = new long[3], accYY = new long[3], accXY = new long[3];
             double[] avgX = new double[3], avgY = new double[3], varX = new double[3], varY = new double[3], covXY = new double[3], corrIndex = new double[3];
 
+            // Information regarding the deplacement is managed
+
             int x0 = Math.Max(0, positions[0]);
             int x1 = Math.Min(bmp1.Width, bmp2.Width + positions[0]);
             int y0 = Math.Max(0, positions[1]);
             int y1 = Math.Min(bmp1.Height, bmp2.Height + positions[1]);
 
             double epsilon = AdvancedOptions._dEpsilonValue;
+
+            // Arrays initialization
 
             for (int i = 0; i < 3; i++)
             {
@@ -123,6 +138,8 @@ namespace AnalysisTestApp
                 corrIndex[i] = 0;
 
             }
+
+            // During the pixel iterations, accumulators are filled so as to compute averages, variances and covariances
 
             for (int j = y0; j < y1; j++)
             {
@@ -157,6 +174,8 @@ namespace AnalysisTestApp
 
             int n = (x1 - x0) * (y1 - y0);
 
+            // Averages computation
+
             avgX[0] = accX[0] / n;
             avgX[1] = accX[1] / n;
             avgX[2] = accX[2] / n;
@@ -164,6 +183,8 @@ namespace AnalysisTestApp
             avgY[0] = accY[0] / n;
             avgY[1] = accY[1] / n;
             avgY[2] = accY[2] / n;
+            
+            // Variances computtion
 
             varX[0] = (accXX[0] / n) - Math.Pow(avgX[0], 2);
             varX[1] = (accXX[1] / n) - Math.Pow(avgX[1], 2);
@@ -181,9 +202,13 @@ namespace AnalysisTestApp
             if (varY[1] <= 0) varY[1] = epsilon;
             if (varY[2] <= 0) varY[2] = epsilon;
 
+            // Covariances computation
+
             covXY[0] = (accXY[0] / n) - avgX[0] * avgY[0];
             covXY[1] = (accXY[1] / n) - avgX[1] * avgY[1];
             covXY[2] = (accXY[2] / n) - avgX[2] * avgY[2];
+
+            // Correlation indexes computation
 
             corrIndex[0] = covXY[0] / Math.Sqrt(varX[0] * varY[0]);
             corrIndex[1] = covXY[1] / Math.Sqrt(varX[1] * varY[1]);
@@ -192,6 +217,8 @@ namespace AnalysisTestApp
             int newWidth = x1 - x0, newHeight = y1 - y0;
 
             Bitmap bmp = new Bitmap(newWidth, newHeight);
+
+            // Difference building using computed index
 
             int[,] colorMap = new int[newWidth, newHeight];
             Color[,] RGBSource = new Color[newWidth, newHeight];

@@ -223,6 +223,9 @@ namespace PetriUI
             {
                 if (i == t.getIndex())
                 {
+                    // Check wether if a match is achieved between the expected and the obtained object. If not, a second capture is attempted
+                    // This is needed because of Sprout's capture errors, that often lead to wrong object identification 
+
                     if (ConfirmMatch(outline, i, t))
                     {
                         string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
@@ -234,7 +237,7 @@ namespace PetriUI
 
                         Uri u = new Uri(fileAndPath, UriKind.Relative);
                         l.Add(u);
-                        t.getCaptureWindow().DrawImage();
+                        t.getCaptureWindow().DrawImage(false);
 
                         ++i;
 
@@ -246,13 +249,16 @@ namespace PetriUI
 
         public static void SaveIndexedImageRep(IPcPicture picture, IPcOutline outline, Task t)
         {
-            // if we are repeating the capture, an error has occured. We will thus try to match the
-            // outline with other indexed objects
+            // If we are repeating the capture, an error has occured. We will thus try to match the
+            // outline with other indexed objects present in the mat screen, looking for a user made location mistake
 
             string dir = Path.Combine(t.getFolder(), @"Captures\");
             ToolBox.EnsureDirectoryExists(dir);
 
             List<int> locationDifferences = new List<int>();
+
+            // In order to acknowledge an object as the targeted one, it's size must match with the expected.
+            // If several objects were to match the size, we shall choose thee who is closer to the expected location
 
             foreach (IPcOutline outlineChild in outline.Children)
             {
@@ -270,6 +276,8 @@ namespace PetriUI
                 if (locationDifferences[i] < minIndex[0]) { minIndex[0] = locationDifferences[i]; minIndex[1] = i; }
             }
 
+            // An object has found inside the minimum location difference
+
             if(minIndex[0] < AdvancedOptions._nLocationThreshold)
             {
                 string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
@@ -283,6 +291,9 @@ namespace PetriUI
                 l.Add(u);
                 t.getCaptureWindow().DrawImage(false);
             }
+
+            // No object in the expected range: we capture a deplaced one and inform the user
+
             else if(minIndex[0] < Int32.MaxValue)
             {
                 string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
@@ -297,6 +308,9 @@ namespace PetriUI
                 t.getCaptureWindow().DrawImage(true);
             
             }
+
+            // The object is not present in the mat as sizes don't match: stop capture process and inform the user
+
             else
             {
                 t.getCaptureWindow().CaptureError();

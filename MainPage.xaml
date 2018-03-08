@@ -80,10 +80,14 @@
                     <RowDefinition/>
           
                 </Grid.RowDefinitions>
-
+                
+                <!-- Close fake button-->
                 <StackPanel Name="CloseSP" Grid.Column="2" Grid.Row="0" Height="30" Width="30" HorizontalAlignment="Right" Margin="0,20,20,0"/>
 
+                <!-- Parameter insertion title -->                
                 <Label Name="ParametersTitleLabel" Grid.Column="1" Grid.Row="0" HorizontalAlignment ="Center" Style="{StaticResource label1Style}"> Object 1 capture parameters</Label>
+                
+                <!-- Labels for parameter insertion -->
                 <Label Grid.Column="0" Grid.Row="3"  Style="{StaticResource label1Style}">Insert time interval (min)</Label>
                 <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource label1Style}">Insert number of captures </Label>
 
@@ -140,9 +144,13 @@
                     <RowDefinition/>
 
                 </Grid.RowDefinitions>
+                
+                <!-- Close "button" -->
 
                 <StackPanel Name="CloseSP2" Grid.Column="0" Grid.Row="0" Height="30" Width="30" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,0"/>
 
+                <!-- Import parameters title -->
+                
                 <Label Name="ImportLabel" Grid.Row="0" HorizontalAlignment ="Center" Style="{StaticResource label1Style}">Import Settings</Label>
                 
                 <!-- Folder election button -->

@@ -14,6 +14,14 @@ using hp.pc.specification;
 
 namespace PetriUI
 {
+    /// <summary>
+    ///  
+    /// Form created to be displayed in the mat screen holding an image
+    /// 
+    /// Launched by: Project into Mat Screen in Capture Window
+    /// 
+    /// </summary>
+
     public class ProjectedForm : IPcWindowManager
     {
         private Form managedWindow;

@@ -18,7 +18,15 @@ namespace PetriUI
 {
     /// <summary>
     /// Interaction logic for AnalysisWindow.xaml
+    /// 
+    /// Funcionalities : Window structure that holds all analysis pages (Picker, CountAnalytics, ClassAnalytics, ChartPage)
+    /// 
+    /// Launched at start of a capture process if an analysis is selected
+    /// 
+    /// Redirected to Picker
+    /// 
     /// </summary>
+
     public partial class AnalysisWindow : NavigationWindow
     {
         private Picker pick;
@@ -26,6 +34,8 @@ namespace PetriUI
         private CountAnalytics countPage;
         private ChartPage chartPage;
         private bool closeRequest;
+
+        // This window will work as the link between the capture processes and the analysis processes
 
         public AnalysisWindow(CaptureWindow cw, bool countAnalysis, bool classAnalysis)
         {

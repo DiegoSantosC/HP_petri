@@ -6,7 +6,7 @@
     
     <Application.Resources>
          
-        <!-- header Style -->
+        <!-- Header Style -->
         <Style x:Key="headerStyle" TargetType="{x:Type Label}">
             
             <Setter Property="Label.VerticalAlignment" Value="Center"></Setter>
@@ -17,7 +17,7 @@
 
         </Style>
 
-        <!-- Button1 Style -->
+        <!-- Button1 (big) Style -->
         <Style x:Key="button1Style" TargetType="{x:Type Button}">
 
             <Setter Property="Width" Value="200"></Setter>
@@ -31,7 +31,7 @@
 
         </Style>
 
-        <!-- BUtton2 Style -->
+        <!-- BUtton2 (small) Style -->
         <Style x:Key="button2Style" TargetType="{x:Type Button}">
 
             <Setter Property="Width" Value="40"></Setter>
@@ -44,7 +44,7 @@
 
         </Style>
 
-        <!-- label Style -->
+        <!-- label Style (regular),  front -->
         <Style x:Key="label1Style" TargetType="{x:Type Label}">
             
             <Setter Property="Label.FontFamily" Value="Impact"></Setter>
@@ -54,7 +54,7 @@
             
         </Style>
 
-        <!-- label Style -->
+        <!-- label2 Style -->
         <Style x:Key="label2Style" TargetType="{x:Type Label}">
             
             <Setter Property="Label.FontFamily" Value="Impact"></Setter>

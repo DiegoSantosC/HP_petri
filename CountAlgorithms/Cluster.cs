@@ -7,8 +7,27 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    /// 
+    /// Core user defined class of the analysis process that holds all information regarding a found cluster in the taken image (corresponding to a colony)
+    /// 
+    /// It's content is filled during the execution ofthe ConnectedComponents algorithm and is required in every analysis functionalty
+    /// 
+    /// </summary>
+
     class Cluster
     {
+        // Parameters:
+        //  
+        //  ID: static identifier of the cluster, that is hold for that cluster over time in following tracking steps
+        //  count : number of pixels belonging to the cluster
+        //  countY countX countColor sumR sumG sumB countColorSquare : accumulators created to stats purposes (mostly avgs)
+        //  minX minY maxX maxY : cluster bounding box definitors
+        //  step : tracking step the cluster belongs to
+        //  mergedToBarnch : stores the id of the branch this cluster has merged to
+        //  mergeBranches : stores the cluster branches that have been merged into this one
+        // 
+      
         private int id, count, countY, countX, countColor, minX, minY, maxX, maxY, step, sumR, sumG, sumB;
         private double countColorSquare;
         private string timelapse;
@@ -43,6 +62,30 @@ namespace AnalysisTestApp
             firstColony = false;
 
         }
+
+        // Dynamic information is added via addPoint function
+
+        public void addPoint(int x, int y, int colorValue, Color RGB)
+        {
+            count++;
+            countColor += colorValue;
+
+            if (minX > x) minX = x;
+            else if (maxX < x) maxX = x;
+
+            if (minY > y) minY = y;
+            else if (maxY < y) maxY = y;
+
+            countColorSquare += colorValue * colorValue;
+            countX += x;
+            countY += y;
+
+            sumR += RGB.R;
+            sumG += RGB.G;
+            sumB += RGB.B;
+        }
+
+        // Static getters and setters
 
         public int getId()
         {
@@ -110,26 +153,6 @@ namespace AnalysisTestApp
             return mergeBranches;
         }
 
-        public void addPoint(int x, int y, int colorValue, Color RGB)
-        {
-            count++;
-            countColor += colorValue;
-
-            if (minX > x) minX = x;
-            else if (maxX < x) maxX = x;
-
-            if (minY > y) minY = y;
-            else if (maxY < y) maxY = y;
-
-            countColorSquare += colorValue * colorValue;
-            countX += x;
-            countY += y;
-
-            sumR += RGB.R;
-            sumG += RGB.G;
-            sumB += RGB.B;
-        }
-
         public void setIndex(int index)
         {
             id = index;
@@ -160,6 +183,18 @@ namespace AnalysisTestApp
         public double getColorAvg()
         {
             return (int)countColor / count;
+        }
+
+        // Conversion between pixels and centimeters:
+
+        // Sreen resolution = 1024 x 768 cm
+        // Screen real size = 40.6 x 30.6
+
+        // Taken conversion rate ≈ 25
+
+        public int getcmSize()
+        {
+            return count / 25;
         }
 
         public int getSize()

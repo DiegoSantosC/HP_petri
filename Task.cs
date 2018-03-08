@@ -34,7 +34,7 @@ namespace PetriUI
 {
     /// <summary>
     /// Definition of a task, which includes parameters for a capture, the Window
-    /// associated to it and the path in which they are saved
+    /// associated to it and the path in which they are saved, as well as the expected locaton and size of the object to capture
     /// </summary>
     class Task
     {

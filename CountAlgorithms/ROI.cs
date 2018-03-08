@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    ///
+    ///  A ROI (or Region Of Interest) defines an area ouside which the results of the difference computation are not 
+    ///  relevant for the ConnectedComponents cluster finding
+    /// 
+    /// </summary>
+
     class ROI
     {
         private int x0, x1, y0, y1;
+
+        // A ROI's definition can be explicit or through a margin
 
         public ROI(int x_0, int x_1, int y_0, int y_1)
         {

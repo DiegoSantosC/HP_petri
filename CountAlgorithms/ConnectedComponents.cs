@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    ///
+    /// Algorthm that finds all connectedComponents (corresponding to clusters) in a user defined Map created from a difference computation result 
+    /// 
+    /// </summary>
+
     class ConnectedComponents
     {
         private int[,] arrTagMap;
@@ -100,11 +106,15 @@ namespace AnalysisTestApp
                     nDownTag = currTag[x, y - 1];
                     int nLeftTag = currTag[x - 1, y];
 
+                    // If the pixel matches both its left and top one, but they are not labeled equally, a remap is made
+
                     if (isInside(region, x, y) && (fnMustInclude(arrSrc[x, y])))
                     {
                         if ((nLeftTag != NIL) && fnAreSimilar(arrSrc[x - 1, y], arrSrc[x, y]))
                         {
                             currTag[x, y] = nLeftTag;
+
+                            // Remap : the label of a lesser index is taken as the target one, and all others are remapped to it
 
                             if ((nDownTag != NIL) && (tagRemap.ElementAt(nDownTag) != tagRemap.ElementAt(nLeftTag)) && (fnAreSimilar(arrSrc[x, y - 1], arrSrc[x, y])))
                             {
@@ -253,7 +263,10 @@ namespace AnalysisTestApp
 
                     //        Console.WriteLine();
 
-                    //        // Horizontal lines
+                    // Cluster's bounding boxes are marked in a map so as to be shown to the user
+                    // (Used for test purposes)
+
+                    // Horizontal lines
 
                     for (int a = c.getBoundingBox()[0]; a < c.getBoundingBox()[2]; a++)
                     {

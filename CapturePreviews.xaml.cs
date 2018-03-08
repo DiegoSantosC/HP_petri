@@ -58,6 +58,10 @@ namespace PetriUI
         private static List<string> capturesNames;
         private static int numberCapturesRunning;
 
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      UI related functions
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         // This Page is initialized without content, and thus will be shown and made avaliable 
         // when the first capture starts to run
 
@@ -85,6 +89,8 @@ namespace PetriUI
 
         }
 
+        // HP logo initialization
+
         private void Logo_Init()
         {
             System.Windows.Controls.Image logo = new System.Windows.Controls.Image();
@@ -101,7 +107,8 @@ namespace PetriUI
         }
 
 
-        // Navigation to MainPage 
+        // Navigation to MainPage handler. This feature will always be active to allow new processes to be launched
+
         private void PageNavigation_Init()
         {
             System.Windows.Controls.Image navImg = new System.Windows.Controls.Image();
@@ -123,6 +130,7 @@ namespace PetriUI
         }
 
         // Navigation functionality definitions
+
         private void navigationArrowEnter(object sender, MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
@@ -154,8 +162,12 @@ namespace PetriUI
 
         }
 
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      Building fake carrousel to toggle between processes previews
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         // Scroll left elements and functionality
+
         private void ScrollLeft_Init()
         {
             System.Windows.Controls.Image rightImg = new System.Windows.Controls.Image();
@@ -176,6 +188,7 @@ namespace PetriUI
         }
 
         // Scroll right elements and functionality
+
         private void scrollRight_Init()
         {
             System.Windows.Controls.Image LeftImg = new System.Windows.Controls.Image();
@@ -201,6 +214,7 @@ namespace PetriUI
 
 
         // Scrolling functionality definitions
+
         private void scrollRight(object sender, MouseButtonEventArgs e)
         {
             String s = infoLabel.Content.ToString();
@@ -276,6 +290,8 @@ namespace PetriUI
 
         }
 
+        // Artificial Scroll will always be set to the first process that exists
+
         private void ArtificialScroll()
         {
             String s = infoLabel.Content.ToString();
@@ -293,7 +309,12 @@ namespace PetriUI
             nameLabel.Content = capturesNames.ElementAt(capturesNames.Count -1);
         }
 
-        // Captures management
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //      Capturing processes management
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Capture proccesses decreasing
+
         public static void DecrementCaptures()
         {
             numberCapturesRunning--;
@@ -303,6 +324,9 @@ namespace PetriUI
                 MainPage.capturesRunning = false;
             }
         }
+
+        // Parameters are received from MainPage listing the features of the new captures to be built
+        // In this method they are built and added to the UI
 
         public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis, List<string> names)
         {
@@ -318,6 +342,8 @@ namespace PetriUI
 
             op = (OutlineParameters)returnable[1];
 
+            // Capture Window holds the control of a process. 
+
             for (int i = 0; i < parameters.Count; i++)
             {
                 capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count -1 -i), op.getLocation(op).ElementAt(op.getLocation(op).Count -1 -i), op.getSize(op).ElementAt(op.getSize(op).Count -1 -i)));
@@ -329,6 +355,8 @@ namespace PetriUI
                 numberCapturesRunning++;
 
             }
+
+            // UI modification according to new situation
 
             sampleSP.Children.Clear();
             sampleSP.Children.Add(samplesList.ElementAt(0));
@@ -357,6 +385,8 @@ namespace PetriUI
             if (parameters.Count == capturesList.Count) ArtificialScroll();
         }
         
+        // This function finishes all running processes due to a closing signal from the window, so as not to leave any execution thread alive
+
         public static void killAllCaptures()
         {
             for (int i = 0; i < capturesList.Count; i++)
@@ -365,6 +395,8 @@ namespace PetriUI
                 capturesList.ElementAt(i).Close();
             }
         }
+
+        // Once a capture process is finished and it's handler is closed, the process is whiped from the UI
 
         public void EraseFinishedCapture(int index)
         {
@@ -384,6 +416,8 @@ namespace PetriUI
             capturesNames.RemoveAt(target);
 
             int i = 0;
+
+            // If the process is being displayed in the preview, a scroll is needed
 
             foreach (object child in sampleSP.Children)
             {
@@ -419,6 +453,7 @@ namespace PetriUI
         }
 
         // Link with CaptureWindow interface
+
         private void showDetails(object sender, RoutedEventArgs e)
         {
             int index;
@@ -433,8 +468,6 @@ namespace PetriUI
                     if(Int32.Parse(element.Uid) == index) element.Show();
                 }                     
             }   
-        }
-
-        
+        }        
     }
 }

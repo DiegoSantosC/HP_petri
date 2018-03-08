@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    ///
+    /// This class holds the algorithm executed to find the best possible match between two images 
+    /// 
+    /// </summary>
+
     class Matching_Robinson
     {
 

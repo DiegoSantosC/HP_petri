@@ -309,6 +309,8 @@ namespace PetriUI
             FolderSaveLabel.Content = fileLocation;
         }
 
+        // Function that inits and shows the navigation handlers
+
         private void enableNavigation()
         {
             // The navigaton is now enabled
@@ -574,7 +576,7 @@ namespace PetriUI
             int minutesInterval, hoursInterval, numberOfCaptures, delayH, delayMin;
             string folder, name;
 
-            // Input format check
+            // Input format check and acquisition
 
             if ((Int32.TryParse(minutesTextBox.Text, out minutesInterval)) && (Int32.TryParse(hoursTextBox.Text, out hoursInterval)) && (Int32.TryParse(numberOfCapturesTextBox.Text, out numberOfCaptures)) && Int32.TryParse(delayHTextBox.Text, out delayH) && Int32.TryParse(delayMinTextBox.Text, out delayMin))
             {
@@ -676,6 +678,7 @@ namespace PetriUI
                     delayMinTextBox.Text = "0";
                     FolderLabel.Content = "Not defined";
                                        
+                    // Analysis info acquisition
 
                     bool[] analysis = new bool[2];
                     if (Chk1.IsChecked.GetValueOrDefault()) { analysis[0] = true; }

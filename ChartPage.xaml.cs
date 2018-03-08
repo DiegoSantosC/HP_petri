@@ -20,13 +20,28 @@ namespace PetriUI
 {
     /// <summary>
     /// Interaction logic for ChartPage.xaml
+    /// 
+    /// Funcionalities : UI that shows the general results of the counting analysis
+    /// regarding number and size of the colonies
+    /// 
+    /// Launched by being selected through the Picker
+    /// 
+    /// Receives data from countAnalytics
+    /// 
     /// </summary>
+    /// 
+
     public partial class ChartPage : Page
     {
+
+        // Empty initialization
         public ChartPage()
         {
             InitializeComponent();
         }
+
+        // Page's content is originated when the page is shown, with a link to the source of the data that needs to be presented
+
         public void initCharts(CountAnalytics analysisDataSource, string _saveDir)
         {
             double[] countYData = analysisDataSource.getColonyCountData();
@@ -45,8 +60,8 @@ namespace PetriUI
 
                 Rectangle r = new Rectangle();
 
-                r.Width = 310;
-                r.Height = 245;
+                r.Width = 300;
+                r.Height = 230;
 
                 r.Margin = new Thickness(305 * (i / 3), 235 * (i % 3), 0, 0);
 

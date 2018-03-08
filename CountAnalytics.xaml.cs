@@ -19,7 +19,15 @@ using System.Windows.Shapes;
 namespace PetriUI
 {
     /// <summary>
-    /// Interaction logic for CountAnalytics.xaml
+    /// Interaction logic for CountAnalytcs.xaml
+    /// 
+    /// Funcionalities : UI created to hold both the colony count analysis and the
+    /// UI that shows it.
+    /// 
+    /// Launched by AnalysisWindow if countAnalysis is selected as an option
+    /// 
+    /// Fed with content by the capture process being running by captureWindow
+    /// 
     /// </summary>
     public partial class CountAnalytics : Page
     {
@@ -34,6 +42,7 @@ namespace PetriUI
 
         // Test inputs
         private Bitmap[] testBmps;
+
 
         public CountAnalytics(AnalysisWindow a)
         {
@@ -97,11 +106,17 @@ namespace PetriUI
             ClusterListBox.SelectionChanged += new SelectionChangedEventHandler(showLocation);
         }
 
+        // An image is shown in the UI
+
         public void Show(int index)
         {
+            // Changing blocks the execution of the handler "ListBox Selection Changed"
+
             changing = true;
 
             sampleSP.Children.Clear();
+
+            // A System.Windows.Controls.Image is created from a System.Drawing.Image by acquiring its Bitmap
 
             System.Windows.Controls.Image img = new System.Windows.Controls.Image();
 
@@ -125,6 +140,8 @@ namespace PetriUI
 
         }
 
+        // Building the new colony specification items according to the image that is shown in the general panel 
+
         private void ModifyListBox(int index)
         {
             ClusterListBox.Items.Clear();
@@ -135,143 +152,8 @@ namespace PetriUI
             }
         }
 
-        // Scroll left elements and functionality
-        private void ScrollLeft_Init()
-        {
-            System.Windows.Controls.Image rightImg = new System.Windows.Controls.Image();
-            BitmapImage srcRight = new BitmapImage();
-            srcRight.BeginInit();
-            srcRight.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Right.png", UriKind.Absolute);
-            srcRight.CacheOption = BitmapCacheOption.OnLoad;
-            srcRight.EndInit();
-            rightImg.Source = srcRight;
-            rightImg.Stretch = Stretch.Uniform;
-
-            rightSp.Children.Add(rightImg);
-
-            rightSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
-            rightSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
-
-            rightSp.MouseDown += new MouseButtonEventHandler(scrollRight);
-        }
-
-        // Scroll right elements and functionality
-        private void ScrollRight_Init()
-        {
-            System.Windows.Controls.Image LeftImg = new System.Windows.Controls.Image();
-            BitmapImage srcLeft = new BitmapImage();
-            srcLeft.BeginInit();
-            srcLeft.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Left.png", UriKind.Absolute);
-            srcLeft.CacheOption = BitmapCacheOption.OnLoad;
-            srcLeft.EndInit();
-            LeftImg.Source = srcLeft;
-            LeftImg.Stretch = Stretch.Uniform;
-
-            leftSp.Children.Add(LeftImg);
-
-            leftSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
-            leftSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
-
-            leftSp.MouseDown += new MouseButtonEventHandler(scrollLeft);
-
-        }
-
-        // Navigation functionality definitions
-        private void navigationArrowEnter(object sender, MouseEventArgs e)
-        {
-            StackPanel senderBut = (StackPanel)sender;
-
-            foreach (object child in senderBut.Children)
-            {
-                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
-
-                childImg.Opacity = 0.7;
-            }
-
-        }
-
-        private void navigationArrowLeave(object sender, MouseEventArgs e)
-        {
-            StackPanel senderBut = (StackPanel)sender;
-
-            foreach (object child in senderBut.Children)
-            {
-                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
-
-                childImg.Opacity = 1;
-            }
-        }
-
-
-        // Scrolling functionality definitions
-        private void scrollRight(object sender, MouseButtonEventArgs e)
-        {
-            String s = infoLabel.Content.ToString();
-            String[] data = s.Split('/');
-
-            int current = Int32.Parse(data[0]);
-            int total = Int32.Parse(data[1]);
-
-            if (current == total)
-            {
-                sampleSP.Children.Clear();
-                try
-                {
-                    Show(0);
-                }
-                catch (ArgumentOutOfRangeException ex) { }
-
-                infoLabel.Content = "1/" + Tracking_Images.Count.ToString();
-            }
-            else
-            {
-                sampleSP.Children.Clear();
-                try
-                {
-                    Show(current);
-                }
-                catch (ArgumentOutOfRangeException ex) { }
-
-                infoLabel.Content = (current + 1) + "/" + Tracking_Images.Count.ToString();
-            }
-
-        }
-
-        private void scrollLeft(object sender, MouseButtonEventArgs e)
-        {
-            String s = infoLabel.Content.ToString();
-            String[] data = s.Split('/');
-
-            int current = Int32.Parse(data[0]);
-            int total = Int32.Parse(data[1]);
-
-            if (current == 1)
-            {
-                sampleSP.Children.Clear();
-
-                try
-                {
-                    Show(total - 1);
-                }
-                catch (ArgumentOutOfRangeException ex) { }
-
-                infoLabel.Content = total + "/" + Tracking_Images.Count.ToString();
-            }
-            else
-            {
-                sampleSP.Children.Clear();
-
-                try
-                {
-                    Show(current - 2);
-                }
-                catch (ArgumentOutOfRangeException ex) { }
-
-                infoLabel.Content = (current - 1) + "/" + Tracking_Images.Count.ToString();
-            }
-
-        }
-
+        // UI elements are initialized whenever the UI is called to be shown with the current state of the analysis
+        // Elements initialized: Rectangles matching clusters' positions, listBoxItems holding clusters' specifications 
         public void initStatics()
         {
             for (int i = 0; i < track.getTimelineTracking().Count; i++)
@@ -304,6 +186,8 @@ namespace PetriUI
                 cluster_locations.Add(locations);
             }
         }
+
+        // A cluster's location is shown in the general panel whenever this cluster is selected in the listbox
 
         private void showLocation(object sender, SelectionChangedEventArgs e)
         {
@@ -339,6 +223,9 @@ namespace PetriUI
 
         }
 
+        // ListBoxItems creation from cluster info
+        // Information show: cluster's ID, size(cm), Average RGB values and events relating to it
+
         private ListBoxItem createItemFromCluster(Cluster c)
         {
             ListBoxItem item = new ListBoxItem();
@@ -346,6 +233,8 @@ namespace PetriUI
 
             item.Height = 80;
             item.Width = 500;
+
+            // Item structure building
 
             ColumnDefinition c1 = new ColumnDefinition();
             c1.Width = new GridLength(350);
@@ -361,6 +250,8 @@ namespace PetriUI
             g.ColumnDefinitions.Add(c2);
             g.ColumnDefinitions.Add(c3);
             g.ColumnDefinitions.Add(c4);
+
+            // Item content filling
 
             Label l1 = new Label();
             l1.Width = 40;
@@ -459,8 +350,155 @@ namespace PetriUI
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //  Fake carrousel elements building and handlers
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        private void ScrollLeft_Init()
+        {
+            System.Windows.Controls.Image rightImg = new System.Windows.Controls.Image();
+            BitmapImage srcRight = new BitmapImage();
+            srcRight.BeginInit();
+            srcRight.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Right.png", UriKind.Absolute);
+            srcRight.CacheOption = BitmapCacheOption.OnLoad;
+            srcRight.EndInit();
+            rightImg.Source = srcRight;
+            rightImg.Stretch = Stretch.Uniform;
+
+            rightSp.Children.Add(rightImg);
+
+            rightSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
+            rightSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+
+            rightSp.MouseDown += new MouseButtonEventHandler(scrollRight);
+        }
+
+        // Scroll right elements and functionality
+
+        private void ScrollRight_Init()
+        {
+            System.Windows.Controls.Image LeftImg = new System.Windows.Controls.Image();
+            BitmapImage srcLeft = new BitmapImage();
+            srcLeft.BeginInit();
+            srcLeft.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Blue_Left.png", UriKind.Absolute);
+            srcLeft.CacheOption = BitmapCacheOption.OnLoad;
+            srcLeft.EndInit();
+            LeftImg.Source = srcLeft;
+            LeftImg.Stretch = Stretch.Uniform;
+
+            leftSp.Children.Add(LeftImg);
+
+            leftSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
+            leftSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+
+            leftSp.MouseDown += new MouseButtonEventHandler(scrollLeft);
+
+        }
+
+        // Navigation functionality definitions
+
+        private void navigationArrowEnter(object sender, MouseEventArgs e)
+        {
+            StackPanel senderBut = (StackPanel)sender;
+
+            foreach (object child in senderBut.Children)
+            {
+                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
+
+                childImg.Opacity = 0.7;
+            }
+
+        }
+
+        private void navigationArrowLeave(object sender, MouseEventArgs e)
+        {
+            StackPanel senderBut = (StackPanel)sender;
+
+            foreach (object child in senderBut.Children)
+            {
+                System.Windows.Controls.Image childImg = (System.Windows.Controls.Image)child;
+
+                childImg.Opacity = 1;
+            }
+        }
+
+
+        // Scrolling functionality definitions
+
+        private void scrollRight(object sender, MouseButtonEventArgs e)
+        {
+            String s = infoLabel.Content.ToString();
+            String[] data = s.Split('/');
+
+            int current = Int32.Parse(data[0]);
+            int total = Int32.Parse(data[1]);
+
+            if (current == total)
+            {
+                sampleSP.Children.Clear();
+                try
+                {
+                    Show(0);
+                }
+                catch (ArgumentOutOfRangeException ex) { }
+
+                infoLabel.Content = "1/" + Tracking_Images.Count.ToString();
+            }
+            else
+            {
+                sampleSP.Children.Clear();
+                try
+                {
+                    Show(current);
+                }
+                catch (ArgumentOutOfRangeException ex) { }
+
+                infoLabel.Content = (current + 1) + "/" + Tracking_Images.Count.ToString();
+            }
+
+        }
+
+        private void scrollLeft(object sender, MouseButtonEventArgs e)
+        {
+            String s = infoLabel.Content.ToString();
+            String[] data = s.Split('/');
+
+            int current = Int32.Parse(data[0]);
+            int total = Int32.Parse(data[1]);
+
+            if (current == 1)
+            {
+                sampleSP.Children.Clear();
+
+                try
+                {
+                    Show(total - 1);
+                }
+                catch (ArgumentOutOfRangeException ex) { }
+
+                infoLabel.Content = total + "/" + Tracking_Images.Count.ToString();
+            }
+            else
+            {
+                sampleSP.Children.Clear();
+
+                try
+                {
+                    Show(current - 2);
+                }
+                catch (ArgumentOutOfRangeException ex) { }
+
+                infoLabel.Content = (current - 1) + "/" + Tracking_Images.Count.ToString();
+            }
+
+        }
+
+        
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analysis functions
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // The first taken image is set as the background image
 
         public void setBackgound(System.Drawing.Image backgroundImg)
         {
@@ -471,25 +509,40 @@ namespace PetriUI
             background = testBmps[0];
         }
 
+        // In each step, colony tracking is performed by comparing the current taken image with the
+        // first one (serving as background) and the last one in the look for changes
+
         public int[] newStep(System.Drawing.Image img, string time)
         {
-            Bitmap bmp = new Bitmap(img);
+            //Bitmap bmp = new Bitmap(img);
 
             // For testing purposes, taken images will be replaced for static ones
 
-            //Bitmap bmp = testBmps[step + 1];
+            Bitmap bmp = testBmps[step + 1];
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
 
+            // Firstly we will find the best matching repositioning to the images by selecting the one that minimizes the edges difference 
+            // This is needed because of the Sprout's image acquisition impresition, which leads to minor mismatches between the same object's captures
+
             int[] positions = Matching_Robinson.RobinsonRepositioning(background, bmp);
 
+            // Once the reposition is calculated, a difference between the taken image and the background is performed
+            // For this difference, Manhattan difference computation has been used. However, Eucliedean distance computation and
+            // Pearson's correlation index difference computation functions are included in the code and ready to be used.
+
             Map resultDifference = DifferenceComputation.getManhattan(background, bmp, positions);
+
+            // A cluster search is computed
 
             List<Cluster> frameBlobs = FindObjects(resultDifference, time);
 
             Console.WriteLine();
             Console.WriteLine("Tracking " + step + ": " + frameBlobs.Count + " blobs encountered");
+
+            // If this is the first tracking step made, the found clusters are set as base ones,
+            // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
 
             int[] events;
 
@@ -505,6 +558,9 @@ namespace PetriUI
 
             return events;
         }
+
+        // Same analysis process than the previous, only that in this case the images are statically acquired and thus 
+        // every step can be performed at once
 
         public void staticAnalysis(object param)
         {
@@ -526,6 +582,8 @@ namespace PetriUI
             App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
                   new Action(() => mp.finished_Analysis(aw, folder)));
         }
+
+        // Builds and returns an event if a cluster's bounds are close to the edge
 
         private int[] checkBounds(int[] events, List<Cluster> list, Bitmap bmp)
         {
@@ -562,6 +620,8 @@ namespace PetriUI
             return newEvents;
         }
 
+        // Finding every cluster in a difference
+
         private List<Cluster> FindObjects(Map resultDifference, string time)
         {
             ConnectedComponents cc = new ConnectedComponents(resultDifference, " ", new ROI(AdvancedOptions._nROIMargin, resultDifference.getGreyMap()), time);
@@ -572,6 +632,8 @@ namespace PetriUI
 
             return cc.getIdentifiedBlobs();
         }
+
+        // Returnables directed to other classes
 
         public double[] getColonyCountData()
         {

@@ -32,7 +32,7 @@
         <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture 
         </Label>
 
-        <!-- Data -->
+        <!-- Label that shows data regarding the capture process -->
         <StackPanel Name="dataSP" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Row="1" Width="40" Height="60" Margin="20,10,60,0"/>
         <Border Grid.Column="0" Visibility="Hidden" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Name="dataBorder" Margin="0,22,80,0" Background="#F5F6CE">
             <Label Name="dataLabel" Visibility="Hidden" FontSize="12" Foreground="Black"></Label>
@@ -59,13 +59,13 @@
         <!-- Last Capture drawing Canvas -->
         <Canvas Name="LastImageCanvas" Margin ="100,0,50,50" Grid.Column="0" Grid.Row="2"/>
 
-        <!-- Analysis button -->
+        <!-- Skip to a capture's analysis button -->
         <Button Name="CountAnalysisBut" Grid.Column="0" Grid.Row="3" HorizontalAlignment ="Center" Visibility ="Hidden" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="250,0,50,40" Width="200" Height="40" Click="Show_Analysis">Show Analysis</Button>
 
         <!-- General analysis button -->
         <Button Name="generalAnalysisBut" Grid.Column="1" Grid.Row="1" HorizontalAlignment ="Left" Visibility ="Visible" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="350,0,50,40" Width="200" Height="40" Click="General_Analysis">General Analysis</Button>
 
-        <!-- Capture Finished Label -->
+        <!-- Capture State Label -->
         <Border Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Center" Name="finishedCapture" Background="#E9DA2D"> 
             <Label Name="RunningLabel" FontSize="15" Foreground="Black">Awaiting to Start</Label>
         </Border>  

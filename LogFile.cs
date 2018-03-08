@@ -32,6 +32,7 @@ namespace PetriUI
     /// <summary>
     /// Definition of the File creation class
     /// </summary>
+    /// 
     class LogFile
     {
         private int index, nOfC;

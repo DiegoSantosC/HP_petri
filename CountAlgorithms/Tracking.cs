@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace AnalysisTestApp
 {
+    /// <summary>
+    ///
+    /// Tracking algorithm that, given an obtained cluster list, matches it with the previous one, looking for cluster growths, merges
+    /// and new colony apprearances
+    /// 
+    /// This class is initialized and called by CountAnalytics 
+    /// 
+    /// </summary>
+
     class Tracking
     {
         private List<List<Cluster>> blobTrack;
@@ -17,6 +26,8 @@ namespace AnalysisTestApp
             blobTrack = new List<List<Cluster>>();
             lastTrack = new List<Cluster>();
         }
+
+        // Getters 
 
         public List<List<Cluster>> getTracking()
         {
@@ -54,7 +65,7 @@ namespace AnalysisTestApp
 
         }
 
-        // Initial step of blob track
+        // Initial step of blob track, every blob is stored as the base one 
 
         public void firstScan(List<Cluster> blobs, int step)
         {
@@ -93,9 +104,13 @@ namespace AnalysisTestApp
 
                 if (!mergedChance && !newColonyChance)
                 {
+                    // Look for a merge
+
                     bool merged = findPossibleMerge(lastTrack, blobs.ElementAt(i));
                     if (!merged)
                     {
+                        // Compare current blob with the past one of the same index
+
                         bool match = blobCompare(lastTrack.ElementAt(i), blobs.ElementAt(i));
 
                         if (match)
@@ -143,6 +158,7 @@ namespace AnalysisTestApp
                 }
                 else
                 {
+                    // Look for a merge
 
                     bool merged = findPossibleMerge(lastTrack, blobs.ElementAt(i));
                     if (!merged)
@@ -187,6 +203,8 @@ namespace AnalysisTestApp
             return eventsList.ToArray();
         }
 
+        // A merging between the blob and every pair of blobs of the last tracking is attempted
+
         private bool findPossibleMerge(List<Cluster> lastTrack, Cluster blob)
         {
             for (int i = 0; i < lastTrack.Count; i++)
@@ -200,6 +218,8 @@ namespace AnalysisTestApp
                         Console.WriteLine("Blobs " + i + " and " + j + " have merged");
 
                         int indexDest, indexBrunch;
+
+                        // The biggest blob holds the branch that will perdure
 
                         if (lastTrack.ElementAt(i).getSize() > lastTrack.ElementAt(j).getSize())
                         {
@@ -304,7 +324,7 @@ namespace AnalysisTestApp
 
             if (intersection) { Console.WriteLine(" Blobs intersect"); possibility++; }
 
-            // Centros ponderados 
+            // Third feature: Center of the new blob is between the centers of past ones
 
             int[] center1 = new int[2], center2 = new int[2], newCenter = new int[2];
 
@@ -350,6 +370,8 @@ namespace AnalysisTestApp
             return -1;
         }
 
+        // Comparison between two clusters to recognize them as the same
+
         private bool blobCompare(Cluster c1, Cluster c2)
         {
             int[] center1 = new int[2], center2 = new int[2];
@@ -389,6 +411,8 @@ namespace AnalysisTestApp
             Console.WriteLine("Growth");
 
             if (boundsDepl > AdvancedOptions._dAbnormalGrowth) eventsList.Add(0);
+
+            // No reason for rejection having been found, both clusters are considered to be the same in two different moments of time
 
             return true;
         }

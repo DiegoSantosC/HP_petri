@@ -110,5 +110,19 @@ namespace AnalysisTestApp
 
         public static int _nMinimumDistance = 40;
 
+        /*  Use :              Picture Handling, CompareOutlines
+        *  Definition :        Outline size threshold for two objects to match
+        *  Recommended value : 30 +- 10
+        */
+
+        public static int _nSizeThreshold = 30;
+
+       /*  Use :              Picture Handling, CompareOutlines
+       *  Definition :        Outline location maximum difference 
+       *  Recommended value : 100 +- 20
+       */
+
+        public static int _nLocationThreshold = 100;
+
     }
 }

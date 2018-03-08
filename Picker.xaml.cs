@@ -16,8 +16,16 @@ using System.Windows.Shapes;
 namespace PetriUI
 {
     /// <summary>
-    /// Interaction logic for Page1.xaml
+    /// Interaction logic for Picker.xaml
+    /// 
+    /// Functionality : Toggle between the different analysis pages
+    /// 
+    /// Launched by: Analysis Window
+    /// 
+    /// Launches : ClassPage, CountAnalytics and ClassAnalytics
+    /// 
     /// </summary>
+    /// 
     public partial class Picker : Page
     {
         private CaptureWindow captureWindow;
@@ -25,6 +33,8 @@ namespace PetriUI
         private ClassifyAnalytics clssPage;
         private CountAnalytics countPage;
         private ChartPage chartPage;
+
+        // UI initialization with a link to every analysis related interface
 
         public Picker(CaptureWindow cw, bool count, bool classAn, ClassifyAnalytics clss, CountAnalytics cnt, ChartPage chp)
         {
@@ -44,6 +54,7 @@ namespace PetriUI
             chartPage = chp;
         }
 
+        // Each stackPanel, when clicked, holds the navigation to the analysis feature it represents
         private void Panel_Logic_Init()
         {
             classSP.MouseEnter += new MouseEventHandler(spEnter);
@@ -79,6 +90,8 @@ namespace PetriUI
             chart.Stretch = Stretch.Uniform;
             chartSP.Children.Add(chart);
         }
+
+        // Navigation clicking handlers
 
         private void chartClick(object sender, MouseButtonEventArgs e)
         {
