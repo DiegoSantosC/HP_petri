@@ -187,8 +187,8 @@ namespace AnalysisTestApp
 
         // Conversion between pixels and centimeters:
 
-        // Sreen resolution = 1024 x 768 cm
-        // Screen real size = 40.6 x 30.6
+        // Sreen resolution = 1024 x 768 pixels
+        // Screen real size = 40.6 x 30.6 cm
 
         // Taken conversion rate ≈ 25
 

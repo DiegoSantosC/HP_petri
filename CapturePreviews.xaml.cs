@@ -333,34 +333,55 @@ namespace PetriUI
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
-            OutlineParameters op;
+            List<IPcOutline> outlines;
 
             object[] returnable = new object[3];
 
             returnable = mc.Samples(folders, ind, locations, sizes);
 
-            // Returnable parameters shown in momentCapture
-
-            // Make captures according to returned shit
-
             samples = (List<Image>) returnable[0];
 
-            op = (OutlineParameters)returnable[1];
+            outlines = (List<IPcOutline>)returnable[1];
 
-            List<bool> moved = (List<bool>)returnable[2];
+            List<int> moved = (List<int>)returnable[2];
 
             // Capture Window holds the control of a process. 
 
+            int previousCaptures = capturesList.Count;
+
             for (int i = 0; i < parameters.Count; i++)
             {
-                capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 -i), folders.ElementAt(folders.Count -1 -i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count -1 -i), op.getLocation(op).ElementAt(op.getLocation(op).Count -1 -i), op.getSize(op).ElementAt(op.getSize(op).Count -1 -i), moved.ElementAt(folders.Count - 1 - i)));
-                capturesList.ElementAt(i).Uid = (i).ToString();
-                samplesList.Add(samples.ElementAt(i));
-                samplesList.ElementAt(i).Uid = (i).ToString();
-                capturesNames.Add(names.ElementAt(names.Count -1 -i));
+                if(moved[i]!= 2)
+                {
+                    PcPhysicalPoint location = new PcPhysicalPoint(outlines[i].PhysicalBoundaries.Location.X * (outlines[i].PixelDensity.X), outlines[i].PhysicalBoundaries.Location.Y * (outlines[i].PixelDensity.Y));
+                    System.Drawing.Point size = new System.Drawing.Point(Convert.ToInt32(PictureHandling.GetOutlineWidth(outlines[i])), Convert.ToInt32(PictureHandling.GetOutlineHeight(outlines[i])));
 
-                numberCapturesRunning++;
+                    if (moved[i] == 0)
+                    {
+                        capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 - i), 
+                            folders.ElementAt(folders.Count - 1 - i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count - 1 - i), 
+                            location, size, false));
+                    }
+                    else
+                    {
+                        capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 - i), 
+                            folders.ElementAt(folders.Count - 1 - i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count - 1 - i),
+                            location, size, true));
+                    }
 
+                    capturesList.ElementAt(i + previousCaptures).Uid = (i + previousCaptures).ToString();
+                    samplesList.Add(samples.ElementAt(i));
+                    samplesList.ElementAt(i + previousCaptures).Uid = (i + previousCaptures).ToString();
+                    capturesNames.Add(names.ElementAt(names.Count - 1 - i));
+
+                    numberCapturesRunning++;
+                }
+                else
+                {
+                    MessageBox.Show("Capture of process " + names.ElementAt(names.Count - 1 - i) + " could not be accomplished. Object not found.");
+
+                    return;
+                }
             }
 
             // UI modification according to new situation

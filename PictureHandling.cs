@@ -199,7 +199,7 @@ namespace PetriUI
                             imgs.Insert(0, null);
                             outlines.Insert(0, null);
 
-                            results.Insert(0, 0);
+                            results.Insert(0, 2);
 
                         }
                     }                  
@@ -249,13 +249,13 @@ namespace PetriUI
             return op;
         }
 
-        private static int GetOutlineWidth(IPcOutline outline)
+        public static int GetOutlineWidth(IPcOutline outline)
         {
             return Convert.ToInt32((outline.PixelDensity.X) * (outline.PhysicalBoundaries.Size.Width));
         }
 
 
-        private static int GetOutlineHeight(IPcOutline outline)
+        public static int GetOutlineHeight(IPcOutline outline)
         {
             return Convert.ToInt32((outline.PixelDensity.Y) * (outline.PhysicalBoundaries.Size.Height));
         }

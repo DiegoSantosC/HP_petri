@@ -98,6 +98,16 @@ namespace PetriUI
             return location;
         }
 
+        public void setSize(System.Drawing.Point s)
+        {
+            size = s;
+        }
+
+        public void setLocation(PcPhysicalPoint loc)
+        {
+            location = loc;
+        }
+
         public List<Uri> getCaptures()
         {
             return this.captures;

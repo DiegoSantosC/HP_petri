@@ -811,7 +811,7 @@ namespace PetriUI
 
             if (moved)
             {
-                emptyLabel.Content = "Capture #" + (cfs.Count - 1) + " " + cf.getTime() + ": " + "Object deplacement detected";
+                emptyLabel.Content = "Capture #" + (cfs.Count - 1) + " " + cf.getTime() + ": " + Environment.NewLine + "Object deplacement detected";
             }
             else
             {
@@ -1007,7 +1007,7 @@ namespace PetriUI
 
             if (moved)
             {
-                emptyLabel.Content = "Capture #" + (cfs.Count -1) + " " + cf.getTime() + ": " +  "Object deplacement detected";
+                emptyLabel.Content = "Capture #" + (cfs.Count -1) + " " + cf.getTime() + ": " + Environment.NewLine +  "Object deplacement detected";
             }
             else
             {
