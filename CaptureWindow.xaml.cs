@@ -89,6 +89,8 @@ namespace PetriUI
 
             this.Height = 900;
 
+            this.Left = 300;
+            this.Top = 100;
             cp = capt;
 
             cfs = new List<captureFramework>();
@@ -883,7 +885,11 @@ namespace PetriUI
 
         public void Trigger_Capture()
         {
-            MomentCapture.Capture(t, false);
+            if(cfs.Count -1 < t.getNumberOfCaptures())
+            {
+                MomentCapture.Capture(t, false);
+
+            }
         }
 
         // An error has occurred during capture process
@@ -1035,6 +1041,8 @@ namespace PetriUI
                     
                 }
                 if (events.Length > 0) file.AppendData(" ");
+
+                Console.WriteLine("Capture " + cfs.Count + " finished");
             }
         }
 

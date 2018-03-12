@@ -73,7 +73,7 @@ namespace PetriUI
             Image count = new Image();
             BitmapImage src2 = new BitmapImage();
             src2.BeginInit();
-            src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Counting_background.jpg", UriKind.Absolute);
+            src2.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Counting.jpg", UriKind.Absolute);
             src2.CacheOption = BitmapCacheOption.OnLoad;
             src2.EndInit();
             count.Source = src2;

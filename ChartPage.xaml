@@ -36,8 +36,7 @@
         </Border>
 
         <!-- Colony Size Charts -->
-        <Canvas Margin ="20" Grid.Column="1" Grid.Row="1" Name="ColonySizesCanvas" Width="600">
-            
-        </Canvas>
+        <Canvas Name="ColonySizesCanvas" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Column="1" Grid.Row="1" Height="1010" Width="650"/>
+
     </Grid>
 </Page>

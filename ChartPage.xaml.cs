@@ -73,6 +73,12 @@ namespace PetriUI
 
                 barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony Size Chart", "Size (mm)", "Step" }, sp);
             }
+
+            if (sizeYData.Count > 2) ColonySizesCanvas.Height = 310 * 3;
+            else { ColonySizesCanvas.Height = 310 * sizeYData.Count; }
+
+            if (sizeYData.Count < 4) ColonySizesCanvas.Width = 250;
+            else ColonySizesCanvas.Width = 250 * (sizeYData.Count/3 +1);
         }
 
         public void barCharConstruct(double[] yData, string _saveDirectory, string[] title)

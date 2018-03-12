@@ -146,6 +146,11 @@ namespace PetriUI
         {
             ClusterListBox.Items.Clear();
 
+            if(cluster_Specs.Count == 0)
+            {
+                return;
+            }
+
             for (int i = 0; i < cluster_Specs[index].Count(); i++)
             {
                 ClusterListBox.Items.Add(cluster_Specs[index][i]);
