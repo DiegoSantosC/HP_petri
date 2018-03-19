@@ -53,7 +53,7 @@ namespace PetriUI
     /// </summary>
     public partial class CapturePreviews : Page
     {
-        private MainPage mainPage;
+        private static MainPage mainPage;
         private static List<CaptureWindow> capturesList;
         private static List<Image> samplesList;
         private static List<string> capturesNames;
@@ -307,7 +307,7 @@ namespace PetriUI
             sampleSP.Children.Add(samplesList.ElementAt(0));
 
             infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
-            nameLabel.Content = capturesNames.ElementAt(capturesNames.Count -1);
+            nameLabel.Content = capturesNames.ElementAt(0);
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -323,6 +323,7 @@ namespace PetriUI
             if (numberCapturesRunning == 0)
             {
                 MainPage.capturesRunning = false;
+                mainPage.EnableNewScan();
             }
         }
 
@@ -340,7 +341,7 @@ namespace PetriUI
             returnable = mc.Samples(folders, ind, locations, sizes);
 
             samples = (List<Image>) returnable[0];
-
+            
             outlines = (List<IPcOutline>)returnable[1];
 
             List<int> moved = (List<int>)returnable[2];
@@ -361,6 +362,9 @@ namespace PetriUI
                         capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 - i), 
                             folders.ElementAt(folders.Count - 1 - i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count - 1 - i), 
                             location, size, false));
+
+                        Console.WriteLine(names[names.Count - 1 - i] + " " + parameters.ElementAt(parameters.Count - 1 - i)[2]);
+
                     }
                     else
                     {

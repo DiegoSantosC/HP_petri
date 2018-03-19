@@ -91,6 +91,8 @@ namespace PetriUI
 
             this.Left = 300;
             this.Top = 100;
+
+            
             cp = capt;
 
             cfs = new List<captureFramework>();
@@ -107,6 +109,13 @@ namespace PetriUI
 
             file.BuildAndSave();
 
+            titleLabel.Content = name;
+
+            if (!analysis[0] && !analysis[1])
+            {
+                generalAnalysisBut.Visibility = Visibility.Hidden;
+            }
+
             // Thread initialization for triggering the captures
 
             MainCapture newCapture = new MainCapture();
@@ -120,6 +129,7 @@ namespace PetriUI
 
             StackPanel aux = new StackPanel();
             Rectangle frame = new Rectangle();
+            frame.Visibility = Visibility.Hidden;
             frame.Width = 575;
             frame.Height = 400;
 
@@ -156,7 +166,7 @@ namespace PetriUI
 
             EventsListBox.SelectionChanged += new SelectionChangedEventHandler(eventClicked);
 
-            if (analysis[0]) { EventsListBox.Visibility = Visibility.Visible; CountAnalysisBut.Visibility = Visibility.Visible;}
+            if (analysis[0]) { EventsListBox.Visibility = Visibility.Visible; CountAnalysisBut.Visibility = Visibility.Visible; frame.Visibility = Visibility.Visible;}
 
             speed = 1;
 
@@ -404,6 +414,9 @@ namespace PetriUI
         {
             newCaptureThread.Abort();
             CaptureFinished();
+
+            Button b = (Button)sender;
+            b.Visibility = Visibility.Hidden;
         }
 
         public void KillCaptures()
@@ -606,7 +619,6 @@ namespace PetriUI
         {
             int selectedChild = EventsListBox.SelectedIndex;
             int counter = 0;
-            Console.WriteLine(selectedChild);
 
             foreach (ListBoxItem item in EventsListBox.Items)
             {
@@ -671,7 +683,7 @@ namespace PetriUI
 
             if (t.getCountAnalysis())
             {
-                if (cfs.Count > 2)
+                if (cfs.Count > 1)
                 {
 
                     aw.Show();
@@ -700,7 +712,7 @@ namespace PetriUI
         {
             Button senderBut = (Button)sender;
 
-            if (cfs.Count > 2)
+            if (cfs.Count > 1)
             {
                 if (t.getClassAnalysis() || t.getCountAnalysis())
                 {
@@ -887,6 +899,7 @@ namespace PetriUI
         {
             if(cfs.Count -1 < t.getNumberOfCaptures())
             {
+                Console.WriteLine("Executing capture");
                 MomentCapture.Capture(t, false);
 
             }
@@ -914,6 +927,8 @@ namespace PetriUI
 
             img1.Uid = cfs.Count.ToString();
             img2.Uid = cfs.Count.ToString();
+
+            Console.WriteLine(t.getName() + " showing capture " + (cfs.Count - 1));
 
 
             // Img acquisition 
@@ -1041,8 +1056,6 @@ namespace PetriUI
                     
                 }
                 if (events.Length > 0) file.AppendData(" ");
-
-                Console.WriteLine("Capture " + cfs.Count + " finished");
             }
         }
 
@@ -1054,6 +1067,8 @@ namespace PetriUI
             finishedCapture.Background = Brushes.Green;
             RunningLabel.Content = "Capture Process Finished";
             running = false;
+
+            StopButton.Visibility = Visibility.Hidden;
 
             if(t.getCountAnalysis())aw.getChart().initCharts(aw.getCount(), t.getFolder());
         }

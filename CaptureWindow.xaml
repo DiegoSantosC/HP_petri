@@ -6,7 +6,8 @@
       xmlns:local="clr-namespace:PetriUI"
       mc:Ignorable="d" 
       Title="CaptureWindow"
-      Closing="CaptureWindow_Closing">
+      Closing="CaptureWindow_Closing"
+      WindowState="Normal">
 
     <Grid>
 
@@ -29,7 +30,7 @@
         <StackPanel Name="LogoSP" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" Height="100" Width="100"/>
 
         <!-- Title label -->
-        <Label Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture 
+        <Label Name="titleLabel" Grid.Column="0" Grid.Row="1" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource headerStyle}">Capture 
         </Label>
 
         <!-- Label that shows data regarding the capture process -->
@@ -39,7 +40,7 @@
         </Border>
 
         <!-- Cancel Capture button -->
-        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,20" Width="200" Height="40" Click="Cancel_Button_Click">Stop this capture</Button>
+        <Button Name="StopButton" Grid.Column="1" Grid.Row="3" Style="{StaticResource button2Style}" VerticalAlignment="Bottom" Margin="0,2,50,20" Width="200" Height="40" Click="Cancel_Button_Click">Stop this capture</Button>
 
         <!-- Project into mat screen button -->
         <Button Grid.Column="0" Name="ProjectButton" Visibility ="Hidden" Grid.Row="3" Style="{StaticResource button2Style}" 

@@ -66,8 +66,7 @@ namespace PetriUI
 
             LoadContent(matForm, img);
 
-            System.Windows.Forms.Application.Run(matForm);
-
+            matForm.Show();
         }
 
        

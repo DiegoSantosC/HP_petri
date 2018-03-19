@@ -63,11 +63,11 @@ namespace PetriUI
             for (int i=0; i<t.getNumberOfCaptures(); i++)
             {
                 // interval*60 missing for testing purposes
-                Thread.Sleep(t.getInterval() * 1000);
+                Thread.Sleep(t.getInterval() * 1000 * 60);
 
                 if (stopRequested) break;
 
-                Console.WriteLine("Capture " + (i + 1) + "Triggered");
+                Console.WriteLine("Capture " + (i + 1) + " triggered");
 
                 App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                     new Action(() => t.getCaptureWindow().Trigger_Capture()));

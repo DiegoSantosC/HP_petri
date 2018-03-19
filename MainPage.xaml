@@ -45,6 +45,8 @@
 
 
         <Label Name="objShowLabel" Grid.Column="0" Grid.Row="2" Visibility="Hidden" HorizontalAlignment="Center" FontSize="15" VerticalAlignment="Bottom">Select a target object</Label>
+        <Label Name="DisclaimerLabel" Grid.Column="0" Grid.Row="4" Visibility="Hidden" HorizontalAlignment="Center" Foreground="DarkRed" Margin="0,15,0,0" VerticalAlignment="Top" FontSize="20">DISCLAIMER: Objects position in the Mat screen must NOT be changed</Label>
+
         <!-- Object Show Canvas -->
 
         <Border Name ="ImageBorder" Grid.Column="0" Grid.Row="3" Background="Gray" BorderBrush="Gainsboro" BorderThickness="4" Visibility="Hidden">

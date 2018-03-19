@@ -46,6 +46,8 @@ namespace PetriUI
                   IPcPicture picture = link.ExtractPicture(moment);
                   IPcOutline outline = link.ExtractOutline(moment);
 
+                    Console.WriteLine("Capture donete");
+
                     if (!repetition) PictureHandling.SaveIndexedImage(picture, outline, t);
                     else { PictureHandling.SaveIndexedImageRep(picture, outline, t); }
               }

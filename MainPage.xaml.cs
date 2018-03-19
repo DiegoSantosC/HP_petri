@@ -270,11 +270,9 @@ namespace PetriUI
                 if (sfd.FileName != "")
                 {
                     fileLocation = sfd.FileName;
+                    FolderLabel.Content = fileLocation;
                 }
             }
-
-            FolderLabel.Content = fileLocation;
-
         }
 
         // Folder election from which analysis input will be extracted in import mode
@@ -287,7 +285,7 @@ namespace PetriUI
 
             if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
             {
-                FolderImportLabel.Content = sfd.SelectedPath;
+                 FolderImportLabel.Content = sfd.SelectedPath;
             }
 
         }
@@ -308,10 +306,11 @@ namespace PetriUI
                 if (sfd.FileName != "")
                 {
                     fileLocation = sfd.FileName;
+                    FolderSaveLabel.Content = fileLocation;
+
                 }
             }
 
-            FolderSaveLabel.Content = fileLocation;
         }
 
         // Function that inits and shows the navigation handlers
@@ -341,6 +340,11 @@ namespace PetriUI
 
         }
 
+        public void EnableNewScan()
+        {
+            ShowButton.IsEnabled = true;
+        }
+
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //      Importing for analysis
@@ -351,6 +355,7 @@ namespace PetriUI
             ImportBorder.Visibility = Visibility.Visible;
             ImageBorder.Visibility = Visibility.Hidden;
             objShowLabel.Visibility = Visibility.Hidden;
+            DisclaimerLabel.Visibility = Visibility.Hidden;
 
             ShowButton.IsEnabled = false;
         }
@@ -438,10 +443,14 @@ namespace PetriUI
 
                 analysisThread.Start(list);
 
-            }
 
-            AnalysisBorder.Visibility = Visibility.Visible;
-            AnalysisBorder.Background = System.Windows.Media.Brushes.LightGray;
+                AnalysisBorder.Visibility = Visibility.Visible;
+                AnalysisBorder.Background = System.Windows.Media.Brushes.LightGray;
+            }
+            if (classA)
+            {
+
+            }
 
             ShowButton.IsEnabled = true;
         }
@@ -506,6 +515,7 @@ namespace PetriUI
 
             ImageBorder.Visibility = Visibility.Visible;
             objShowLabel.Visibility = Visibility.Visible;
+            DisclaimerLabel.Visibility = Visibility.Visible;
 
             ImageCanvas.Children.Clear();
             ImageCanvas.Children.Add(objectShowStackPanel);

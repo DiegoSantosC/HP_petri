@@ -75,6 +75,10 @@ namespace PetriUI
             int i = 0;
             bool found = false;
 
+            for(int n = 0; n < indexes.Count; n++)
+            {
+                Console.WriteLine(indexes[n] + ": " + locations[n].X + " " + locations[n].Y);
+            }
 
             for (int j = 0; j < folders.Count; j++)
             {
@@ -111,98 +115,99 @@ namespace PetriUI
                             results.Insert(0, 0);
 
                             found = true;
+
+                        }
+
+                        if (!found)
+                        {
+                            List<int> locationDifferences = new List<int>();
+
+                            foreach (IPcOutline outlineChild in outline.Children)
+                            {
+                                if (ConfirmSize(outlineChild, sizes[j]))
+                                {
+                                    locationDifferences.Add(FindCloser(outline, locations[j]));
+                                }
+                                else { locationDifferences.Add(Int32.MaxValue); }
+                            }
+
+                            int[] minIndex = new int[] { Int32.MaxValue, Int32.MaxValue };
+
+                            for (int n = 0; n < locationDifferences.Count; n++)
+                            {
+                                if (locationDifferences[n] < minIndex[0]) { minIndex[0] = locationDifferences[n]; minIndex[1] = n; }
+                            }
+
+                            // An object has found inside the minimum location difference
+
+                            if (minIndex[0] < AdvancedOptions._nLocationThreshold)
+                            {
+                                string dir = Path.Combine(folders[j], @"Captures\");
+                                ToolBox.EnsureDirectoryExists(dir);
+
+                                string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                                ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+
+                                Uri u = new Uri(fileAndPath, UriKind.Relative);
+                                System.Windows.Controls.Image im = new System.Windows.Controls.Image();
+                                BitmapImage src = new BitmapImage();
+
+                                src.BeginInit();
+                                src.UriSource = u;
+                                src.CacheOption = BitmapCacheOption.OnLoad;
+                                src.EndInit();
+                                im.Source = src;
+                                im.Stretch = Stretch.Uniform;
+                                im.Stretch = Stretch.Uniform;
+
+                                imgs.Insert(0, im);
+                                outlines.Insert(0, getOutline(i, outline));
+
+                                results.Insert(0, 0);
+
+                            }
+
+                            // No object in the expected range: we capture a deplaced one and inform the user
+
+                            else if (minIndex[0] < Int32.MaxValue)
+                            {
+                                string dir = Path.Combine(folders[j], @"Captures\");
+                                ToolBox.EnsureDirectoryExists(dir);
+
+                                string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
+                                ToolBox.SaveProcessedImage(image.Image, fileAndPath);
+
+                                Uri u = new Uri(fileAndPath, UriKind.Relative);
+                                System.Windows.Controls.Image im = new System.Windows.Controls.Image();
+                                BitmapImage src = new BitmapImage();
+
+                                src.BeginInit();
+                                src.UriSource = u;
+                                src.CacheOption = BitmapCacheOption.OnLoad;
+                                src.EndInit();
+                                im.Source = src;
+                                im.Stretch = Stretch.Uniform;
+                                im.Stretch = Stretch.Uniform;
+
+                                imgs.Insert(0, im);
+                                outlines.Insert(0, getOutline(i, outline));
+
+                                results.Insert(0, 1);
+
+                            }
+
+                            // The object is not present in the mat as sizes don't match: stop capture process and inform the user
+
+                            else
+                            {
+                                imgs.Insert(0, null);
+                                outlines.Insert(0, null);
+
+                                results.Insert(0, 2);
+
+                            }
                         }
                     }
-
-                    if (!found)
-                    {
-                        List<int> locationDifferences = new List<int>();
-
-                        foreach (IPcOutline outlineChild in outline.Children)
-                        {
-                            if (ConfirmSize(outlineChild, sizes[j]))
-                            {
-                                locationDifferences.Add(FindCloser(outline, locations[j]));
-                            }
-                            else { locationDifferences.Add(Int32.MaxValue); }
-                        }
-
-                        int[] minIndex = new int[] { Int32.MaxValue, Int32.MaxValue };
-
-                        for (int n = 0; n < locationDifferences.Count; n++)
-                        {
-                            if (locationDifferences[n] < minIndex[0]) { minIndex[0] = locationDifferences[n]; minIndex[1] = n; }
-                        }
-
-                        // An object has found inside the minimum location difference
-
-                        if (minIndex[0] < AdvancedOptions._nLocationThreshold)
-                        {
-                            string dir = Path.Combine(folders[j], @"Captures\");
-                            ToolBox.EnsureDirectoryExists(dir);
-
-                            string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
-                            ToolBox.SaveProcessedImage(image.Image, fileAndPath);
-
-                            Uri u = new Uri(fileAndPath, UriKind.Relative);
-                            System.Windows.Controls.Image im = new System.Windows.Controls.Image();
-                            BitmapImage src = new BitmapImage();
-
-                            src.BeginInit();
-                            src.UriSource = u;
-                            src.CacheOption = BitmapCacheOption.OnLoad;
-                            src.EndInit();
-                            im.Source = src;
-                            im.Stretch = Stretch.Uniform;
-                            im.Stretch = Stretch.Uniform;
-
-                            imgs.Insert(0, im);
-                            outlines.Insert(0, getOutline(i, outline));
-
-                            results.Insert(0, 0);
-
-                        }
-
-                        // No object in the expected range: we capture a deplaced one and inform the user
-
-                        else if (minIndex[0] < Int32.MaxValue)
-                        {
-                            string dir = Path.Combine(folders[j], @"Captures\");
-                            ToolBox.EnsureDirectoryExists(dir);
-
-                            string fileAndPath = Path.Combine(dir, DateTime.Now.ToString("MM-dd-yyyy_hh.mm.ss" + "_" + marker) + ".bmp");
-                            ToolBox.SaveProcessedImage(image.Image, fileAndPath);
-
-                            Uri u = new Uri(fileAndPath, UriKind.Relative);
-                            System.Windows.Controls.Image im = new System.Windows.Controls.Image();
-                            BitmapImage src = new BitmapImage();
-
-                            src.BeginInit();
-                            src.UriSource = u;
-                            src.CacheOption = BitmapCacheOption.OnLoad;
-                            src.EndInit();
-                            im.Source = src;
-                            im.Stretch = Stretch.Uniform;
-                            im.Stretch = Stretch.Uniform;
-
-                            imgs.Insert(0, im);
-                            outlines.Insert(0, getOutline(i, outline));
-
-                            results.Insert(0, 1);
-
-                        }
-
-                        // The object is not present in the mat as sizes don't match: stop capture process and inform the user
-
-                        else
-                        {
-                            imgs.Insert(0, null);
-                            outlines.Insert(0, null);
-
-                            results.Insert(0, 2);
-
-                        }
-                    }                  
 
                     i++;
                 }
@@ -327,8 +332,11 @@ namespace PetriUI
 
             int i = 0;
 
+
             foreach (IPcPicture image in picture.Children)
             {
+                Console.WriteLine(i + " " + t.getIndex());
+
                 if (i == t.getIndex())
                 {
                     // Check wether if a match is achieved between the expected and the obtained object. If not, a second capture is attempted
@@ -352,6 +360,8 @@ namespace PetriUI
                     }
                     else { MomentCapture.Capture(t, true); }
                 }
+
+                i++;
             }
         }
 
