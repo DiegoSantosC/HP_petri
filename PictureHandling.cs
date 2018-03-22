@@ -31,7 +31,6 @@ using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
-using AnalysisTestApp;
 
 namespace PetriUI
 {
@@ -353,7 +352,10 @@ namespace PetriUI
 
                         Uri u = new Uri(fileAndPath, UriKind.Relative);
                         l.Add(u);
-                        t.getCaptureWindow().DrawImage(false);
+
+                        App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                            new Action(() => t.getCaptureWindow().DrawImage(false)));
+                        //t.getCaptureWindow().DrawImage(false);
 
                         ++i;
 
@@ -407,7 +409,9 @@ namespace PetriUI
 
                 Uri u = new Uri(fileAndPath, UriKind.Relative);
                 l.Add(u);
-                t.getCaptureWindow().DrawImage(false);
+                App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                           new Action(() => t.getCaptureWindow().DrawImage(false)));
+                //t.getCaptureWindow().DrawImage(false);
 
             }
 
@@ -424,7 +428,9 @@ namespace PetriUI
 
                 Uri u = new Uri(fileAndPath, UriKind.Relative);
                 l.Add(u);
-                t.getCaptureWindow().DrawImage(true);
+                App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                           new Action(() => t.getCaptureWindow().DrawImage(true)));
+                //t.getCaptureWindow().DrawImage(true);
 
                 t.setLocation(getOutlineLocation(minIndex[1], outline));
                 t.setSize(getOutlineSize(minIndex[1], outline));          

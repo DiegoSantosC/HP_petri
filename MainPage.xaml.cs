@@ -153,7 +153,6 @@ namespace PetriUI
 
                 childImg.Opacity = 0.7;
             }
-
         }
 
         private void navigationArrowLeave(object sender, System.Windows.Input.MouseEventArgs e)
@@ -345,6 +344,353 @@ namespace PetriUI
             ShowButton.IsEnabled = true;
         }
 
+        // Creation of a Form from which AdvancedOptions' settings can be modified
+
+        private void Modify_Advanced_Settings_Click(object sender, RoutedEventArgs e)
+        {
+            Form settingsForm = new Form();
+            settingsForm.Width = 900;
+            settingsForm.Height = 550;
+
+            System.Windows.Forms.Label title = new System.Windows.Forms.Label();
+            title.Location = new System.Drawing.Point(300, 10);
+            title.Text = " Advanced Settings ";
+            title.Size = new System.Drawing.Size(new System.Drawing.Point(200, 20));
+            title.Font = new Font("Arial", 12, System.Drawing.FontStyle.Bold);
+
+            System.Drawing.Size standardSize = new System.Drawing.Size(new System.Drawing.Point(195, 15));
+
+
+
+            System.Windows.Forms.Label t1 = new System.Windows.Forms.Label();
+            t1.Text = " Colony detection settings ";
+            t1.Size = new System.Drawing.Size(200, 15);
+            t1.Font = new Font("Arial", 9, System.Drawing.FontStyle.Bold);
+            t1.Location = new System.Drawing.Point(50, 40);
+
+            System.Windows.Forms.Label l11 = new System.Windows.Forms.Label();
+            l11.Text = "  Colony similarity tolerance:";
+            l11.Size = standardSize;
+            l11.Location = new System.Drawing.Point(0, 70);
+
+            System.Windows.Forms.Label l12 = new System.Windows.Forms.Label();
+            l12.Text = " Colony relevance threshold: ";
+            l12.Size = standardSize;
+            l12.Location = new System.Drawing.Point(300, 70);
+
+            System.Windows.Forms.Label l13 = new System.Windows.Forms.Label();
+            l13.Text = " Region of Interest margin: ";
+            l13.Size = standardSize;
+            l13.Location = new System.Drawing.Point(600, 70);
+
+            System.Windows.Forms.TextBox tb11 = new System.Windows.Forms.TextBox();
+            tb11.Size = new System.Drawing.Size(40, 20);
+            tb11.Text = AdvancedOptions._nSimilarityTolerance.ToString();
+            tb11.Location = new System.Drawing.Point(210, 70);
+
+            System.Windows.Forms.TextBox tb12 = new System.Windows.Forms.TextBox();
+            tb12.Size = new System.Drawing.Size(40, 20);
+            tb12.Text = AdvancedOptions._nRelevanceThreshold.ToString();
+            tb12.Location = new System.Drawing.Point(510, 70);
+
+            System.Windows.Forms.TextBox tb13 = new System.Windows.Forms.TextBox();
+            tb13.Size = new System.Drawing.Size(40, 20);
+            tb13.Text = AdvancedOptions._nROIMargin.ToString();
+            tb13.Location = new System.Drawing.Point(810, 70);
+
+
+            System.Windows.Forms.Label l2 = new System.Windows.Forms.Label();
+            l2.Text = " Variance Epsylon Value : ";
+            l2.Size = standardSize;
+            l2.Location = new System.Drawing.Point(0, 100);
+
+            System.Windows.Forms.TextBox tb2 = new System.Windows.Forms.TextBox();
+            tb2.Size = new System.Drawing.Size(40, 20);
+            tb2.Text = AdvancedOptions._dEpsilonValue.ToString();
+            tb2.Location = new System.Drawing.Point(210, 100);
+
+
+
+            System.Windows.Forms.Label t3 = new System.Windows.Forms.Label();
+            t3.Text = " Pixel recognition settings ";
+            t3.Size = new System.Drawing.Size(200, 15);
+            t3.Font = new Font("Arial", 9, System.Drawing.FontStyle.Bold);
+            t3.Location = new System.Drawing.Point(50, 140);
+
+
+            System.Windows.Forms.Label l31 = new System.Windows.Forms.Label();
+            l31.Text = "  Pixel recognition threshold:";
+            l31.Size = standardSize;
+            l31.Location = new System.Drawing.Point(0, 170);
+
+            System.Windows.Forms.Label l32 = new System.Windows.Forms.Label();
+            l32.Text = " Hysteresis difference top value: ";
+            l32.Size = standardSize;
+            l32.Location = new System.Drawing.Point(300, 170);
+
+            System.Windows.Forms.Label l33 = new System.Windows.Forms.Label();
+            l33.Text = " Hysteresis difference bottom value: ";
+            l33.Size = standardSize;
+            l33.Location = new System.Drawing.Point(600, 170);
+
+            System.Windows.Forms.TextBox tb31 = new System.Windows.Forms.TextBox();
+            tb31.Size = new System.Drawing.Size(40, 20);
+            tb31.Text = AdvancedOptions._nThresholdValue.ToString();
+            tb31.Location = new System.Drawing.Point(210, 170);
+
+            System.Windows.Forms.TextBox tb32 = new System.Windows.Forms.TextBox();
+            tb32.Size = new System.Drawing.Size(40, 20);
+            tb32.Text = AdvancedOptions._nTopHysteresis.ToString();
+            tb32.Location = new System.Drawing.Point(510, 170);
+
+            System.Windows.Forms.TextBox tb33 = new System.Windows.Forms.TextBox();
+            tb33.Size = new System.Drawing.Size(40, 20);
+            tb33.Text = AdvancedOptions._nBottomHysteresis.ToString();
+            tb33.Location = new System.Drawing.Point(810, 170);
+
+
+
+            System.Windows.Forms.Label t4 = new System.Windows.Forms.Label();
+            t4.Text = " Colony tracking comparison settings ";
+            t4.Size = new System.Drawing.Size(250, 15);
+            t4.Font = new Font("Arial", 9, System.Drawing.FontStyle.Bold);
+            t4.Location = new System.Drawing.Point(50, 210);
+
+
+            System.Windows.Forms.Label l41 = new System.Windows.Forms.Label();
+            l41.Text = "  Colony bounds diminish (%):";
+            l41.Size = standardSize;
+            l41.Location = new System.Drawing.Point(0, 240);
+
+            System.Windows.Forms.Label l42 = new System.Windows.Forms.Label();
+            l42.Text = " Colony position greatly deplaced (%): ";
+            l42.Size = standardSize;
+            l42.Location = new System.Drawing.Point(300, 240);
+
+            System.Windows.Forms.Label l43 = new System.Windows.Forms.Label();
+            l43.Text = " Colony color difference (%): ";
+            l43.Size = standardSize;
+            l43.Location = new System.Drawing.Point(600, 240);
+
+            System.Windows.Forms.TextBox tb41 = new System.Windows.Forms.TextBox();
+            tb41.Size = new System.Drawing.Size(40, 20);
+            tb41.Text = AdvancedOptions._dBoundsDiminish.ToString();
+            tb41.Location = new System.Drawing.Point(210, 240);
+
+            System.Windows.Forms.TextBox tb42 = new System.Windows.Forms.TextBox();
+            tb42.Size = new System.Drawing.Size(40, 20);
+            tb42.Text = AdvancedOptions._dGreatDeplacement.ToString();
+            tb42.Location = new System.Drawing.Point(510, 240);
+
+            System.Windows.Forms.TextBox tb43 = new System.Windows.Forms.TextBox();
+            tb43.Size = new System.Drawing.Size(40, 20);
+            tb43.Text = AdvancedOptions._dMaxColorDiff.ToString();
+            tb43.Location = new System.Drawing.Point(810, 240);
+
+
+            System.Windows.Forms.Label l44 = new System.Windows.Forms.Label();
+            l44.Text = "  Colony merging tolerance (%):";
+            l44.Size = standardSize;
+            l44.Location = new System.Drawing.Point(0, 270);
+
+            System.Windows.Forms.Label l45 = new System.Windows.Forms.Label();
+            l45.Text = " Colony centers merging distance: ";
+            l45.Size = standardSize;
+            l45.Location = new System.Drawing.Point(300, 270);
+
+            System.Windows.Forms.Label l46 = new System.Windows.Forms.Label();
+            l46.Text = " Colony minimum size: ";
+            l46.Size = standardSize;
+            l46.Location = new System.Drawing.Point(600, 270);
+
+            System.Windows.Forms.TextBox tb44 = new System.Windows.Forms.TextBox();
+            tb44.Size = new System.Drawing.Size(40, 20);
+            tb44.Text = AdvancedOptions._dMergingTolerance.ToString();
+            tb44.Location = new System.Drawing.Point(210, 270);
+
+            System.Windows.Forms.TextBox tb45 = new System.Windows.Forms.TextBox();
+            tb45.Size = new System.Drawing.Size(40, 20);
+            tb45.Text = AdvancedOptions._nMergingDistance.ToString();
+            tb45.Location = new System.Drawing.Point(510, 270);
+
+            System.Windows.Forms.TextBox tb46 = new System.Windows.Forms.TextBox();
+            tb46.Size = new System.Drawing.Size(40, 20);
+            tb46.Text = AdvancedOptions._nMinimumSize.ToString();
+            tb46.Location = new System.Drawing.Point(810, 270);
+
+            System.Windows.Forms.Label l47 = new System.Windows.Forms.Label();
+            l47.Text = " Colony size matching difference: ";
+            l47.Size = standardSize;
+            l47.Location = new System.Drawing.Point(0, 300);
+
+            System.Windows.Forms.Label l48 = new System.Windows.Forms.Label();
+            l48.Text = " Colony location matching difference: ";
+            l48.Size = standardSize;
+            l48.Location = new System.Drawing.Point(300, 300);
+
+            System.Windows.Forms.TextBox tb47 = new System.Windows.Forms.TextBox();
+            tb47.Size = new System.Drawing.Size(40, 20);
+            tb47.Text = AdvancedOptions._nSizeThreshold.ToString();
+            tb47.Location = new System.Drawing.Point(210, 300);
+
+            System.Windows.Forms.TextBox tb48 = new System.Windows.Forms.TextBox();
+            tb48.Size = new System.Drawing.Size(40, 20);
+            tb48.Text = AdvancedOptions._nLocationThreshold.ToString();
+            tb48.Location = new System.Drawing.Point(510, 300);
+
+
+           
+            System.Windows.Forms.Label t5 = new System.Windows.Forms.Label();
+            t5.Text = " Colony related events settings ";
+            t5.Size = new System.Drawing.Size(250, 15);
+            t5.Font = new Font("Arial", 9, System.Drawing.FontStyle.Bold);
+            t5.Location = new System.Drawing.Point(50, 340);
+
+
+            System.Windows.Forms.Label l51 = new System.Windows.Forms.Label();
+            l51.Text = "  Colony abnormal growth (%):";
+            l51.Size = standardSize;
+            l51.Location = new System.Drawing.Point(0, 370);
+
+            System.Windows.Forms.Label l52 = new System.Windows.Forms.Label();
+            l52.Text = " Colony bounds to borders min distance: ";
+            l52.Size = standardSize;
+            l52.Location = new System.Drawing.Point(300, 370);
+
+            System.Windows.Forms.TextBox tb51 = new System.Windows.Forms.TextBox();
+            tb51.Size = new System.Drawing.Size(40, 20);
+            tb51.Text = AdvancedOptions._dAbnormalGrowth.ToString();
+            tb51.Location = new System.Drawing.Point(210, 370);
+
+            System.Windows.Forms.TextBox tb52 = new System.Windows.Forms.TextBox();
+            tb52.Size = new System.Drawing.Size(40, 20);
+            tb52.Text = AdvancedOptions._nMinimumDistance.ToString();
+            tb52.Location = new System.Drawing.Point(510, 370);
+
+
+            System.Windows.Forms.Label infoLabel = new System.Windows.Forms.Label();
+            infoLabel.Text = "  More info regarding parameter significance and recommended values in README file";
+            infoLabel.Size = new System.Drawing.Size(400, 15);
+            infoLabel.Location = new System.Drawing.Point(50, 480);
+
+
+            System.Windows.Forms.Button sendBut = new System.Windows.Forms.Button();
+            sendBut.Text = "Accept";
+            sendBut.Size = new System.Drawing.Size(130, 25);
+            sendBut.Location = new System.Drawing.Point(700, 450);
+            sendBut.Click += new EventHandler(settingsFormClicked);
+
+
+            settingsForm.Controls.Add(title);
+
+            settingsForm.Controls.Add(t1);
+
+            settingsForm.Controls.Add(l11);
+            settingsForm.Controls.Add(l12);
+            settingsForm.Controls.Add(l13);
+            settingsForm.Controls.Add(tb11);
+            settingsForm.Controls.Add(tb12);
+            settingsForm.Controls.Add(tb13);
+
+            settingsForm.Controls.Add(l2);
+            settingsForm.Controls.Add(tb2);
+
+            settingsForm.Controls.Add(t3);
+
+            settingsForm.Controls.Add(l31);
+            settingsForm.Controls.Add(l32);
+            settingsForm.Controls.Add(l33);
+            settingsForm.Controls.Add(tb31);
+            settingsForm.Controls.Add(tb32);
+            settingsForm.Controls.Add(tb33);
+
+            settingsForm.Controls.Add(t4);
+
+            settingsForm.Controls.Add(l41);
+            settingsForm.Controls.Add(l42);
+            settingsForm.Controls.Add(l43);
+            settingsForm.Controls.Add(tb41);
+            settingsForm.Controls.Add(tb42);
+            settingsForm.Controls.Add(tb43);
+            settingsForm.Controls.Add(l44);
+            settingsForm.Controls.Add(l45);
+            settingsForm.Controls.Add(l46);
+            settingsForm.Controls.Add(tb44);
+            settingsForm.Controls.Add(tb45);
+            settingsForm.Controls.Add(tb46);
+            settingsForm.Controls.Add(l47);
+            settingsForm.Controls.Add(l48);
+            settingsForm.Controls.Add(tb47);
+            settingsForm.Controls.Add(tb48);
+
+            settingsForm.Controls.Add(t5);
+
+            settingsForm.Controls.Add(l51);
+            settingsForm.Controls.Add(l52);
+            settingsForm.Controls.Add(tb51);
+            settingsForm.Controls.Add(tb52);
+
+            settingsForm.Controls.Add(infoLabel);
+            settingsForm.Controls.Add(sendBut);
+
+
+            settingsForm.Show();
+        }
+
+        private void settingsFormClicked(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+            Form form = (Form)b.Parent;
+
+            List<string> parList = new List<string>();
+
+            foreach (object child in form.Controls)
+            {
+                try
+                {
+                    System.Windows.Forms.TextBox tb = (System.Windows.Forms.TextBox)child;
+                    parList.Add(tb.Text);
+
+                }
+                catch (Exception) { }
+            }
+
+            ModifyStaticParameters(parList, form);
+
+        }
+
+        private void ModifyStaticParameters(List<string> list, Form f)
+        {
+            try
+            {
+
+                AdvancedOptions._nSimilarityTolerance = Int32.Parse(list[0]);
+                AdvancedOptions._nRelevanceThreshold = Int32.Parse(list[1]);
+                AdvancedOptions._nROIMargin = Int32.Parse(list[2]);
+                AdvancedOptions._dEpsilonValue = Double.Parse(list[3]);
+                AdvancedOptions._nThresholdValue = Int32.Parse(list[4]);
+                AdvancedOptions._nTopHysteresis = Int32.Parse(list[5]);
+                AdvancedOptions._nBottomHysteresis = Int32.Parse(list[6]);
+                AdvancedOptions._dBoundsDiminish = Double.Parse(list[7]);
+                AdvancedOptions._dGreatDeplacement = Double.Parse(list[8]);
+                AdvancedOptions._dMaxColorDiff = Double.Parse(list[9]);
+                AdvancedOptions._dMergingTolerance = Double.Parse(list[10]);
+                AdvancedOptions._nMergingDistance = Int32.Parse(list[11]);
+                AdvancedOptions._nMinimumSize = Int32.Parse(list[12]);
+                AdvancedOptions._nSizeThreshold = Int32.Parse(list[13]);
+                AdvancedOptions._nLocationThreshold = Int32.Parse(list[13]);
+                AdvancedOptions._dAbnormalGrowth = Double.Parse(list[13]);
+                AdvancedOptions._nMinimumDistance = Int32.Parse(list[13]);
+
+                f.Close();
+
+            }
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show("Parameter parsing error");
+            }
+
+        }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //      Importing for analysis

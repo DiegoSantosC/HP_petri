@@ -56,26 +56,29 @@ namespace PetriUI
 
 
             Thread.Sleep(t.getDelay()*1000);
-
+            
             App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                      new Action(() => t.getCaptureWindow().startTriggered()));
-
+            
             for (int i=0; i<t.getNumberOfCaptures(); i++)
             {
                 // interval*60 missing for testing purposes
-                Thread.Sleep(t.getInterval() * 1000 * 60);
+                Thread.Sleep(t.getInterval() * 1000);
 
                 if (stopRequested) break;
 
                 Console.WriteLine("Capture " + (i + 1) + " triggered");
-
+                /*
                 App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                     new Action(() => t.getCaptureWindow().Trigger_Capture()));
+                */
+                t.getCaptureWindow().Trigger_Capture();
             }
 
-            if(!stopRequested)App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
-                   new Action(() => t.getCaptureWindow().CaptureFinished()));
-            
+            if (!stopRequested) App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                   new Action(() => t.getCaptureWindow().CaptureFinished())); 
+
+
         }
 
         // Outline capture 

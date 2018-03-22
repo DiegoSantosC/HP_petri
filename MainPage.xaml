@@ -118,11 +118,13 @@
                 <Button Grid.Column="2" Grid.Row="6" VerticalAlignment="Bottom" Margin="0,0,30,50" Width="220" Style="{StaticResource button1Style}" Click="ParameterConfirm_Button_Click">Confirm Parameters</Button>
                
                 <!-- Enable different analysis options -->
-                <CheckBox Name="Chk1" Grid.Column="0" Grid.Row="6" Margin="125,78,0,0"/>
-                <Label Grid.Column="0" Grid.Row="6" Margin="137,70,0,0" FontSize="16">Count Analysis</Label>
+                <CheckBox Name="Chk1" Grid.Column="0" Grid.Row="6" Margin="125,60,0,0"/>
+                <Label Grid.Column="0" Grid.Row="6" Margin="137,52,0,0" FontSize="16">Count Analysis</Label>
 
-                <CheckBox Name="Chk2" Grid.Column="1" Grid.Row="6" Margin="5,78,0,0"/>
-                <Label Grid.Column="1" Grid.Row="6" Margin="20,70,0,0" FontSize="16">Classification Analysis</Label>
+                <CheckBox Name="Chk2" Grid.Column="1" Grid.Row="6" Margin="5,60,0,0"/>
+                <Label Grid.Column="1" Grid.Row="6" Margin="20,52,0,0" FontSize="16">Classification Analysis</Label>
+
+                <Button Grid.Column="0" Grid.Row="6" Height="20" Width="100" Margin="40,0,0,0" Click="Modify_Advanced_Settings_Click">Advanced settings</Button>
             </Grid>
         </Border>
 
@@ -174,7 +176,9 @@
                 <!-- Folder election button -->
                 <Button Height="25" Width="170" HorizontalAlignment ="Left" Grid.Row="4" FontSize="17" VerticalAlignment="Top" Margin="30,20,0,0" Style="{StaticResource button1Style}" Click="Folder_Save_Button_Click">Save Folder</Button>
                 <Label Name="FolderSaveLabel" Grid.Row="4" VerticalAlignment="Top" Margin="230,20,0,0" FontSize="16" HorizontalAlignment="Left">Not defined</Label>
-                
+
+                <Button Grid.Column="0" Grid.Row="5" Height="20" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,30,0,0" Click="Modify_Advanced_Settings_Click">Advanced settings</Button>
+
             </Grid>
         </Border>
 

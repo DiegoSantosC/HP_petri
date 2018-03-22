@@ -20,7 +20,6 @@
 */
 
 // .NET framework namespaces
-using AnalysisTestApp;
 using hp.pc;
 using Microsoft.Win32;
 using System;

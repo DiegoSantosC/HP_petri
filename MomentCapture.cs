@@ -39,24 +39,6 @@ namespace PetriUI
         // Picture by index capture
         public static void Capture(Task t, bool repetition)
         {
-           using (IPcLink link = HPPC.CreateLink())
-           {
-              using (IPcMoment moment = link.CaptureMoment())
-              {
-                  IPcPicture picture = link.ExtractPicture(moment);
-                  IPcOutline outline = link.ExtractOutline(moment);
-
-                    Console.WriteLine("Capture donete");
-
-                    if (!repetition) PictureHandling.SaveIndexedImage(picture, outline, t);
-                    else { PictureHandling.SaveIndexedImageRep(picture, outline, t); }
-              }
-           }
-        }
-
-        // Outlines capture 
-        public static OutlineParameters ConfirmCapture()
-        {
             try
             {
                 using (IPcLink link = HPPC.CreateLink())
@@ -66,12 +48,43 @@ namespace PetriUI
                         IPcPicture picture = link.ExtractPicture(moment);
                         IPcOutline outline = link.ExtractOutline(moment);
 
-                        OutlineParameters op = PictureHandling.SavePicture(picture, outline);
-                        return op;
+                        if (!repetition) PictureHandling.SaveIndexedImage(picture, outline, t);
+                        else { PictureHandling.SaveIndexedImageRep(picture, outline, t); }
+                        outline.Dispose();
+                        picture.Dispose();
+                        moment.Dispose();
                     }
+                    link.Dispose();
                 }
-               
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("\t\t*****An error occurred*****\n\n{0}{1}\n\nExit now, or this console will automatically exit in 15 seconds.", ToolBox.TimeStamp(), exception.Message);
+                ToolBox.AppExceptionExit();
+            }
+        }
 
+        // Outlines capture 
+        public static OutlineParameters ConfirmCapture()
+        {
+            try
+            {
+                OutlineParameters op;
+                using (IPcLink link = HPPC.CreateLink())
+                {
+                    using (IPcMoment moment = link.CaptureMoment())
+                    {
+                        IPcPicture picture = link.ExtractPicture(moment);
+                        IPcOutline outline = link.ExtractOutline(moment);
+
+                        op = PictureHandling.SavePicture(picture, outline);
+                        outline.Dispose();
+                        picture.Dispose();
+                        moment.Dispose();
+                    }
+                    link.Dispose();
+                }
+                return op;
             }
             catch (Exception exception)
             {
@@ -88,15 +101,19 @@ namespace PetriUI
             {
                 using (IPcLink link = HPPC.CreateLink())
                 {
+                    object[] returned;
                     using (IPcMoment moment = link.CaptureMoment())
                     {
                         IPcPicture picture = link.ExtractPicture(moment);
                         IPcOutline outlines = link.ExtractOutline(moment);
 
-                        object[] returned = PictureHandling.SaveSamples(picture, outlines, folders, indexes, locations, sizes);
-                        
-                        return returned;
+                        returned = PictureHandling.SaveSamples(picture, outlines, folders, indexes, locations, sizes);
+                        outlines.Dispose();
+                        picture.Dispose();
+                        moment.Dispose();
                     }
+                    link.Dispose();
+                    return returned;
                 }
 
 

@@ -49,36 +49,34 @@ namespace PetriUI
             barCharConstruct(countYData, _saveDir, new string[] { "Colony Count Chart", "Number of colonies", "Step" });
 
             List<double[]> sizeYData = analysisDataSource.getColonySizeData();
-       
-            for (int i=0; i < sizeYData.Count; i++)
+
+            for (int i = 0; i < sizeYData.Count; i++)
             {
-                StackPanel sp = new StackPanel();
-                sp.Width = 300;
-                sp.Height = 230;
+                ListBoxItem lbItem = new ListBoxItem();
+                System.Windows.Controls.Label l = new System.Windows.Controls.Label();
+                l.Content = "Colony " + i.ToString();
 
-                sp.Margin = new Thickness(305 * (i/3), 235 * (i%3), 0, 0);
+                lbItem.Content = l;
 
-                Rectangle r = new Rectangle();
-
-                r.Width = 300;
-                r.Height = 230;
-
-                r.Margin = new Thickness(305 * (i / 3), 235 * (i % 3), 0, 0);
-
-                r.Stroke = Brushes.Gray;
-                r.StrokeThickness = 3;
-
-                ColonySizesCanvas.Children.Add(sp);
-                ColonySizesCanvas.Children.Add(r);
-
-                barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony Size Chart", "Size (mm)", "Step" }, sp);
+                colonyListBox.Items.Add(lbItem);
             }
 
-            if (sizeYData.Count > 2) ColonySizesCanvas.Height = 310 * 3;
-            else { ColonySizesCanvas.Height = 310 * sizeYData.Count; }
+            StackPanel sp = new StackPanel();
+            sp.Width = 350;
+            sp.Height = 280;
 
-            if (sizeYData.Count < 4) ColonySizesCanvas.Width = 250;
-            else ColonySizesCanvas.Width = 250 * (sizeYData.Count/3 +1);
+            Rectangle r = new Rectangle();
+
+            r.Width = 350;
+            r.Height = 280;           
+            r.Stroke = Brushes.Gray;
+            r.StrokeThickness = 3;
+
+            ColonySizesCanvas.Children.Add(sp);
+            ColonySizesCanvas.Children.Add(r);
+
+            //barCharConstruct(sizeYData[i], _saveDir, i, new string[] { "Colony " + index + " Size Chart", "Size (mm)", "Step" }, sp);
+
         }
 
         public void barCharConstruct(double[] yData, string _saveDirectory, string[] title)
