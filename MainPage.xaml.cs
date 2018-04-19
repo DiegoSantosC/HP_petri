@@ -62,7 +62,7 @@ namespace PetriUI
     {
         public static List<int[]> parameters;
         private static int counter;
-        private static List<string> saveFolders;
+        private static List<string> saveFolders, mapSourceFolders;
         private static List<bool[]> analysisToPerform;
         private static List<string> processNames;
         private static List<System.Drawing.Point> sizes;
@@ -96,6 +96,7 @@ namespace PetriUI
 
             cp = new CapturePreviews(this);
             saveFolders = new List<string>();
+            mapSourceFolders = new List<string>();
             processNames = new List<string>();
             capturesRunning = false;
             sizes = new List<System.Drawing.Point>();
@@ -104,6 +105,26 @@ namespace PetriUI
             Logo_Init();
 
             CloseStatics_Init();
+
+            Chk2.Checked += new RoutedEventHandler(Chk2IsChecked);
+            ImportChck2.Checked += new RoutedEventHandler(ImportChk2IsChecked);
+
+        }
+
+        private void Chk2IsChecked(object sender, RoutedEventArgs e)
+        {
+            if (Chk2.IsChecked.GetValueOrDefault() == true)
+            {
+                Chk1.IsChecked = true;
+            }
+        }
+
+        private void ImportChk2IsChecked(object sender, RoutedEventArgs e)
+        {
+            if (ImportChck2.IsChecked.GetValueOrDefault() == true)
+            {
+                ImportChck1.IsChecked = true;
+            }
         }
 
         private void Logo_Init()
@@ -310,6 +331,20 @@ namespace PetriUI
                 }
             }
 
+        }
+
+        // Folder election from which analysis input will be extracted in import mode
+
+        private void Map_Import_Button_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog sfd = new FolderBrowserDialog();
+
+            DialogResult res = sfd.ShowDialog();
+
+            if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
+            {
+                MapImportLabel.Content = sfd.SelectedPath;
+            }
         }
 
         // Function that inits and shows the navigation handlers
@@ -712,10 +747,17 @@ namespace PetriUI
         {
             string folderImport = (string)FolderImportLabel.Content;
             string folderSave = (string)FolderSaveLabel.Content;
+            string mapFolder = (string)MapImportLabel.Content;
 
             if (folderImport == "Not defined" || folderSave == "Not defined")
             {
                 System.Windows.MessageBox.Show(" Invalid directory path");
+                return;
+            }
+
+            if (mapFolder == "Not defined (classification analysis only)" && ImportChck2.IsChecked.GetValueOrDefault())
+            {
+                System.Windows.MessageBox.Show(" A source Kohonen network must be chosen "+ Environment.NewLine + " for a classification analysis to be done");
                 return;
             }
 
@@ -730,6 +772,12 @@ namespace PetriUI
             if (!ImportChck1.IsChecked.GetValueOrDefault() && !ImportChck2.IsChecked.GetValueOrDefault())
             {
                 System.Windows.MessageBox.Show(" Select an analysis to be performed ");
+                return;
+            }
+
+            if (!ImportChck1.IsChecked.GetValueOrDefault() && ImportChck2.IsChecked.GetValueOrDefault())
+            {
+                System.Windows.MessageBox.Show("Classification analysis cannot be performed without a " + Environment.NewLine + " previous Colony Tracking analysis.");
                 return;
             }
 
@@ -778,7 +826,13 @@ namespace PetriUI
 
             // Count analysis is launched in a separated thread
 
-            if (countA)
+            if(classA && !countA)
+            {
+                System.Windows.MessageBox.Show("Classification analysis cannot be performed without a " + Environment.NewLine + " previous Colony Tracking analysis");
+                return;
+            }
+
+            if (countA && !classA)
             {
                 Thread analysisThread = new Thread(aw.getCount().staticAnalysis);
 
@@ -786,6 +840,7 @@ namespace PetriUI
                 list.Add(images);
                 list.Add(this);
                 list.Add(folderSave);
+                list.Add(false);
 
                 analysisThread.Start(list);
 
@@ -793,9 +848,29 @@ namespace PetriUI
                 AnalysisBorder.Visibility = Visibility.Visible;
                 AnalysisBorder.Background = System.Windows.Media.Brushes.LightGray;
             }
+
             if (classA)
             {
 
+                aw.getClass().Init(MapImportLabel.Content.ToString());
+
+                MapImportLabel.Content = "Not defined (classification analysis only)";
+
+                Thread analysisThread = new Thread(aw.getCount().staticAnalysis);
+
+                List<object> list = new List<object>();
+                list.Add(images);
+                list.Add(this);
+                list.Add(folderSave);
+                list.Add(true);
+
+                AnalysisBorder.Visibility = Visibility.Visible;
+
+                analysisThread.Start(list);
+
+                AnalysisBorder.Background = System.Windows.Media.Brushes.LightGray;
+
+                mapSourceFolders = new List<string>();
             }
 
             ShowButton.IsEnabled = true;
@@ -1012,6 +1087,29 @@ namespace PetriUI
 
                     int objIndex = Int32.Parse(ParametersTitleLabel.Content.ToString().Split(' ')[1]);
 
+                    // Analysis info acquisition
+
+                    bool[] analysis = new bool[2];
+                    if (Chk1.IsChecked.GetValueOrDefault()) { analysis[0] = true; }
+                    else { analysis[0] = false; }
+
+                    if (Chk2.IsChecked.GetValueOrDefault()) { analysis[1] = true; }
+                    else { analysis[1] = false; }
+
+                    if (analysis[1] && !analysis[0])
+                    {
+                        System.Windows.MessageBox.Show("Classification analysis cannot be performed without a " + Environment.NewLine + " previous Colony Tracking analysis");
+                        return;
+                    }
+
+                    if (analysis[1])
+                    {
+                        ChooseSourceFolder();
+                    }
+
+                    Chk1.IsChecked = false;
+                    Chk2.IsChecked = false;
+
                     // Pending capture building
 
                     CaptureDetailsLabel.Content = CaptureDetailsLabel.Content +
@@ -1031,6 +1129,8 @@ namespace PetriUI
                     saveFolders.Add(folder);
                     processNames.Add(name);
 
+                    analysisToPerform.Add(analysis);
+
                     // UI reset
 
                     ParametersBorder.Visibility = Visibility.Hidden;
@@ -1041,29 +1141,119 @@ namespace PetriUI
                     delayHTextBox.Text = "0";
                     delayMinTextBox.Text = "0";
                     FolderLabel.Content = "Not defined";
-                                       
-                    // Analysis info acquisition
-
-                    bool[] analysis = new bool[2];
-                    if (Chk1.IsChecked.GetValueOrDefault()) { analysis[0] = true; }
-                    else { analysis[0] = false; }
-
-                    if (Chk2.IsChecked.GetValueOrDefault()) { analysis[1] = true; }
-                    else { analysis[1] = false; }
-
-                    Chk1.IsChecked = false;
-                    Chk2.IsChecked = false;
-
-                    analysisToPerform.Add(analysis);
 
                     CaptureCancelButton.Visibility = Visibility.Visible;
 
                     ImportButton.IsEnabled = true;
+
                 }
             }
             else
             {
                 System.Windows.MessageBox.Show("Parameter parsing error");
+            }
+        }
+
+        private void ChooseSourceFolder()
+        {
+            Form f = new Form();
+            f.Height = 200;
+            f.Width = 500;
+
+            f.Text  = "Choose Classification Map Source Location";
+            f.FormClosing += new FormClosingEventHandler(AvoidClosing);
+
+            System.Windows.Forms.Button b = new System.Windows.Forms.Button();
+            b.Text = "Choose Location";
+            b.Size = new System.Drawing.Size(100, 20);
+            b.Click += new EventHandler(FormButtonClicked);
+            b.Location = new System.Drawing.Point(30, 30);
+
+            System.Windows.Forms.Label l = new System.Windows.Forms.Label();
+            l.Text = "Not defined";
+            l.Size = new System.Drawing.Size(170, 20);
+            l.Location = new System.Drawing.Point(150, 50);
+
+
+            System.Windows.Forms.Button b2 = new System.Windows.Forms.Button();
+            b2.Text = "Accept";
+            b2.Size = new System.Drawing.Size(60, 20);
+            b2.Click += new EventHandler(AcceptClicked);
+            b2.Location = new System.Drawing.Point(300, 100);
+
+            f.Controls.Add(b);
+            f.Controls.Add(b2);
+            f.Controls.Add(l);
+
+            f.Show();
+        }
+
+        private void AcceptClicked(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+
+            Form f = (Form)b.Parent;
+
+            foreach (object child in f.Controls)
+            {
+                try
+                {
+                    System.Windows.Forms.Label l = (System.Windows.Forms.Label)child;
+                    mapSourceFolders.Add(l.Text);
+                }
+                catch (Exception) { }
+            }
+
+            f.Close();
+        }
+
+        private void AvoidClosing(object sender, FormClosingEventArgs e)
+        {
+            Form f = (Form)sender;
+
+            foreach (object child in f.Controls)
+            {
+                try
+                {
+                    System.Windows.Forms.Label l = (System.Windows.Forms.Label)child;
+                    if (l.Text == "Not defined")
+                    {
+                        e.Cancel = true;
+                    }else
+                    {
+                        mapSourceFolders.Add(l.Text);
+                        e.Cancel = false;
+                    }
+                }
+                catch (Exception) { }
+            }
+        }
+
+        private void FormButtonClicked(object sender, EventArgs e)
+        {
+            FolderBrowserDialog sfd = new FolderBrowserDialog();
+
+            string fileLocation = "";
+
+            DialogResult res = sfd.ShowDialog();
+
+            if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
+            {
+                fileLocation = sfd.SelectedPath;
+            }
+
+            System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+
+            Form f = (Form)b.Parent;
+
+            foreach (object child in f.Controls)
+            {
+                try
+                {
+                    System.Windows.Forms.Label l = (System.Windows.Forms.Label)child;
+                    l.Text = fileLocation;
+                }
+                catch (Exception) { }
             }
         }
 
@@ -1093,8 +1283,10 @@ namespace PetriUI
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
+
             CaptureDetailsLabel.Content = "";
             saveFolders = new List<string>();
+            mapSourceFolders = new List<string>();
             analysisToPerform = new List<bool[]>();
             processNames = new List<string>();
 

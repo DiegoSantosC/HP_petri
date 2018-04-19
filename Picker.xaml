@@ -34,8 +34,8 @@
         <Rectangle Grid.Column="0" Grid.Row="1" Margin ="40,350,40,40" Height="300" Stroke="#08298A" StrokeThickness="6"/>
 
         <!-- Pick class analysis -->
-        <StackPanel Name="classSP" Grid.Column="1" Grid.Row="1" Margin="40"/>
-        <Rectangle Grid.Column="1" Grid.Row="1" Stroke="#08298A" StrokeThickness="6" Margin ="40"/>
+        <StackPanel Name="classSP" Grid.Column="1" Grid.Row="1"  Width ="450" Height="300" Margin="40"/>
+        <Rectangle Grid.Column="1" Grid.Row="1" Stroke="#08298A" Height ="310" Width ="460" StrokeThickness="6" Margin ="40"/>
 
     </Grid> 
 </Page>

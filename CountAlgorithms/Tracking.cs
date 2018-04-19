@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AnalysisTestApp
+namespace PetriUI
 {
     /// <summary>
     ///
@@ -69,8 +69,6 @@ namespace AnalysisTestApp
 
         public void firstScan(List<Cluster> blobs, int step)
         {
-            Console.WriteLine("First scan being performed");
-
             for (int i = 0; i < blobs.Count; i++)
             {
                 blobs.ElementAt(i).setStep(step);
@@ -81,9 +79,7 @@ namespace AnalysisTestApp
 
                 blobTrack.Add(initialList);
             }
-
-            Console.WriteLine(blobTrack.Count + " blobs being tracked");
-            
+           
             lastTrack = blobs;
         }
 
@@ -91,6 +87,7 @@ namespace AnalysisTestApp
 
         public int[] assignBlobs(List<Cluster> blobs, int step)
         {
+
             bool mergedChance = false, newColonyChance = false;
 
             eventsList = new List<int>();
@@ -129,8 +126,6 @@ namespace AnalysisTestApp
 
                             if (matchIndex >= 0)
                             {
-                                Console.WriteLine("Match with element " + matchIndex);
-
                                 int index = lastTrack.ElementAt(matchIndex).getId();
                                 blobs.ElementAt(i).setIndex(index);
 
@@ -141,8 +136,6 @@ namespace AnalysisTestApp
                             {
                            
                                 // New colony has appeared
-
-                                Console.WriteLine("New colony considered to be appeared");
 
                                 List<Cluster> newlist = new List<Cluster>();
                                 blobs[i].setFirst();
@@ -170,8 +163,6 @@ namespace AnalysisTestApp
 
                         if (matchIndex >= 0)
                         {
-                            Console.WriteLine("Match with element " + matchIndex);
-
                             int index = lastTrack.ElementAt(matchIndex).getId();
                             blobs.ElementAt(i).setIndex(index);
 
@@ -180,8 +171,6 @@ namespace AnalysisTestApp
                         else
                         {
                             // No match found 
-
-                            Console.WriteLine("New colony considered to be appeared");
 
                             // New colony has appeared
 
@@ -215,7 +204,6 @@ namespace AnalysisTestApp
 
                     if (mergedCheck[0])
                     {
-                        Console.WriteLine("Blobs " + i + " and " + j + " have merged");
 
                         int indexDest, indexBrunch;
 
@@ -279,8 +267,6 @@ namespace AnalysisTestApp
 
             if (sizeDifference < AdvancedOptions._dMergingTolerance && sizeDifference > 1)
             {
-                Console.WriteLine(" Adequated Size Difference ");
-
                 possibility++;
             }
 
@@ -322,7 +308,7 @@ namespace AnalysisTestApp
             }
 
 
-            if (intersection) { Console.WriteLine(" Blobs intersect"); possibility++; }
+            if (intersection) { possibility++; }
 
             // Third feature: Center of the new blob is between the centers of past ones
 
@@ -338,7 +324,7 @@ namespace AnalysisTestApp
             predictedCenter[1] = (center1[1] * cluster1.getSize() + center2[1] * cluster2.getSize()) / (cluster1.getSize() + cluster2.getSize());
 
             if (Math.Abs(predictedCenter[0] - newCenter[0]) / Math.Sqrt(blob.getSize()) < AdvancedOptions._dMergingTolerance && Math.Abs(predictedCenter[1] - newCenter[1]) /
-                Math.Sqrt(blob.getSize()) < AdvancedOptions._dMergingTolerance) { Console.WriteLine(" Center correctly located"); possibility++; }
+                Math.Sqrt(blob.getSize()) < AdvancedOptions._dMergingTolerance) { possibility++; }
 
             if (possibility > 1)
             {
@@ -398,8 +384,6 @@ namespace AnalysisTestApp
 
             boundsDepl = (X0Depl + X1Depl + Y0Depl + Y1Depl) / Math.Sqrt(c1.getSize());
 
-            Console.WriteLine(centerDepl + " Center depl + " + boundsDepl + " Bounds depl");
-
             // Abnormal deplacement
 
             if (boundsDepl < AdvancedOptions._dBoundsDiminish || centerDepl - boundsDepl > AdvancedOptions._dGreatDeplacement) return false;
@@ -407,8 +391,6 @@ namespace AnalysisTestApp
             // Abnormal growth
 
             if (boundsDepl > AdvancedOptions._dAbnormalGrowth && centerDepl > AdvancedOptions._dGreatDeplacement) return false;
-
-            Console.WriteLine("Growth");
 
             if (boundsDepl > AdvancedOptions._dAbnormalGrowth) eventsList.Add(0);
 

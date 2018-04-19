@@ -37,7 +37,7 @@ namespace PetriUI
         private Tracking track;
         private AnalysisWindow aw;
         private int step;
-        private bool changing;
+        private bool changing, existsClass;
 
         // Test inputs
         private Bitmap[] testBmps;
@@ -58,23 +58,23 @@ namespace PetriUI
             cluster_Specs = new List<List<ListBoxItem>>();
             cluster_locations = new List<List<System.Windows.Shapes.Rectangle>>();
 
-            // Test inputs initialization
+            //// Test inputs initialization
 
-            testBmps = new Bitmap[11];
+            //testBmps = new Bitmap[11];
 
             Tracking_Images = new List<Bitmap>();
 
-            testBmps[0] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C1.png"));
-            testBmps[1] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C2.png"));
-            testBmps[2] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\MergingTest.png"));
-            testBmps[3] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C4.png"));
-            testBmps[4] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C5.png"));
-            testBmps[5] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C6.png"));
-            testBmps[6] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C7.png"));
-            testBmps[7] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C8.png"));
-            testBmps[8] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C9.png"));
-            testBmps[9] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C10.png"));
-            testBmps[10] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C11.png"));
+            //testBmps[0] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C1.png"));
+            //testBmps[1] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C2.png"));
+            //testBmps[2] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\MergingTest.png"));
+            //testBmps[3] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C4.png"));
+            //testBmps[4] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C5.png"));
+            //testBmps[5] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C6.png"));
+            //testBmps[6] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C7.png"));
+            //testBmps[7] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C8.png"));
+            //testBmps[8] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C9.png"));
+            //testBmps[9] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C10.png"));
+            //testBmps[10] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C11.png"));
 
             ScrollLeft_Init();
 
@@ -506,8 +506,6 @@ namespace PetriUI
 
         public void setBackgound(System.Drawing.Image backgroundImg)
         {
-            Console.WriteLine("Background set");
-
             background = new Bitmap(backgroundImg);
 
             //background = testBmps[0];
@@ -542,9 +540,6 @@ namespace PetriUI
 
             List<Cluster> frameBlobs = FindObjects(resultDifference, time);
 
-            Console.WriteLine();
-            Console.WriteLine("Tracking " + step + ": " + frameBlobs.Count + " blobs encountered");
-
             // If this is the first tracking step made, the found clusters are set as base ones,
             // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
 
@@ -568,17 +563,23 @@ namespace PetriUI
 
         public void staticAnalysis(object param)
         {
+            // + last parameter (bool existsClassAnalysis)
+
             List<object> Params = (List<object>)param;
 
             List<System.Drawing.Image> images = (List < System.Drawing.Image > )Params.ElementAt(0);
             MainPage mp = (MainPage)Params.ElementAt(1);
             string folder = (string)Params.ElementAt(2);
+            existsClass = (bool)Params.ElementAt(3);
 
             setBackgound(images[0]);
 
             for(int i = 1; i < images.Count; i++)
             {
                 newStep(images[i], DateTime.Now.ToString());
+                if (existsClass)
+                    send clusters to be classified
+
             }
 
             Directory.CreateDirectory(folder);
@@ -658,9 +659,11 @@ namespace PetriUI
             return returnable.ToArray();
         }
 
-        public List<double[]> getColonySizeData()
+        public object[] getColonySizeData()
         {
+            List<int[]> bbs = new List<int[]>();
             List<double[]> sizes = new List<double[]>();
+            List<Bitmap> images = new List<Bitmap>();
 
             List<List<Cluster>> clusters = track.getTracking();
 
@@ -672,9 +675,17 @@ namespace PetriUI
                 {
                     sizes[i][j] = clusters[i][j].getcmSize();
                 }
+
+               bbs.Add(clusters[i][clusters[i].Count - 1].getBoundingBox());
+               images.Add(Tracking_Images[clusters[i][clusters[i].Count - 1].getStep()]); 
             }
 
-            return sizes;
+            object[] returnable = new object[3];
+            returnable[0] = sizes;
+            returnable[1] = bbs;
+            returnable[2] = images;
+
+            return returnable;
         }
 
     }

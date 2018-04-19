@@ -89,6 +89,16 @@ namespace PetriUI
             chart.Source = src;
             chart.Stretch = Stretch.Uniform;
             chartSP.Children.Add(chart);
+
+            Image classif = new Image();
+            BitmapImage src3 = new BitmapImage();
+            src3.BeginInit();
+            src3.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\Grid.png", UriKind.Absolute);
+            src3.CacheOption = BitmapCacheOption.OnLoad;
+            src3.EndInit();
+            classif.Source = src3;
+            classif.Stretch = Stretch.Uniform;
+            classSP.Children.Add(classif);
         }
 
         // Navigation clicking handlers

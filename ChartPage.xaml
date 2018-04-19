@@ -35,13 +35,14 @@
         </Border>
 
         <ListBox Name="colonyListBox" Grid.Column="1" Grid.Row="1" Height="400" Width="250" HorizontalAlignment="Left"/>
-
+        <Label Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20, 150, 0, 0">Click to visualize size and location data</Label>
 
         <!-- Colony Size Charts -->
-        <Canvas Name="ColonySizesCanvas" VerticalAlignment="Top"  HorizontalAlignment="Right" Margin="0,30,20,0" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Column="1" Grid.Row="1" Height="350" Width="350"/>
+        <Canvas Name="ColonySizesCanvas" VerticalAlignment="Top"  HorizontalAlignment="Right" Margin="0,30,50,0" Grid.Column="1" Grid.Row="1" Height="350" Width="350"/>
 
         <!-- Image Canvas -->
-        <Canvas Name="ImageCanvas" VerticalAlignment="bottom"  HorizontalAlignment="Right" Margin="0,0,20,50" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Column="1" Grid.Row="1" Height="350" Width="350"/>
-
+        <StackPanel Name="ImageCanvas" VerticalAlignment="bottom"  HorizontalAlignment="Right" Margin="0,0,50,100" Grid.Column="1" Grid.Row="1" Height="350" Width="350"/>
+        <Canvas Name="BbCanvas" VerticalAlignment="bottom" HorizontalAlignment="Right" Margin="0,0,50,100" Grid.Column="1" Grid.Row="1" Height="350" Width="350"/>
+   
     </Grid>
 </Page>

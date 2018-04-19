@@ -435,6 +435,7 @@ namespace PetriUI
             ProjectedFormHandler handler = new ProjectedFormHandler();
 
             handler.HandleProjection(img);
+
         }
 
         // UI Closing handling

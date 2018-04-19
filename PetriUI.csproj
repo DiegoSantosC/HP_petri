@@ -105,6 +105,11 @@
     <Compile Include="CountAnalytics.xaml.cs">
       <DependentUpon>CountAnalytics.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Kohonen\AdvancedOptions.cs" />
+    <Compile Include="Kohonen\Cell.cs" />
+    <Compile Include="Kohonen\DataHandler.cs" />
+    <Compile Include="Kohonen\KohonenNetwork.cs" />
+    <Compile Include="Kohonen\LabelingHandler.cs" />
     <Compile Include="Picker.xaml.cs">
       <DependentUpon>Picker.xaml</DependentUpon>
     </Compile>
