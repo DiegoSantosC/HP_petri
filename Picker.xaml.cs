@@ -124,6 +124,7 @@ namespace PetriUI
         {
             if (classAnalysis)
             {
+                clssPage.ArtificialScroll();
                 this.NavigationService.Navigate(clssPage);
             }
         }

@@ -39,10 +39,6 @@ namespace PetriUI
         private int step;
         private bool changing, existsClass;
 
-        // Test inputs
-        private Bitmap[] testBmps;
-
-
         public CountAnalytics(AnalysisWindow a)
         {
             InitializeComponent();
@@ -58,34 +54,36 @@ namespace PetriUI
             cluster_Specs = new List<List<ListBoxItem>>();
             cluster_locations = new List<List<System.Windows.Shapes.Rectangle>>();
 
-            //// Test inputs initialization
-
-            //testBmps = new Bitmap[11];
-
             Tracking_Images = new List<Bitmap>();
-
-            //testBmps[0] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C1.png"));
-            //testBmps[1] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C2.png"));
-            //testBmps[2] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\MergingTest.png"));
-            //testBmps[3] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C4.png"));
-            //testBmps[4] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C5.png"));
-            //testBmps[5] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C6.png"));
-            //testBmps[6] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C7.png"));
-            //testBmps[7] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C8.png"));
-            //testBmps[8] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C9.png"));
-            //testBmps[9] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C10.png"));
-            //testBmps[10] = new Bitmap(System.Drawing.Image.FromFile(@"Resources\Captures\C11.png"));
 
             ScrollLeft_Init();
 
             ScrollRight_Init();
 
             ListBox_Init();
+
+            Logo_Init();
+
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // UI functions
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+        private void Logo_Init()
+        {
+            System.Windows.Controls.Image logo = new System.Windows.Controls.Image();
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + @"Resources\HP_logo.png", UriKind.Absolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            logo.Source = src;
+            logo.Stretch = Stretch.Uniform;
+
+            LogoSP.Children.Add(logo);
+        }
 
         private void ListBox_Init()
         {
@@ -578,7 +576,7 @@ namespace PetriUI
             {
                 newStep(images[i], DateTime.Now.ToString());
                 if (existsClass)
-                    send clusters to be classified
+                    aw.getClass().newStep(track.getLast(), images[i]);
 
             }
 

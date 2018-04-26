@@ -16,9 +16,12 @@ namespace Kohonen
         private List<List<Bitmap>> sourceData;
         private LabelingHandler lh;
         private Cell[,] map;
-        private List<Cell> best;
         private ClassifyAnalytics cw;
-             
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Construction
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         public KohonenNetwork(LabelingHandler labels, Cell[,] srcMap, ClassifyAnalytics classWindow)
         {
             lh = labels;
@@ -27,6 +30,7 @@ namespace Kohonen
 
             cw = classWindow;
 
+            sourceData = new List<List<Bitmap>>();
         }
 
         private void Init_Map()
@@ -39,6 +43,10 @@ namespace Kohonen
             for (int i = 0; i < sizeY; i++)
                 for (int j = 0; j < sizeX; j++) map[i, j] = generateCell(i, j);
         }
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Kohonen Algorithm
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         private double ComputeDistanceFactor(int currEpoch)
         {
@@ -57,48 +65,19 @@ namespace Kohonen
             return F;
         }
 
-        public void Test_Network(List<Bitmap> clustList)
+        public List<int[]> Test_Network(List<Bitmap> clustList)
         {
             sourceData.Add(clustList);
+            List<int[]> bestMatches = new List<int[]>();
 
             for(int i=0; i < clustList.Count; i++)
             {
                 int[] bestMatch = FindBestMatch(clustList[i], -1);
-                best.Add(map[bestMatch[0], bestMatch[1]]);
 
+                bestMatches.Add(bestMatch);
             }
-        }
 
-        private void Execute_Epoch(int epoch)
-        {
-            double k = ComputeLearningFactor(epoch);
-
-            for (int i = 0; i < sourceData.Count; i++)
-            {
-                // Best match is found attending to Euclidean distance
-
-                int label = lh.getIndex(i);
-
-                int[] bestMatch = FindBestMatch(sourceData[i], label);
-                
-                // The cell is labelled and it's neightbours modified
-
-                if (bestMatch[0] == -1)
-                {
-                    MessageBox.Show("No available cell found");
-
-                    return;
-                }
-
-                map[bestMatch[0], bestMatch[1]].setIndex(label);
-                
-
-                ModifyMap(bestMatch, sourceData[i], epoch, k, label);
-
-                Console.WriteLine(epoch + " " + i);
-                //Console.WriteLine(bestMatch[0] + " " + bestMatch[1]);
-                //Console.WriteLine();
-            }
+            return bestMatches;
         }
 
         private int[] FindBestMatch(Bitmap bitmap, int label)
@@ -261,6 +240,15 @@ namespace Kohonen
             float B = r.Next(0, 255);
 
             return new float[] { R, G, B };
+        }
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Communication
+        // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        public Cell getCellAtPosition(int x, int y)
+        {
+            return map[y, x];
         }
     }
 }

@@ -34,6 +34,11 @@ namespace PetriUI
             return blobTrack;
         }
 
+        public List<Cluster> getLast()
+        {
+            return lastTrack;
+        }
+
         public List<List<Cluster>> getTimelineTracking()
         {
             List<List<Cluster>> timeTracking = new List<List<Cluster>>();
@@ -397,11 +402,6 @@ namespace PetriUI
             // No reason for rejection having been found, both clusters are considered to be the same in two different moments of time
 
             return true;
-        }
-
-        public List<Cluster> getLast()
-        {
-            return lastTrack;
         }
     }
 }
