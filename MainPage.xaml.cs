@@ -815,7 +815,7 @@ namespace PetriUI
 
             // UI Reset
 
-            AnalysisWindow aw = new AnalysisWindow(null, countA, classA);
+            AnalysisWindow aw = new AnalysisWindow(null, countA, classA, "");
 
             ImportBorder.Visibility = Visibility.Hidden;
             ImportChck1.IsChecked = false;
@@ -1106,6 +1106,10 @@ namespace PetriUI
                     {
                         ChooseSourceFolder();
                     }
+                    else
+                    {
+                        mapSourceFolders.Add("");
+                    }
 
                     Chk1.IsChecked = false;
                     Chk2.IsChecked = false;
@@ -1159,6 +1163,7 @@ namespace PetriUI
             Form f = new Form();
             f.Height = 200;
             f.Width = 500;
+            f.Location = new System.Drawing.Point(1000, 500);
 
             f.Text  = "Choose Classification Map Source Location";
             f.FormClosing += new FormClosingEventHandler(AvoidClosing);
@@ -1171,8 +1176,8 @@ namespace PetriUI
 
             System.Windows.Forms.Label l = new System.Windows.Forms.Label();
             l.Text = "Not defined";
-            l.Size = new System.Drawing.Size(170, 20);
-            l.Location = new System.Drawing.Point(150, 50);
+            l.Size = new System.Drawing.Size(200, 40);
+            l.Location = new System.Drawing.Point(150, 30);
 
 
             System.Windows.Forms.Button b2 = new System.Windows.Forms.Button();
@@ -1186,6 +1191,8 @@ namespace PetriUI
             f.Controls.Add(l);
 
             f.Show();
+
+            CaptureConfirmButton.IsEnabled = false;
         }
 
         private void AcceptClicked(object sender, EventArgs e)
@@ -1221,7 +1228,7 @@ namespace PetriUI
                         e.Cancel = true;
                     }else
                     {
-                        mapSourceFolders.Add(l.Text);
+                        CaptureConfirmButton.IsEnabled = true;
                         e.Cancel = false;
                     }
                 }
@@ -1278,8 +1285,8 @@ namespace PetriUI
                 sendingSizes.Add(sizes[parameters.ElementAt(i)[2]]);
 
             }
-
-            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform, processNames, sendingLocs, sendingSizes);
+            
+            cp.AddCaptures(parameters, indexes, saveFolders, analysisToPerform, processNames, sendingLocs, sendingSizes, mapSourceFolders);
             this.NavigationService.Navigate(cp);
 
             parameters = new List<int[]>();
@@ -1289,6 +1296,7 @@ namespace PetriUI
             mapSourceFolders = new List<string>();
             analysisToPerform = new List<bool[]>();
             processNames = new List<string>();
+            mapSourceFolders = new List<string>();
 
             ShowButton.IsEnabled = false;
 

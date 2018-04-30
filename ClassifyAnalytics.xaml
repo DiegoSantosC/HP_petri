@@ -33,13 +33,17 @@
 
         <!-- Canvas 1 -->
         <Canvas Grid.Row="2" Grid.Column="0" Width="300" Height="500" Margin="50, 50, 0, 0">
-            <StackPanel Name="StackPanel1" Width="300" Height="250"/>
+            <!-- set label Button -->
+            <Button Name="setLabel1" Width="100" Height="20"  Visibility="Hidden" HorizontalAlignment="Center" FontSize="15" Click="SetLabel_Click">set Label</Button>
+            <StackPanel Name="StackPanel1" Width="250" Height="250"/>
             <Label Name="Label1"/>
         </Canvas>
 
         <!-- Canvas 2 -->
         <Canvas Grid.Row="2" Grid.Column="2" Width="300" Height="500" Margin="50, 50, 0, 0">
-            <StackPanel Name="StackPanel2" Width="300" Height="250"/>
+            <!-- set label Button -->
+            <Button Name="setLabel2" Width="100" Height="20" Visibility="Hidden" HorizontalAlignment="Center" FontSize="15" Click="SetLabel_Click">set Label</Button>
+            <StackPanel Name="StackPanel2" Width="250" Height="250"/>
             <Label Name="Label2"/>
         </Canvas>
 

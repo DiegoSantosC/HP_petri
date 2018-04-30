@@ -74,11 +74,6 @@ namespace PetriUI
             int i = 0;
             bool found = false;
 
-            for(int n = 0; n < indexes.Count; n++)
-            {
-                Console.WriteLine(indexes[n] + ": " + locations[n].X + " " + locations[n].Y);
-            }
-
             for (int j = 0; j < folders.Count; j++)
             {
                 i = 0;
@@ -334,7 +329,6 @@ namespace PetriUI
 
             foreach (IPcPicture image in picture.Children)
             {
-                Console.WriteLine(i + " " + t.getIndex());
 
                 if (i == t.getIndex())
                 {
@@ -353,7 +347,7 @@ namespace PetriUI
                         Uri u = new Uri(fileAndPath, UriKind.Relative);
                         l.Add(u);
 
-                        App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                        App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
                             new Action(() => t.getCaptureWindow().DrawImage(false)));
                         //t.getCaptureWindow().DrawImage(false);
 

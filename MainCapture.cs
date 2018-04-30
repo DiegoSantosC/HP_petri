@@ -67,11 +67,6 @@ namespace PetriUI
 
                 if (stopRequested) break;
 
-                Console.WriteLine("Capture " + (i + 1) + " triggered");
-                /*
-                App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
-                    new Action(() => t.getCaptureWindow().Trigger_Capture()));
-                */
                 t.getCaptureWindow().Trigger_Capture();
             }
 

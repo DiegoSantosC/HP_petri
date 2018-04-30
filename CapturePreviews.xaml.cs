@@ -232,7 +232,7 @@ namespace PetriUI
                 {
                     sampleSP.Children.Add(samplesList.ElementAt(0));
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = "Process 1/" + capturesList.Count.ToString();
                 nameLabel.Content = capturesNames.ElementAt(0);
@@ -243,7 +243,7 @@ namespace PetriUI
                 {
                     sampleSP.Children.Add(samplesList.ElementAt(current));
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = "Process " + (current+1) + "/" + capturesList.Count.ToString();
                 nameLabel.Content = capturesNames.ElementAt(current);
@@ -268,7 +268,7 @@ namespace PetriUI
                 {
                     sampleSP.Children.Add(samplesList.ElementAt(total - 1));
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = "Process " + total + "/" + capturesList.Count.ToString();
                 nameLabel.Content = capturesNames.ElementAt(capturesNames.Count - 1);
@@ -282,7 +282,7 @@ namespace PetriUI
                 {
                     sampleSP.Children.Add(samplesList.ElementAt(current - 2));
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = "Process " + (current - 1) + "/" + capturesList.Count.ToString();
                 nameLabel.Content = capturesNames.ElementAt(current -2);
@@ -330,7 +330,7 @@ namespace PetriUI
         // Parameters are received from MainPage listing the features of the new captures to be built
         // In this method they are built and added to the UI
 
-        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis, List<string> names, List<PcPhysicalPoint> locations, List<System.Drawing.Point> sizes)
+        public void AddCaptures(List<int[]> parameters, List<int> ind, List<string> folders, List<bool[]> analysis, List<string> names, List<PcPhysicalPoint> locations, List<System.Drawing.Point> sizes, List<string> maps)
         {
             MainCapture mc = new MainCapture();
             List<Image> samples = new List<Image>();
@@ -361,16 +361,14 @@ namespace PetriUI
                     {
                         capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 - i), 
                             folders.ElementAt(folders.Count - 1 - i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count - 1 - i), 
-                            location, size, false));
-
-                        Console.WriteLine(names[names.Count - 1 - i] + " " + parameters.ElementAt(parameters.Count - 1 - i)[2]);
+                            location, size, false, maps.ElementAt(maps.Count - 1 - i)));
 
                     }
                     else
                     {
                         capturesList.Add(new CaptureWindow(this, samples.ElementAt(i), parameters.ElementAt(parameters.Count - 1 - i), 
                             folders.ElementAt(folders.Count - 1 - i), analysis.ElementAt(analysis.Count - 1 - i), names.ElementAt(names.Count - 1 - i),
-                            location, size, true));
+                            location, size, true, maps.ElementAt(maps.Count - 1 - i)));
                     }
 
                     capturesList.ElementAt(i + previousCaptures).Uid = (i + previousCaptures).ToString();

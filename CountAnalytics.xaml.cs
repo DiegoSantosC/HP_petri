@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Threading;
 using System.Windows.Shapes;
 
 namespace PetriUI
@@ -38,6 +39,7 @@ namespace PetriUI
         private AnalysisWindow aw;
         private int step;
         private bool changing, existsClass;
+        private int[] events;
 
         public CountAnalytics(AnalysisWindow a)
         {
@@ -441,7 +443,7 @@ namespace PetriUI
                 {
                     Show(0);
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = "1/" + Tracking_Images.Count.ToString();
             }
@@ -452,7 +454,7 @@ namespace PetriUI
                 {
                     Show(current);
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = (current + 1) + "/" + Tracking_Images.Count.ToString();
             }
@@ -475,7 +477,7 @@ namespace PetriUI
                 {
                     Show(total - 1);
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = total + "/" + Tracking_Images.Count.ToString();
             }
@@ -487,7 +489,7 @@ namespace PetriUI
                 {
                     Show(current - 2);
                 }
-                catch (ArgumentOutOfRangeException ex) { }
+                catch (ArgumentOutOfRangeException) { }
 
                 infoLabel.Content = (current - 1) + "/" + Tracking_Images.Count.ToString();
             }
@@ -512,13 +514,60 @@ namespace PetriUI
         // In each step, colony tracking is performed by comparing the current taken image with the
         // first one (serving as background) and the last one in the look for changes
 
-        public int[] newStep(System.Drawing.Image img, string time)
+        public void newStep(object param)
         {
+            object[] objects = (object[])param;
+
+            System.Drawing.Image img = (System.Drawing.Image)objects[0];
+            CaptureWindow cw = (CaptureWindow)objects[1];
+
             Bitmap bmp = new Bitmap(img);
+            Bitmap bmpClone = (Bitmap)bmp.Clone();
 
-            // For testing purposes, taken images will be replaced for static ones
+            Tracking_Images.Add(bmp);
+            Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
 
-            //Bitmap bmp = testBmps[step + 1];
+            // Firstly we will find the best matching repositioning to the images by selecting the one that minimizes the edges difference 
+            // This is needed because of the Sprout's image acquisition impresition, which leads to minor mismatches between the same object's captures
+
+            int[] positions = Matching_Robinson.RobinsonRepositioning(background, bmpClone);
+
+            // Once the reposition is calculated, a difference between the taken image and the background is performed
+            // For this difference, Manhattan difference computation has been used. However, Eucliedean distance computation and
+            // Pearson's correlation index difference computation functions are included in the code and ready to be used.
+
+            Map resultDifference = DifferenceComputation.getManhattan(background, bmpClone, positions);
+
+            // A cluster search is computed
+
+            List<Cluster> frameBlobs = FindObjects(resultDifference, DateTime.Now.ToString("hh:mm:ss"));
+
+            // If this is the first tracking step made, the found clusters are set as base ones,
+            // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
+
+            if (track.isEmpty()) { track.firstScan(frameBlobs, step); events = new int[0]; }
+            else
+            {
+                events = track.assignBlobs(frameBlobs, step);
+            }
+
+            step++;
+
+            events = checkBounds(events, track.getLast(), bmpClone);
+
+            if (aw.getPicker().classAnalysis && !aw.getClass().hasError()) {
+
+               aw.getClass().newStep(track.getLast(), bmpClone);
+            }
+
+            App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+                            new Action(() => cw.processEvents()));
+        }
+
+        public int[] newStep(System.Drawing.Image img)
+        {
+
+            Bitmap bmp = new Bitmap(img);
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
@@ -536,7 +585,7 @@ namespace PetriUI
 
             // A cluster search is computed
 
-            List<Cluster> frameBlobs = FindObjects(resultDifference, time);
+            List<Cluster> frameBlobs = FindObjects(resultDifference, DateTime.Now.ToString("hh:mm:ss"));
 
             // If this is the first tracking step made, the found clusters are set as base ones,
             // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
@@ -552,6 +601,11 @@ namespace PetriUI
             step++;
 
             events = checkBounds(events, track.getLast(), bmp);
+
+            if (aw.getPicker().classAnalysis && !aw.getClass().hasError())
+            {
+                aw.getClass().newStep(track.getLast(), img);
+            }
 
             return events;
         }
@@ -574,8 +628,8 @@ namespace PetriUI
 
             for(int i = 1; i < images.Count; i++)
             {
-                newStep(images[i], DateTime.Now.ToString());
-                if (existsClass)
+                newStep(images[i]);
+                if (existsClass && !aw.getClass().hasError())
                     aw.getClass().newStep(track.getLast(), images[i]);
 
             }
@@ -657,6 +711,25 @@ namespace PetriUI
             return returnable.ToArray();
         }
 
+        public bool hasBlobs(int n)
+        {
+            List<List<Cluster>> clusters = track.getTracking();
+
+            return clusters[n].Count > 0;
+        }
+
+        public bool hasBlobs()
+        {
+            List<List<Cluster>> clusters = track.getTracking();
+
+            for(int i = 0; i < clusters.Count; i++)
+            {
+                if (clusters[i].Count > 0) return true;
+            }
+
+            return false;
+        }
+
         public object[] getColonySizeData()
         {
             List<int[]> bbs = new List<int[]>();
@@ -683,7 +756,14 @@ namespace PetriUI
             returnable[1] = bbs;
             returnable[2] = images;
 
+
+
             return returnable;
+        }
+
+        public int[] getEvents()
+        {
+            return events;
         }
 
     }

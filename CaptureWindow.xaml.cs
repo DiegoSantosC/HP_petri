@@ -79,13 +79,11 @@ namespace PetriUI
 
         // This window is responsble for handling the captures of the object that represents, and thus 
         // manages the MainCapture thread and hosts capture taking functions 
-        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name, PcPhysicalPoint location, System.Drawing.Point size, bool moved)
+        public CaptureWindow(CapturePreviews capt, Image img, int[] param, string folder, bool[] analysis, string name, PcPhysicalPoint location, System.Drawing.Point size, bool moved, string map)
         {
             InitializeComponent();
 
             this.Width = 1200;
-
-
             this.Height = 900;
 
             this.Left = 300;
@@ -101,7 +99,7 @@ namespace PetriUI
 
             t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1], name, location, size);
 
-            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis());
+            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis(), map);
 
             Directory.CreateDirectory(folder);
             file = new LogFile(t.getFolder(), t.getIndex(), t.getName(), t.getNumberOfCaptures());
@@ -685,18 +683,24 @@ namespace PetriUI
             {
                 if (cfs.Count > 1)
                 {
-
-                    aw.Show();
-                    aw.getCount().initStatics();
-
-                    aw.Navigate(aw.getCount());
-
-                    if (CapturesListBox.SelectedIndex == 0)
+                    if (aw.getCount().hasBlobs())
                     {
-                        aw.getCount().Show(0);
+                        aw.Show();
+                        aw.getCount().initStatics();
+
+                        aw.Navigate(aw.getCount());
+
+                        if (CapturesListBox.SelectedIndex == 0)
+                        {
+                            aw.getCount().Show(0);
+                        }
+                        else { aw.getCount().Show(CapturesListBox.SelectedIndex - 1); }
                     }
-                    else { aw.getCount().Show(CapturesListBox.SelectedIndex - 1); }
-                }
+                    else
+                    {
+                        MessageBox.Show("No colonies found to be analyzed");
+                    }
+                }                
                 else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
             }
             else
@@ -716,11 +720,18 @@ namespace PetriUI
             {
                 if (t.getClassAnalysis() || t.getCountAnalysis())
                 {
-                    aw.Show();
-                    aw.getCount().initStatics();
-                    aw.Navigate(aw.getPicker());
-                    aw.getChart().initCharts(aw.getCount(), t.getFolder());
+                    if (aw.getCount().hasBlobs())
+                    {
+                        aw.Show();
+                        aw.getCount().initStatics();
+                        aw.Navigate(aw.getPicker());
+                        aw.getChart().initCharts(aw.getCount(), t.getFolder());
 
+                    }
+                    else
+                    {
+                        MessageBox.Show("No colonies were found to be analyzed");
+                    }
                 }
                 else
                 {
@@ -728,10 +739,7 @@ namespace PetriUI
                 }
             }
             else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
-
         }
-
-
 
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -899,7 +907,6 @@ namespace PetriUI
         {
             if(cfs.Count -1 < t.getNumberOfCaptures())
             {
-                Console.WriteLine("Executing capture");
                 MomentCapture.Capture(t, false);
 
             }
@@ -927,9 +934,6 @@ namespace PetriUI
 
             img1.Uid = cfs.Count.ToString();
             img2.Uid = cfs.Count.ToString();
-
-            Console.WriteLine(t.getName() + " showing capture " + (cfs.Count - 1));
-
 
             // Img acquisition 
 
@@ -1045,22 +1049,33 @@ namespace PetriUI
                 bbe.Save(ms);
                 System.Drawing.Image bmpImg = System.Drawing.Image.FromStream(ms);
 
-                int[] events = aw.getCount().newStep(bmpImg, DateTime.Now.ToString("hh:mm:ss"));
+                object[] param = new object[2];
+                param[0] = bmpImg;
+                param[1] = this;
 
-                if (events.Length > 0) file.AppendData("\t\t Events happened : ");
-                     
-                for(int i = 0; i < events.Length; i++)
-                {
-                    addEvent(cfs.Count -1, AdvancedOptions._sEventMessages[events[i]]);
-                    file.AppendData("\t\t\t " + AdvancedOptions._sEventMessages[events[i]]);
-                    
-                }
-                if (events.Length > 0) file.AppendData(" ");
+                Thread t = new Thread(aw.getCount().newStep);
+                t.Start(param);
+
+                //aw.getCount().newStep(bmpImg, DateTime.Now.ToString("hh:mm:ss"));               
             }
         }
 
-        // Capture starting and finished handlers
+        public void processEvents()
+        {
+            int[] events = aw.getCount().getEvents();
 
+            if (events.Length > 0) file.AppendData("\t\t Events happened : ");
+
+            for (int i = 0; i < events.Length; i++)
+            {
+                addEvent(cfs.Count - 1, AdvancedOptions._sEventMessages[events[i]]);
+                file.AppendData("\t\t\t " + AdvancedOptions._sEventMessages[events[i]]);
+
+            }
+            if (events.Length > 0) file.AppendData(" ");
+        }
+
+        // Capture starting and finished handlers
         internal void CaptureFinished()
         {
             CapturePreviews.DecrementCaptures();
@@ -1070,7 +1085,7 @@ namespace PetriUI
 
             StopButton.Visibility = Visibility.Hidden;
 
-            if(t.getCountAnalysis())aw.getChart().initCharts(aw.getCount(), t.getFolder());
+            //if(t.getCountAnalysis())aw.getChart().initCharts(aw.getCount(), t.getFolder());
         }
 
         public void startTriggered()

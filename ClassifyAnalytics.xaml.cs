@@ -29,6 +29,7 @@ namespace PetriUI
         private List<List<int[]>> matches;
         private List<List<System.Windows.Shapes.Rectangle>> locations;
         private List<List<Cluster>> clusters;
+        private static bool errorDuringImport;
 
         public ClassifyAnalytics()
         {
@@ -37,6 +38,7 @@ namespace PetriUI
             matches = new List<List<int[]>>();
             locations = new List<List<System.Windows.Shapes.Rectangle>>();
             clusters = new List<List<Cluster>>();
+            errorDuringImport = false;
         }
 
         internal void Init(string sourceFolder)
@@ -44,6 +46,8 @@ namespace PetriUI
             object[] returned = DataHandler.ProcessInputTest(sourceFolder);
             if(returned == null)
             {
+                MessageBox.Show(" Invalid map folder");
+                errorDuringImport = true;
                 return;
             }
 
@@ -56,8 +60,7 @@ namespace PetriUI
             Logo_Init();
 
             ScrollLeft_Init();
-            ScrollRight_Init();
-            
+            ScrollRight_Init();            
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,6 +86,14 @@ namespace PetriUI
         public void Show(int index)
         {
             sampleSP.Children.Clear();
+
+            StackPanel1.Visibility = Visibility.Hidden;
+            Label1.Visibility = Visibility.Hidden;
+            StackPanel2.Visibility = Visibility.Hidden;
+            Label2.Visibility = Visibility.Hidden;
+            setLabel1.Visibility = Visibility.Hidden;
+            setLabel2.Visibility = Visibility.Hidden;
+
 
             // A System.Windows.Controls.Image is created from a System.Drawing.Image by acquiring its Bitmap
 
@@ -160,7 +171,10 @@ namespace PetriUI
         {
             StackPanel1.Children.Clear();
 
-            Cell winner = kn.getCellAtPosition(best[1], best[0]);
+            StackPanel1.Visibility = Visibility.Visible;
+            Label1.Visibility = Visibility.Visible;
+
+            Cell winner = kn.getCellAtPosition(best[0], best[1]);
 
             System.Windows.Controls.Image img = new System.Windows.Controls.Image();
             Bitmap bmp = winner.getAsBmp();
@@ -184,35 +198,33 @@ namespace PetriUI
 
             int top = ((int)(t.Top * 500 / 350) - 50);
 
-            if (top < 0) top = 0;
+            if (top < 30) top = 30;
+
+            if (top > 200) top = 200;
 
             StackPanel1.Margin = new Thickness( 0, top, 0, 0);
 
             List<string> labels = lh.getAllLabels();
             List<int> indexes = lh.getAllIndexes();
 
-            for(int i = 0; i < labels.Count; i++)
-            {
-                Console.Write(labels[i] + " ");
-
-            }
-            Console.WriteLine();
-
-            for (int i = 0; i < indexes.Count; i++)
-            {
-                Console.Write(indexes[i] + "     ");
-
-            }
-
-            Console.WriteLine(winner.getIndex());
-
-            Console.WriteLine(winner.getIndex() + " " + lh.getLabel(winner.getIndex()));
-
             string label = "";
-            //string label = lh.getLabel(winner.getIndex());
-            if (label.Trim().Length < 1) label = "       undefined";
+            if (winner.getIndex() < 0)
+            {
+                label = "       undefined";
+                setLabel1.Visibility = Visibility.Visible;
+                setLabel1.Margin = new Thickness(150, top - 30, 0, 0);
+                string s = best[0] + " " + best[1];
+                setLabel1.Uid = s;
 
-            Label1.Content = "Winner map position:     [" + best[1] + " " + best[0]  + " " + Environment.NewLine + 
+            }
+            else {
+
+                label = lh.getLabel(winner.getIndex());
+                setLabel1.Visibility = Visibility.Hidden;
+
+            }
+
+            Label1.Content = "Winner map position:     [" + best[0] + " " + best[1]  + "] " + Environment.NewLine + 
                 "Winner label: " + label;
             Label1.Margin = new Thickness(0, top + 280, 0, 0);
         }
@@ -221,7 +233,10 @@ namespace PetriUI
         {
             StackPanel2.Children.Clear();
 
-            Cell winner = kn.getCellAtPosition(best[1], best[0]);
+            StackPanel2.Visibility = Visibility.Visible;
+            Label2.Visibility = Visibility.Visible;
+
+            Cell winner = kn.getCellAtPosition(best[0], best[1]);
 
             System.Windows.Controls.Image img = new System.Windows.Controls.Image();
             Bitmap bmp = winner.getAsBmp();
@@ -244,34 +259,27 @@ namespace PetriUI
 
             int top = ((int)(t.Top * 500 / 350) - 50);
 
-            if (top < 0) top = 0;
+            if (top < 30) top = 30;
 
             StackPanel2.Margin = new Thickness(0, top, 0, 0);
 
-            List<string> labels = lh.getAllLabels();
-            List<int> indexes = lh.getAllIndexes();
-
-            for (int i = 0; i < labels.Count; i++)
+            string label;
+            if (winner.getIndex() < 0)
             {
-                Console.Write(labels[i] + " ");
+                label = "       undefined";
+                setLabel2.Visibility = Visibility.Visible;
+                setLabel2.Margin = new Thickness(150, top - 30, 0, 0);
+                string s = best[0] + " " + best[1];
+                setLabel2.Uid = s;
 
             }
-            Console.WriteLine();
-
-            for (int i = 0; i < indexes.Count; i++)
+            else
             {
-                Console.Write(indexes[i] + "     ");
-
+                label = lh.getLabel(winner.getIndex());
+                setLabel2.Visibility = Visibility.Hidden;
             }
 
-            Console.WriteLine(winner.getIndex());
-
-            Console.WriteLine(winner.getIndex() + " " + lh.getLabel(winner.getIndex()));
-
-            string label = lh.getLabel(winner.getIndex());
-            if (label.Trim().Length < 1) label = "undefined";
-
-            Label2.Content = "Winner map position: " + best[1] + best[0] + Environment.NewLine +
+            Label2.Content = "Winner map position:     [" + best[0] + " " + best[1] + "] " + Environment.NewLine +
                 "Winner label: " + label;
 
             Label2.Margin = new Thickness(0, top + 280, 0, 0);
@@ -292,6 +300,77 @@ namespace PetriUI
             c.Background = System.Windows.Media.Brushes.LightGreen;
 
             c.Opacity = 0.7;
+        }
+
+        private void SetLabel_Click(object sender, RoutedEventArgs e)
+        {
+            Button senderBut = (Button)sender;
+            string indexString = senderBut.Uid;
+            Console.WriteLine(indexString);
+
+            System.Windows.Forms.Form labelDialog = new System.Windows.Forms.Form();
+            labelDialog.Name = "Instert label";
+
+            labelDialog.Size = new System.Drawing.Size(350, 270);
+
+            System.Windows.Forms.Button insertButton = new System.Windows.Forms.Button();
+
+            insertButton.Width = 60;
+            insertButton.Height = 23;
+            insertButton.Text = "Insert";
+            insertButton.Location = new System.Drawing.Point(200, 160);
+            insertButton.Name = indexString;
+            insertButton.Click += new EventHandler(insertLabel);
+
+            System.Windows.Forms.TextBox tb = new System.Windows.Forms.TextBox();
+            tb.Width = 220;
+            tb.Height = 100;
+            tb.Multiline = true;
+            tb.Location = new System.Drawing.Point(40, 20);
+            tb.Text = "Type your label here";
+
+            labelDialog.Controls.Add(tb);
+            labelDialog.Controls.Add(insertButton);
+
+            labelDialog.Show();
+        }
+
+        private void insertLabel(object sender, EventArgs e)
+        {
+            string content = "";
+
+            // A form is created to receive user's input
+
+            System.Windows.Forms.Button senderBut = (System.Windows.Forms.Button)sender;
+            string indexString = senderBut.Name;
+
+            System.Windows.Forms.Form parentForm = (System.Windows.Forms.Form)senderBut.Parent;
+
+            foreach (object child in parentForm.Controls)
+            {
+                try
+                {
+                    System.Windows.Forms.TextBox tb = (System.Windows.Forms.TextBox)child;
+                    content = tb.Text;
+                }
+                catch (Exception) { }                 
+                
+            }
+
+            string[] pos = (indexString.Split(' '));
+            Cell c = kn.getCellAtPosition(Int32.Parse(pos[0]), Int32.Parse(pos[1]));
+
+            int newIndex = lh.setNewLabel(content);
+            c.setIndex(newIndex);
+
+            parentForm.Close();
+
+
+        }
+
+        public bool hasError()
+        {
+            return errorDuringImport;
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -511,10 +590,10 @@ namespace PetriUI
 
                 // Rectangles' size and position is scaled 
 
-                r.Width = ((bbx[2] -bbx[0]) * 360 / img.Width);
-                r.Height = ((bbx[3] - bbx[1]) * 360 / img.Height);
+                r.Width = ((bbx[2] -bbx[0]) * 380 / img.Width);
+                r.Height = ((bbx[3] - bbx[1]) * 380 / img.Height);
 
-                r.Margin = new Thickness((bbx[0] * 350 / img.Width), (bbx[1] * 350 / img.Height), 0, 0);
+                r.Margin = new Thickness((bbx[0] * 345 / img.Width), (bbx[1] * 345 / img.Height), 0, 0);
 
                 locs.Add(r);
             }

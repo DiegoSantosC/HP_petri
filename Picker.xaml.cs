@@ -29,7 +29,7 @@ namespace PetriUI
     public partial class Picker : Page
     {
         private CaptureWindow captureWindow;
-        private bool countAnalysis, classAnalysis;
+        public bool countAnalysis, classAnalysis;
         private ClassifyAnalytics clssPage;
         private CountAnalytics countPage;
         private ChartPage chartPage;
@@ -122,6 +122,7 @@ namespace PetriUI
 
         private void classClick(object sender, MouseButtonEventArgs e)
         {
+            if (clssPage.hasError()) return;
             if (classAnalysis)
             {
                 clssPage.ArtificialScroll();

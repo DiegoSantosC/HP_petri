@@ -60,8 +60,6 @@ namespace PetriUI
 
         public void initCharts(CountAnalytics analysisDataSource, string _saveDir)
         {
-            // TO BE FIXES!!!! SEVERAL ENTRIES????
-
             double[] countYData = analysisDataSource.getColonyCountData();
 
             barCharConstruct(countYData, _saveDir, new string[] { "Colony Count Chart", "Number of colonies", "Step" });
