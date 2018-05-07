@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -47,7 +48,7 @@ namespace PetriUI
             object[] returned = DataHandler.ProcessInputTest(sourceFolder);
             if(returned == null)
             {
-                MessageBox.Show(" Invalid map folder");
+                System.Windows.MessageBox.Show(" Invalid map folder");
                 errorDuringImport = true;
                 return;
             }
@@ -92,11 +93,6 @@ namespace PetriUI
 
             StackPanel1.Visibility = Visibility.Hidden;
             Label1.Visibility = Visibility.Hidden;
-            StackPanel2.Visibility = Visibility.Hidden;
-            Label2.Visibility = Visibility.Hidden;
-            setLabel1.Visibility = Visibility.Hidden;
-            setLabel2.Visibility = Visibility.Hidden;
-
 
             // A System.Windows.Controls.Image is created from a System.Drawing.Image by acquiring its Bitmap
 
@@ -142,8 +138,8 @@ namespace PetriUI
 
                 c2.Background = System.Windows.Media.Brushes.White;
                 c2.Opacity = 0;
-                c2.MouseEnter += new MouseEventHandler(mouseEnter);
-                c2.MouseLeave += new MouseEventHandler(mouseLeave);
+                c2.MouseEnter += new System.Windows.Input.MouseEventHandler(mouseEnter);
+                c2.MouseLeave += new System.Windows.Input.MouseEventHandler(mouseLeave);
                 c2.MouseLeftButtonDown += new MouseButtonEventHandler(clicked);
                 c2.Uid = i.ToString();
 
@@ -165,12 +161,11 @@ namespace PetriUI
 
             Thickness t = c.Margin;
 
-            if (t.Left > 150) modifyRight(t, matches[current - 1][index]);
-            else { modifyLeft(t, matches[current - 1][index]); }
+            modifyLeft(t, matches[current - 1][index], index);
 
         }
 
-        private void modifyLeft(Thickness t, int[] best)
+        private void modifyLeft(Thickness t, int[] best, int index)
         {
             StackPanel1.Children.Clear();
 
@@ -214,82 +209,55 @@ namespace PetriUI
             if (winner.getIndex() < 0)
             {
                 label = "       undefined";
-                setLabel1.Visibility = Visibility.Visible;
-                setLabel1.Margin = new Thickness(150, top - 30, 0, 0);
-                string s = best[0] + " " + best[1];
-                setLabel1.Uid = s;
+                undefinedCanvas.Visibility = Visibility.Visible;
 
+                string s = best[0] + " " + best[1];
+
+                String s2 = infoLabel.Content.ToString();
+                String[] data = s2.Split('/');
+
+                int current = Int32.Parse(data[0]) - 1;
+
+                int[] bbx = clusters[current][index].getBoundingBox();
+
+                labelTextBox.Text = "";
+                StackPanel2.Children.Clear();
+                saveButton.Uid = s;
+
+                BuildRightSP(bbx, imagesMap[current]);
             }
             else {
 
                 label = lh.getLabel(winner.getIndex());
-                setLabel1.Visibility = Visibility.Hidden;
-
+                undefinedCanvas.Visibility = Visibility.Hidden;
+                
             }
 
             Label1.Content = "Winner map position:     [" + best[0] + " " + best[1]  + "] " + Environment.NewLine + 
                 "Winner label: " + label;
             Label1.Margin = new Thickness(0, top + 280, 0, 0);
+
         }
 
-        private void modifyRight(Thickness t, int[] best)
+        private void BuildRightSP(int[] bbx, Bitmap bmp)
         {
-            StackPanel2.Children.Clear();
+            Bitmap clusterBmp = new Bitmap(bbx[2] - bbx[0], bbx[3] - bbx[1]);
 
-            StackPanel2.Visibility = Visibility.Visible;
-            Label2.Visibility = Visibility.Visible;
-
-            Cell winner = kn.getCellAtPosition(best[0], best[1]);
+            for (int j = bbx[1]; j < bbx[3]; j++)
+                for (int i = bbx[0]; i < bbx[2]; i++) clusterBmp.SetPixel(i - bbx[0], j - bbx[1], bmp.GetPixel(i, j));
 
             System.Windows.Controls.Image img = new System.Windows.Controls.Image();
-            Bitmap bmp = winner.getAsBmp();
-            BitmapImage src = new BitmapImage();
 
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bmp.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                src.BeginInit();
-                src.StreamSource = memory;
-                src.CacheOption = BitmapCacheOption.OnLoad;
-                src.EndInit();
-            }
+            IntPtr ip = clusterBmp.GetHbitmap();
+
+            BitmapSource src = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip, IntPtr.Zero, Int32Rect.Empty,
+                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
 
             img.Source = src;
-            img.Stretch = Stretch.Uniform;
-
             StackPanel2.Children.Add(img);
-
-            int top = ((int)(t.Top * 500 / 350) - 50);
-
-            if (top < 30) top = 30;
-
-            StackPanel2.Margin = new Thickness(0, top, 0, 0);
-
-            string label;
-            if (winner.getIndex() < 0)
-            {
-                label = "       undefined";
-                setLabel2.Visibility = Visibility.Visible;
-                setLabel2.Margin = new Thickness(150, top - 30, 0, 0);
-                string s = best[0] + " " + best[1];
-                setLabel2.Uid = s;
-
-            }
-            else
-            {
-                label = lh.getLabel(winner.getIndex());
-                setLabel2.Visibility = Visibility.Hidden;
-            }
-
-            Label2.Content = "Winner map position:     [" + best[0] + " " + best[1] + "] " + Environment.NewLine +
-                "Winner label: " + label;
-
-            Label2.Margin = new Thickness(0, top + 280, 0, 0);
-
         }
 
-        private void mouseLeave(object sender, MouseEventArgs e)
+        private void mouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Canvas c = (Canvas)sender;
             c.Background = System.Windows.Media.Brushes.White;
@@ -297,78 +265,12 @@ namespace PetriUI
             c.Opacity = 0.0;
         }
 
-        private void mouseEnter(object sender, MouseEventArgs e)
+        private void mouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Canvas c = (Canvas)sender;
             c.Background = System.Windows.Media.Brushes.LightGreen;
 
             c.Opacity = 0.7;
-        }
-
-        private void SetLabel_Click(object sender, RoutedEventArgs e)
-        {
-            Button senderBut = (Button)sender;
-            string indexString = senderBut.Uid;
-            Console.WriteLine(indexString);
-
-            System.Windows.Forms.Form labelDialog = new System.Windows.Forms.Form();
-            labelDialog.Name = "Instert label";
-
-            labelDialog.Size = new System.Drawing.Size(350, 270);
-
-            System.Windows.Forms.Button insertButton = new System.Windows.Forms.Button();
-
-            insertButton.Width = 60;
-            insertButton.Height = 23;
-            insertButton.Text = "Insert";
-            insertButton.Location = new System.Drawing.Point(200, 160);
-            insertButton.Name = indexString;
-            insertButton.Click += new EventHandler(insertLabel);
-
-            System.Windows.Forms.TextBox tb = new System.Windows.Forms.TextBox();
-            tb.Width = 220;
-            tb.Height = 100;
-            tb.Multiline = true;
-            tb.Location = new System.Drawing.Point(40, 20);
-            tb.Text = "Type your label here";
-
-            labelDialog.Controls.Add(tb);
-            labelDialog.Controls.Add(insertButton);
-
-            labelDialog.Show();
-        }
-
-        private void insertLabel(object sender, EventArgs e)
-        {
-            string content = "";
-
-            // A form is created to receive user's input
-
-            System.Windows.Forms.Button senderBut = (System.Windows.Forms.Button)sender;
-            string indexString = senderBut.Name;
-
-            System.Windows.Forms.Form parentForm = (System.Windows.Forms.Form)senderBut.Parent;
-
-            foreach (object child in parentForm.Controls)
-            {
-                try
-                {
-                    System.Windows.Forms.TextBox tb = (System.Windows.Forms.TextBox)child;
-                    content = tb.Text;
-                }
-                catch (Exception) { }                 
-                
-            }
-
-            string[] pos = (indexString.Split(' '));
-            Cell c = kn.getCellAtPosition(Int32.Parse(pos[0]), Int32.Parse(pos[1]));
-
-            int newIndex = lh.setNewLabel(content);
-            c.setIndex(newIndex);
-
-            parentForm.Close();
-
-
         }
 
         public bool hasError()
@@ -418,8 +320,8 @@ namespace PetriUI
 
             rightSp.Children.Add(rightImg);
 
-            rightSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
-            rightSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+            rightSp.MouseEnter += new System.Windows.Input.MouseEventHandler(navigationArrowEnter);
+            rightSp.MouseLeave += new System.Windows.Input.MouseEventHandler(navigationArrowLeave);
 
             rightSp.MouseDown += new MouseButtonEventHandler(scrollRight);
         }
@@ -439,8 +341,8 @@ namespace PetriUI
 
             leftSp.Children.Add(LeftImg);
 
-            leftSp.MouseEnter += new MouseEventHandler(navigationArrowEnter);
-            leftSp.MouseLeave += new MouseEventHandler(navigationArrowLeave);
+            leftSp.MouseEnter += new System.Windows.Input.MouseEventHandler(navigationArrowEnter);
+            leftSp.MouseLeave += new System.Windows.Input.MouseEventHandler(navigationArrowLeave);
 
             leftSp.MouseDown += new MouseButtonEventHandler(scrollLeft);
 
@@ -448,7 +350,7 @@ namespace PetriUI
 
         // Navigation functionality definitions
 
-        private void navigationArrowEnter(object sender, MouseEventArgs e)
+        private void navigationArrowEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
 
@@ -461,7 +363,7 @@ namespace PetriUI
 
         }
 
-        private void navigationArrowLeave(object sender, MouseEventArgs e)
+        private void navigationArrowLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             StackPanel senderBut = (StackPanel)sender;
 
@@ -627,10 +529,51 @@ namespace PetriUI
 
                 r.Margin = new Thickness((bbx[0] * sampleSP.Width / img.Width), (bbx[1] * sampleSP.Height / img.Height), 0, 0);
 
+                r.Uid = i.ToString();
+
                 locs.Add(r);
             }
 
             return locs;
+        }
+
+        private void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+            string s = labelTextBox.Text;
+
+            if (s.Length < 1) { System.Windows.MessageBox.Show("Please introduce a valid label"); return; }
+
+            FolderBrowserDialog sfd = new FolderBrowserDialog();
+
+            DialogResult res = sfd.ShowDialog();
+
+            if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
+            {
+                string loc = sfd.SelectedPath;
+                string imageName = System.IO.Path.Combine(loc, "savedColony.bmp");
+                string fileName = System.IO.Path.Combine(loc, "label.txt");
+
+                foreach (object child in StackPanel2.Children)
+                {
+                    System.Windows.Controls.Image img = (System.Windows.Controls.Image)child;
+
+                    // !!!!!!!!!!!!!!!!!!!!!!!! FAILING
+
+                    Bitmap bmpOut = null;
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        PngBitmapEncoder encoder = new PngBitmapEncoder();
+                        encoder.Frames.Add(BitmapFrame.Create((BitmapSource)img.Source));
+
+                        using (Bitmap bmp = new Bitmap(ms)) bmpOut = new Bitmap(bmp);
+                    }
+
+                    bmpOut.Save(imageName);
+                }
+
+                string[] content = new string[] {"Colony saved for future trainings", "Map position found to be the closest " + this.Uid, "Label set: " + s};
+            }
         }
     }
 }

@@ -34,17 +34,17 @@
         <!-- Canvas 1 -->
         <Canvas Grid.Row="2" Grid.Column="0" Width="300" Height="500" Margin="50, 50, 0, 0">
             <!-- set label Button -->
-            <Button Name="setLabel1" Width="100" Height="20"  Visibility="Hidden" HorizontalAlignment="Center" FontSize="15" Click="SetLabel_Click">set Label</Button>
             <StackPanel Name="StackPanel1" Width="250" Height="250"/>
             <Label Name="Label1"/>
         </Canvas>
 
         <!-- Canvas 2 -->
-        <Canvas Grid.Row="2" Grid.Column="2" Width="300" Height="500" Margin="50, 50, 0, 0">
+        <Canvas Grid.Row="2" Name="undefinedCanvas" Visibility="Hidden" Grid.Column="2" Width="300" Height="500" Margin="50, 50, 0, 0">
             <!-- set label Button -->
-            <Button Name="setLabel2" Width="100" Height="20" Visibility="Hidden" HorizontalAlignment="Center" FontSize="15" Click="SetLabel_Click">set Label</Button>
-            <StackPanel Name="StackPanel2" Width="250" Height="250"/>
-            <Label Name="Label2"/>
+            <Label FontSize="20" Margin="25">Set a label and save colony</Label>
+            <StackPanel Margin="30,100,0,0" Name="StackPanel2" Width="250" Height="250"/>
+            <TextBox Name="labelTextBox" Width="250" Height="40" Margin="20, 380,0,0"/>
+            <Button Name="saveButton" Margin="170,450,0,0" Width="100" Height="23" FontSize="15" Click="saveButton_Click">Save</Button>
         </Canvas>
 
         <Canvas  Grid.Column="1" Grid.Row="2" Margin="25, 150, 0, 0" Height="350" Width="350">

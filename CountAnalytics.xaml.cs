@@ -507,7 +507,7 @@ namespace PetriUI
 
         public void setBackgound(System.Drawing.Image backgroundImg)
         {
-            background = new Bitmap(new Bitmap(userClone(backgroundImg)));
+            background = new Bitmap(new Bitmap(backgroundImg));
 
         }
 
@@ -518,20 +518,15 @@ namespace PetriUI
         {
             while (analysisInProgress)
             {
-                Console.WriteLine("Espero");
                 Thread.Sleep(1000);
             }
-
-            Console.WriteLine("Paso");
 
             analysisInProgress = true;
 
             object[] objects = (object[])param;
 
-            System.Drawing.Bitmap bmpOriginal = (System.Drawing.Bitmap)objects[0];
+            System.Drawing.Bitmap bmp = (System.Drawing.Bitmap)objects[0];
             CaptureWindow cw = (CaptureWindow)objects[1];
-
-            System.Drawing.Bitmap bmp = userClone(bmpOriginal);
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
@@ -550,8 +545,6 @@ namespace PetriUI
             // A cluster search is computed
 
             List<Cluster> frameBlobs = FindObjects(resultDifference, DateTime.Now.ToString("hh:mm:ss"));
-
-            Console.WriteLine("Blobs found: " + frameBlobs.Count);
 
             // If this is the first tracking step made, the found clusters are set as base ones,
             // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
@@ -579,20 +572,6 @@ namespace PetriUI
 
             analysisInProgress = false;
 
-            Console.WriteLine("Termino");
-
-
-        }
-
-        private System.Drawing.Bitmap userClone(System.Drawing.Image bmpImg)
-        {
-            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(bmpImg);
-
-            System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);
-
-            
-
-            return clonedBitmap;
         }
 
         public void newStep(System.Drawing.Image img)
@@ -783,8 +762,6 @@ namespace PetriUI
             returnable[0] = sizes;
             returnable[1] = bbs;
             returnable[2] = images;
-
-
 
             return returnable;
         }
