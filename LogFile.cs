@@ -88,8 +88,7 @@ namespace PetriUI
 
                 File.WriteAllLines(targetLocation + @"\README.txt", classData[i]);
 
-                if (classData[i].Count > 0) File.AppendText("\n\n");
-
+                if (classData[i].Count > 0) File.AppendText(Environment.NewLine + Environment.NewLine);
             }
         }
 

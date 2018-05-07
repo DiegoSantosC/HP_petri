@@ -507,7 +507,7 @@ namespace PetriUI
 
         public void setBackgound(System.Drawing.Image backgroundImg)
         {
-            background = new Bitmap(new Bitmap(userClone(backgroundImg)));
+            background = new Bitmap(new Bitmap(backgroundImg));
 
         }
 
@@ -525,10 +525,8 @@ namespace PetriUI
 
             object[] objects = (object[])param;
 
-            System.Drawing.Bitmap bmpOriginal = (System.Drawing.Bitmap)objects[0];
+            System.Drawing.Bitmap bmp = (System.Drawing.Bitmap)objects[0];
             CaptureWindow cw = (CaptureWindow)objects[1];
-
-            System.Drawing.Bitmap bmp = userClone(bmpOriginal);
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
@@ -576,15 +574,6 @@ namespace PetriUI
 
             analysisInProgress = false;
 
-        }
-
-        private System.Drawing.Bitmap userClone(System.Drawing.Image bmpImg)
-        {
-            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(bmpImg);
-
-            System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);           
-
-            return clonedBitmap;
         }
 
         public void newStep(System.Drawing.Image img)
