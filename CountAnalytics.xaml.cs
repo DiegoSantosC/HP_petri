@@ -518,11 +518,8 @@ namespace PetriUI
         {
             while (analysisInProgress)
             {
-                Console.WriteLine("Espero");
                 Thread.Sleep(1000);
             }
-
-            Console.WriteLine("Paso");
 
             analysisInProgress = true;
 
@@ -579,18 +576,13 @@ namespace PetriUI
 
             analysisInProgress = false;
 
-            Console.WriteLine("Termino");
-
-
         }
 
         private System.Drawing.Bitmap userClone(System.Drawing.Image bmpImg)
         {
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(bmpImg);
 
-            System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);
-
-            
+            System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);           
 
             return clonedBitmap;
         }
@@ -783,8 +775,6 @@ namespace PetriUI
             returnable[0] = sizes;
             returnable[1] = bbs;
             returnable[2] = images;
-
-
 
             return returnable;
         }

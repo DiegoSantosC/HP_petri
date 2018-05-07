@@ -71,14 +71,14 @@ namespace PetriUI
             File.WriteAllLines(targetLocation + @"\README.txt", new string[] { "\n" });
 
             File.WriteAllLines(targetLocation + @"\README.txt", new string[] { captureData[0], "\n" });
+            File.WriteAllLines(targetLocation + @"\README.txt", new string[] { captureData[1], "\n" });
 
-            Console.WriteLine(eventsData.Count);
 
-            for (int i = 0; i < captureData.Count -1; i++)
+            for (int i = 0; i < captureData.Count -2; i++)
             {
                 // capture data
 
-                File.WriteAllLines(targetLocation + @"\README.txt", new string[] {captureData[i + 1]});
+                File.WriteAllLines(targetLocation + @"\README.txt", new string[] {captureData[i + 2]});
 
                 // events data
 

@@ -54,14 +54,14 @@ namespace PetriUI
     /// Launched by: Show details in CapturePreviews
     /// 
     /// </summary>
-    
+
     public partial class CaptureWindow : Window
     {
         private Task t;
         private captureFramework cf;
         private List<captureFramework> cfs;
         private bool running;
-        
+
         private Thread newCaptureThread, playThread;
         private CapturePreviews cp;
         private LogFile file;
@@ -89,7 +89,7 @@ namespace PetriUI
             this.Left = 300;
             this.Top = 100;
 
-            
+
             cp = capt;
 
             cfs = new List<captureFramework>();
@@ -130,7 +130,7 @@ namespace PetriUI
 
             frame.Stroke = Brushes.Black;
             frame.StrokeThickness = 4;
-            
+
             aux.Children.Add(frame);
             StackPanel.SetZIndex(aux, 10);
 
@@ -161,7 +161,7 @@ namespace PetriUI
 
             EventsListBox.SelectionChanged += new SelectionChangedEventHandler(eventClicked);
 
-            if (analysis[0]) { EventsListBox.Visibility = Visibility.Visible; CountAnalysisBut.Visibility = Visibility.Visible; frame.Visibility = Visibility.Visible;}
+            if (analysis[0]) { EventsListBox.Visibility = Visibility.Visible; CountAnalysisBut.Visibility = Visibility.Visible; frame.Visibility = Visibility.Visible; }
 
             speed = 1;
 
@@ -313,7 +313,7 @@ namespace PetriUI
 
             foreach (object child in parentGrid.Children)
             {
-               if (counter == 1)
+                if (counter == 1)
                 {
                     Label commentLabel = (Label)child;
 
@@ -618,12 +618,12 @@ namespace PetriUI
 
             foreach (ListBoxItem item in EventsListBox.Items)
             {
-                if(counter == selectedChild)
+                if (counter == selectedChild)
                 {
                     aw.Show();
                     aw.Navigate(aw.getCount());
                     aw.getCount().initStatics();
-                    aw.getCount().Show(Int32.Parse(item.Uid)-1);
+                    aw.getCount().Show(Int32.Parse(item.Uid) - 1);
 
                 }
             }
@@ -698,7 +698,7 @@ namespace PetriUI
                     {
                         MessageBox.Show("No colonies found to be analyzed");
                     }
-                }                
+                }
                 else { MessageBox.Show("Not enough captures taken for an analysis to be performed"); }
             }
             else
@@ -780,9 +780,9 @@ namespace PetriUI
             arrangingGrid.ColumnDefinitions.Add(c2);
             arrangingGrid.ColumnDefinitions.Add(c3);
 
-            Button commentBut = initializeButton(cfs.Count-1);
+            Button commentBut = initializeButton(cfs.Count - 1);
             commentBut.HorizontalAlignment = HorizontalAlignment.Left;
-            commentBut.Margin = new Thickness(30,0,0,0);
+            commentBut.Margin = new Thickness(30, 0, 0, 0);
 
             Label emptyLabel = new Label();
             emptyLabel.HorizontalAlignment = HorizontalAlignment.Center;
@@ -807,7 +807,7 @@ namespace PetriUI
             cfs.ElementAt(cfs.Count - 1).getCapturePanel().Uid = (cfs.Count - 1).ToString();
             cfs.ElementAt(cfs.Count - 1).getBorder().Background = Brushes.LightBlue;
 
-            
+
             // Setting to last image
 
             cf = new captureFramework(clone2, 400, ratio);
@@ -822,7 +822,7 @@ namespace PetriUI
             timeLabel.Content = "Capture taken at: " + cf.getTime();
             timeLabel.Visibility = Visibility.Visible;
 
-            file.AppendData("\t First capture taken at :" + cf.getTime() + ". " + t.getDelay() + "minutes of delay waited.");
+            file.AppendData("\t First capture taken at: " + cf.getTime() + ". " + t.getDelay() + " minutes of delay waited.");
 
             CapturesListBox.SelectedIndex = 0;
             CapturesListBox.Focus();
@@ -887,7 +887,7 @@ namespace PetriUI
             if (t.getDelay() != 0)
             {
                 dataLabel.Content = dataLabel.Content + Environment.NewLine +
-                "Delay of " + t.getDelay() + " minutes until start"; 
+                "Delay of " + t.getDelay() + " minutes until start";
             }
         }
 
@@ -903,12 +903,12 @@ namespace PetriUI
             dataBorder.Visibility = Visibility.Visible;
         }
 
-        
+
         // Function called from MainCapture each time counter is trigged
 
         public void Trigger_Capture()
         {
-            if(cfs.Count -1 < t.getNumberOfCaptures())
+            if (cfs.Count - 1 < t.getNumberOfCaptures())
             {
                 MomentCapture.Capture(t, false);
 
@@ -1035,7 +1035,7 @@ namespace PetriUI
 
             if (moved)
             {
-                emptyLabel.Content = "Capture #" + (cfs.Count -1) + " " + cf.getTime() + ": " + Environment.NewLine +  "Object deplacement detected";
+                emptyLabel.Content = "Capture #" + (cfs.Count - 1) + " " + cf.getTime() + ": " + Environment.NewLine + "Object deplacement detected";
             }
             else
             {
@@ -1071,9 +1071,9 @@ namespace PetriUI
 
             System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);
 
-            for(int i = 0; i < bmp.Height; i++)
+            for (int i = 0; i < bmp.Height; i++)
             {
-                for(int j = 0; j < bmp.Width; j++)
+                for (int j = 0; j < bmp.Width; j++)
                 {
                     clonedBitmap.SetPixel(j, i, bmp.GetPixel(j, i));
                 }
@@ -1111,12 +1111,12 @@ namespace PetriUI
 
             List<string> lines = new List<string>();
 
-            if(positions.Count > 0)
+            if (positions.Count > 0)
             {
                 lines.Add("\t\t Classification of found colonies : ");
             }
 
-            for(int i = 0; i < positions.Count; i++)
+            for (int i = 0; i < positions.Count; i++)
             {
                 lines.Add("\t\t\t Colony " + i + " classified as: " + labels[i] + " in map position : " + positions[i][0] + " " + positions[i][1]);
             }
