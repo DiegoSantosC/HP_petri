@@ -38,7 +38,7 @@ namespace PetriUI
         private Tracking track;
         private AnalysisWindow aw;
         private int step;
-        private bool changing, existsClass;
+        private bool changing, existsClass, analysisInProgress;
         private int[] events;
 
         public CountAnalytics(AnalysisWindow a)
@@ -66,6 +66,7 @@ namespace PetriUI
 
             Logo_Init();
 
+            analysisInProgress = false;
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -506,9 +507,8 @@ namespace PetriUI
 
         public void setBackgound(System.Drawing.Image backgroundImg)
         {
-            background = new Bitmap(backgroundImg);
+            background = new Bitmap(new Bitmap(userClone(backgroundImg)));
 
-            //background = testBmps[0];
         }
 
         // In each step, colony tracking is performed by comparing the current taken image with the
@@ -516,13 +516,22 @@ namespace PetriUI
 
         public void newStep(object param)
         {
+            while (analysisInProgress)
+            {
+                Console.WriteLine("Espero");
+                Thread.Sleep(1000);
+            }
+
+            Console.WriteLine("Paso");
+
+            analysisInProgress = true;
+
             object[] objects = (object[])param;
 
-            System.Drawing.Image img = (System.Drawing.Image)objects[0];
+            System.Drawing.Bitmap bmpOriginal = (System.Drawing.Bitmap)objects[0];
             CaptureWindow cw = (CaptureWindow)objects[1];
 
-            Bitmap bmp = new Bitmap(img);
-            Bitmap bmpClone = (Bitmap)bmp.Clone();
+            System.Drawing.Bitmap bmp = userClone(bmpOriginal);
 
             Tracking_Images.Add(bmp);
             Tracking_Images[Tracking_Images.Count - 1].Tag = DateTime.Now.ToString("hh:mm:ss");
@@ -530,17 +539,19 @@ namespace PetriUI
             // Firstly we will find the best matching repositioning to the images by selecting the one that minimizes the edges difference 
             // This is needed because of the Sprout's image acquisition impresition, which leads to minor mismatches between the same object's captures
 
-            int[] positions = Matching_Robinson.RobinsonRepositioning(background, bmpClone);
+            int[] positions = Matching_Robinson.RobinsonRepositioning(background, bmp);
 
             // Once the reposition is calculated, a difference between the taken image and the background is performed
             // For this difference, Manhattan difference computation has been used. However, Eucliedean distance computation and
             // Pearson's correlation index difference computation functions are included in the code and ready to be used.
 
-            Map resultDifference = DifferenceComputation.getManhattan(background, bmpClone, positions);
+            Map resultDifference = DifferenceComputation.getManhattan(background, bmp, positions);
 
             // A cluster search is computed
 
             List<Cluster> frameBlobs = FindObjects(resultDifference, DateTime.Now.ToString("hh:mm:ss"));
+
+            Console.WriteLine("Blobs found: " + frameBlobs.Count);
 
             // If this is the first tracking step made, the found clusters are set as base ones,
             // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
@@ -551,20 +562,40 @@ namespace PetriUI
                 events = track.assignBlobs(frameBlobs, step);
             }
 
-            step++;
-
-            events = checkBounds(events, track.getLast(), bmpClone);
+            events = checkBounds(events, track.getLast(), bmp);
 
             if (aw.getPicker().classAnalysis && !aw.getClass().hasError()) {
 
-               aw.getClass().newStep(track.getLast(), bmpClone);
+               aw.getClass().newStep(track.getLast(), bmp);
+
+                App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+                             new Action(() => cw.processClassification()));
             }
+
+            step++;
 
             App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
                             new Action(() => cw.processEvents()));
+
+            analysisInProgress = false;
+
+            Console.WriteLine("Termino");
+
+
         }
 
-        public int[] newStep(System.Drawing.Image img)
+        private System.Drawing.Bitmap userClone(System.Drawing.Image bmpImg)
+        {
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(bmpImg);
+
+            System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);
+
+            
+
+            return clonedBitmap;
+        }
+
+        public void newStep(System.Drawing.Image img)
         {
 
             Bitmap bmp = new Bitmap(img);
@@ -590,8 +621,6 @@ namespace PetriUI
             // If this is the first tracking step made, the found clusters are set as base ones,
             // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
 
-            int[] events;
-
             if (track.isEmpty()) { track.firstScan(frameBlobs, step); events = new int[0]; }
             else
             {
@@ -606,8 +635,6 @@ namespace PetriUI
             {
                 aw.getClass().newStep(track.getLast(), img);
             }
-
-            return events;
         }
 
         // Same analysis process than the previous, only that in this case the images are statically acquired and thus 
@@ -663,6 +690,7 @@ namespace PetriUI
             {
                 newEvents = new int[events.Length + 1];
                 newEvents[events.Length] = 4;
+
             }
             else
             {
@@ -766,5 +794,14 @@ namespace PetriUI
             return events;
         }
 
+        public int getStep()
+        {
+            return step;
+        }
+
+        public void checkLast()
+        {
+            if (aw.getCaptureWindow() != null) aw.getCaptureWindow().checkLast();
+        }
     }
 }

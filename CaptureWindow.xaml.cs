@@ -104,8 +104,6 @@ namespace PetriUI
             Directory.CreateDirectory(folder);
             file = new LogFile(t.getFolder(), t.getIndex(), t.getName(), t.getNumberOfCaptures());
 
-            file.BuildAndSave();
-
             titleLabel.Content = name;
 
             if (!analysis[0] && !analysis[1])
@@ -402,7 +400,7 @@ namespace PetriUI
             parentForm.Close();
 
             string textToAppend = "Comment added on capture " + indexString + Environment.NewLine + content + Environment.NewLine;
-            file.AppendData(textToAppend);
+            file.AppendComment(textToAppend);
         }
 
         // Buttons functionalities
@@ -824,9 +822,7 @@ namespace PetriUI
             timeLabel.Content = "Capture taken at: " + cf.getTime();
             timeLabel.Visibility = Visibility.Visible;
 
-            file.AppendData("\t First capture taken at :" + cf.getTime());
-
-            file.AppendData("\t " + t.getDelay() + " minutes of delay waited");
+            file.AppendData("\t First capture taken at :" + cf.getTime() + ". " + t.getDelay() + "minutes of delay waited.");
 
             CapturesListBox.SelectedIndex = 0;
             CapturesListBox.Focus();
@@ -851,8 +847,15 @@ namespace PetriUI
                 System.Drawing.Image img2 = System.Drawing.Image.FromStream(ms);
 
                 aw.getCount().setBackgound(img2);
+
+                img2.Dispose();
             }
-        }     
+        }
+
+        internal void checkLast()
+        {
+            if (aw.getCount().getStep() == t.getNumberOfCaptures() - 1) file.BuildAndSave();
+        }
 
         // Information about the capture is initialized and updated
 
@@ -1049,32 +1052,77 @@ namespace PetriUI
                 bbe.Save(ms);
                 System.Drawing.Image bmpImg = System.Drawing.Image.FromStream(ms);
 
+                System.Drawing.Bitmap cloneBmp = userClone(bmpImg);
+
                 object[] param = new object[2];
-                param[0] = bmpImg;
+                param[0] = cloneBmp;
                 param[1] = this;
 
                 Thread t = new Thread(aw.getCount().newStep);
                 t.Start(param);
 
-                //aw.getCount().newStep(bmpImg, DateTime.Now.ToString("hh:mm:ss"));               
+                bmpImg.Dispose();
             }
+        }
+
+        private System.Drawing.Bitmap userClone(System.Drawing.Image bmpImg)
+        {
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(bmpImg);
+
+            System.Drawing.Bitmap clonedBitmap = new System.Drawing.Bitmap(bmp.Width, bmp.Height);
+
+            for(int i = 0; i < bmp.Height; i++)
+            {
+                for(int j = 0; j < bmp.Width; j++)
+                {
+                    clonedBitmap.SetPixel(j, i, bmp.GetPixel(j, i));
+                }
+            }
+
+            return clonedBitmap;
         }
 
         public void processEvents()
         {
             int[] events = aw.getCount().getEvents();
 
-            if (events.Length > 0) file.AppendData("\t\t Events happened : ");
+            List<string> lines = new List<string>();
+
+            if (events.Length > 0) lines.Add("\t\t Events happened : ");
 
             for (int i = 0; i < events.Length; i++)
             {
-                addEvent(cfs.Count - 1, AdvancedOptions._sEventMessages[events[i]]);
-                file.AppendData("\t\t\t " + AdvancedOptions._sEventMessages[events[i]]);
+                addEvent(aw.getCount().getStep() + 1, AdvancedOptions._sEventMessages[events[i]]);
+                lines.Add("\t\t\t " + AdvancedOptions._sEventMessages[events[i]]);
+
+                Console.WriteLine("Event " + i);
 
             }
-            if (events.Length > 0) file.AppendData(" ");
+
+            file.AppendEvents(lines);
+            Console.WriteLine("Successful events");
         }
 
+
+        public void processClassification()
+        {
+            List<int[]> positions = aw.getClass().getLastMatches();
+            List<string> labels = aw.getClass().getLastLabels();
+
+            List<string> lines = new List<string>();
+
+            if(positions.Count > 0)
+            {
+                lines.Add("\t\t Classification of found colonies : ");
+            }
+
+            for(int i = 0; i < positions.Count; i++)
+            {
+                lines.Add("\t\t\t Colony " + i + " classified as: " + labels[i] + " in map position : " + positions[i][0] + " " + positions[i][1]);
+            }
+
+            file.AppendClassData(lines);
+        }
         // Capture starting and finished handlers
         internal void CaptureFinished()
         {
@@ -1085,7 +1133,10 @@ namespace PetriUI
 
             StopButton.Visibility = Visibility.Hidden;
 
-            //if(t.getCountAnalysis())aw.getChart().initCharts(aw.getCount(), t.getFolder());
+            if (!aw.getPicker().countAnalysis)
+            {
+                file.BuildAndSave();
+            }
         }
 
         public void startTriggered()

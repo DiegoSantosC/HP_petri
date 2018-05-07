@@ -33,6 +33,7 @@ namespace PetriUI
         private ClassifyAnalytics clssPage;
         private CountAnalytics countPage;
         private ChartPage chartPage;
+        private CaptureWindow captureWindow;
         private bool closeRequest;
 
         // This window will work as the link between the capture processes and the analysis processes
@@ -44,14 +45,16 @@ namespace PetriUI
             this.Width = 1200;
             this.Height = 900;
 
-            if (classAnalysis) { clssPage = new ClassifyAnalytics(); clssPage.Init(map); }
             if (countAnalysis) { countPage = new CountAnalytics(this); chartPage = new ChartPage(); }
+            if (classAnalysis) { clssPage = new ClassifyAnalytics(); clssPage.Init(map, countPage); }
 
             pick = new Picker(cw, countAnalysis, classAnalysis, clssPage, countPage, chartPage);
 
             Navigate(pick);
 
             closeRequest = false;
+
+            captureWindow = cw;
         }
         public void requestClosing()
         {
@@ -84,6 +87,11 @@ namespace PetriUI
         public ChartPage getChart()
         {
             return chartPage;
+        }
+
+        public CaptureWindow getCaptureWindow()
+        {
+            return captureWindow;
         }
     }
 }

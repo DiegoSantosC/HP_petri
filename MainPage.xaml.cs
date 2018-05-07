@@ -278,20 +278,13 @@ namespace PetriUI
 
         private void Folder_Election_Button_Click(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
-            sfd.Title = "Choose Saving Location";
+            FolderBrowserDialog sfd = new FolderBrowserDialog();
 
-            Nullable<bool> result = sfd.ShowDialog();
+            DialogResult res = sfd.ShowDialog();
 
-            string fileLocation = "";
-
-            if (result == true)
+            if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
             {
-                if (sfd.FileName != "")
-                {
-                    fileLocation = sfd.FileName;
-                    FolderLabel.Content = fileLocation;
-                }
+                FolderLabel.Content = sfd.SelectedPath;
             }
         }
 
@@ -815,7 +808,7 @@ namespace PetriUI
 
             // UI Reset
 
-            AnalysisWindow aw = new AnalysisWindow(null, countA, classA, "");
+            AnalysisWindow aw = new AnalysisWindow(null, countA, classA, mapFolder);
 
             ImportBorder.Visibility = Visibility.Hidden;
             ImportChck1.IsChecked = false;
@@ -852,7 +845,7 @@ namespace PetriUI
             if (classA)
             {
 
-                aw.getClass().Init(MapImportLabel.Content.ToString());
+                aw.getClass().Init(MapImportLabel.Content.ToString(), aw.getCount());
 
                 MapImportLabel.Content = "Not defined (classification analysis only)";
 

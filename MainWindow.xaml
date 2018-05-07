@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PetriUI"
         mc:Ignorable="d"
-        Title="SupportWindow"
+        Title=""
         WindowState="Maximized"
         Source="MainPage.xaml"
         Closing="MainWindow_Closing"

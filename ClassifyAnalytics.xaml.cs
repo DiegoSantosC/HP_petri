@@ -29,6 +29,7 @@ namespace PetriUI
         private List<List<int[]>> matches;
         private List<List<System.Windows.Shapes.Rectangle>> locations;
         private List<List<Cluster>> clusters;
+        private CountAnalytics countA;
         private static bool errorDuringImport;
 
         public ClassifyAnalytics()
@@ -41,7 +42,7 @@ namespace PetriUI
             errorDuringImport = false;
         }
 
-        internal void Init(string sourceFolder)
+        internal void Init(string sourceFolder, CountAnalytics ca)
         {
             object[] returned = DataHandler.ProcessInputTest(sourceFolder);
             if(returned == null)
@@ -60,7 +61,9 @@ namespace PetriUI
             Logo_Init();
 
             ScrollLeft_Init();
-            ScrollRight_Init();            
+            ScrollRight_Init();
+
+            countA = ca;          
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -373,6 +376,31 @@ namespace PetriUI
             return errorDuringImport;
         }
 
+        public List<int[]> getLastMatches()
+        {
+            return matches[matches.Count - 1];
+        }
+
+        public List<string> getLastLabels()
+        {
+            List<string> labels = new List<string>();
+
+            List<int[]> matches = getLastMatches();
+
+            for (int i = 0; i < matches.Count; i++)
+            {
+                Cell winner = kn.getCellAtPosition(matches[i][0], matches[i][1]);
+
+                string label = "";
+                if (winner.getIndex() < 0) { label = "Undefined"; }
+                else{ label = lh.getLabel(winner.getIndex());}
+
+                labels.Add(label);
+            }
+
+            return labels;
+        }
+
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //  Fake carrousel elements building and handlers
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -542,6 +570,8 @@ namespace PetriUI
 
             matches.Add(bestMatches);
             imagesMap.Add(new Bitmap(image));
+
+            countA.checkLast();
         }
 
         private List<Bitmap> extractBitmapsFromClusters(List<Cluster> list, System.Drawing.Image image)
@@ -590,10 +620,12 @@ namespace PetriUI
 
                 // Rectangles' size and position is scaled 
 
-                r.Width = ((bbx[2] -bbx[0]) * 380 / img.Width);
-                r.Height = ((bbx[3] - bbx[1]) * 380 / img.Height);
+                if(img.Width > img.Height) { sampleSP.Width = 350; sampleSP.Height = 350 * sampleSP.Height / sampleSP.Width; }
 
-                r.Margin = new Thickness((bbx[0] * 345 / img.Width), (bbx[1] * 345 / img.Height), 0, 0);
+                r.Width = ((bbx[2] -bbx[0]) * sampleSP.Width * 1.1 / img.Width);
+                r.Height = ((bbx[3] - bbx[1]) * sampleSP.Height * 1.1 / img.Height);
+
+                r.Margin = new Thickness((bbx[0] * sampleSP.Width / img.Width), (bbx[1] * sampleSP.Height / img.Height), 0, 0);
 
                 locs.Add(r);
             }
