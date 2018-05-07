@@ -67,28 +67,31 @@ namespace PetriUI
 
             };
 
-            File.WriteAllLines(targetLocation + @"\README.txt", header);
-            File.WriteAllLines(targetLocation + @"\README.txt", new string[] { "\n" });
+            File.AppendAllLines(targetLocation + @"\README.txt", header);
+            File.AppendAllLines(targetLocation + @"\README.txt", new string[] { "\n" });
 
-            File.WriteAllLines(targetLocation + @"\README.txt", new string[] { captureData[0], "\n" });
-            File.WriteAllLines(targetLocation + @"\README.txt", new string[] { captureData[1], "\n" });
+            File.AppendAllLines(targetLocation + @"\README.txt", new string[] { captureData[0], "\n" });
+            File.AppendAllLines(targetLocation + @"\README.txt", new string[] { captureData[1], "\n" });
 
 
             for (int i = 0; i < captureData.Count -2; i++)
             {
                 // capture data
 
-                File.WriteAllLines(targetLocation + @"\README.txt", new string[] {captureData[i + 2]});
+                File.AppendAllLines(targetLocation + @"\README.txt", new string[] {captureData[i + 2]});
 
                 // events data
 
-                File.WriteAllLines(targetLocation + @"\README.txt", eventsData[i]);
+                File.AppendAllLines(targetLocation + @"\README.txt", eventsData[i]);
 
-                if(eventsData[i].Count > 0)File.AppendText("\n");
+                if(eventsData[i].Count > 0)File.AppendAllLines(targetLocation + @"\README.txt", new string[] { " " });
 
-                File.WriteAllLines(targetLocation + @"\README.txt", classData[i]);
+                File.AppendAllLines(targetLocation + @"\README.txt", classData[i]);
 
-                if (classData[i].Count > 0) File.AppendText(Environment.NewLine + Environment.NewLine);
+                if (classData[i].Count > 0)
+                {
+                    File.AppendAllLines(targetLocation + @"\README.txt", new string[] { " ", "\n"});
+                }
             }
         }
 
@@ -104,12 +107,11 @@ namespace PetriUI
         public void AppendEvents(List<string> events)
         {
             eventsData.Add(events);
-            Console.WriteLine("Appended");
         }
 
         public void AppendComment(string comment)
         {
-            File.WriteAllLines(targetLocation + @"\README.txt", new string[] {"\n", comment, "\n"});
+            File.AppendAllLines(targetLocation + @"\README.txt", new string[] {"\n", comment, "\n"});
         }
     }
 }

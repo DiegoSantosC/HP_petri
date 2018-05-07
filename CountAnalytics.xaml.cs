@@ -546,8 +546,6 @@ namespace PetriUI
 
             List<Cluster> frameBlobs = FindObjects(resultDifference, DateTime.Now.ToString("hh:mm:ss"));
 
-            Console.WriteLine("Blobs found: " + frameBlobs.Count);
-
             // If this is the first tracking step made, the found clusters are set as base ones,
             // otherwise a tracking algorithm trying to match current clusters with already monitored ones is performed
 

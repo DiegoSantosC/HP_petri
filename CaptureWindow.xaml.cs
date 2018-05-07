@@ -1094,13 +1094,9 @@ namespace PetriUI
             {
                 addEvent(aw.getCount().getStep() + 1, AdvancedOptions._sEventMessages[events[i]]);
                 lines.Add("\t\t\t " + AdvancedOptions._sEventMessages[events[i]]);
-
-                Console.WriteLine("Event " + i);
-
             }
 
             file.AppendEvents(lines);
-            Console.WriteLine("Successful events");
         }
 
 
