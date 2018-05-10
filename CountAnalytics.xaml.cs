@@ -558,7 +558,7 @@ namespace PetriUI
             events = checkBounds(events, track.getLast(), bmp);
 
             if (aw.getPicker().classAnalysis && !aw.getClass().hasError()) {
-
+                
                aw.getClass().newStep(track.getLast(), bmp);
 
                 App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
@@ -609,11 +609,6 @@ namespace PetriUI
             step++;
 
             events = checkBounds(events, track.getLast(), bmp);
-
-            if (aw.getPicker().classAnalysis && !aw.getClass().hasError())
-            {
-                aw.getClass().newStep(track.getLast(), img);
-            }
         }
 
         // Same analysis process than the previous, only that in this case the images are statically acquired and thus 

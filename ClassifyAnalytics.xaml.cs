@@ -43,14 +43,14 @@ namespace PetriUI
             errorDuringImport = false;
         }
 
-        internal void Init(string sourceFolder, CountAnalytics ca)
+        internal bool Init(string sourceFolder, CountAnalytics ca)
         {
             object[] returned = DataHandler.ProcessInputTest(sourceFolder);
             if(returned == null)
             {
                 System.Windows.MessageBox.Show(" Invalid map folder");
                 errorDuringImport = true;
-                return;
+                return false;
             }
 
             List<string> labels = (List<string>)returned[0];
@@ -64,7 +64,9 @@ namespace PetriUI
             ScrollLeft_Init();
             ScrollRight_Init();
 
-            countA = ca;          
+            countA = ca;
+
+            return true;         
         }
 
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +108,7 @@ namespace PetriUI
             img.Source = src;
             sampleSP.Children.Add(img);
 
-            infoLabel.Content = (index + 1).ToString() + "/" + imagesMap.Count.ToString();
+            infoLabel.Content = (index+1).ToString() + "/" + imagesMap.Count.ToString();
 
             RebuildClusterLocations(index);            
         }
@@ -167,6 +169,8 @@ namespace PetriUI
 
         private void modifyLeft(Thickness t, int[] best, int index)
         {
+            undefinedCanvas.Visibility = Visibility.Hidden;
+
             StackPanel1.Children.Clear();
 
             StackPanel1.Visibility = Visibility.Visible;
@@ -229,8 +233,6 @@ namespace PetriUI
             else {
 
                 label = lh.getLabel(winner.getIndex());
-                undefinedCanvas.Visibility = Visibility.Hidden;
-                
             }
 
             Label1.Content = "Winner map position:     [" + best[0] + " " + best[1]  + "] " + Environment.NewLine + 
@@ -241,10 +243,14 @@ namespace PetriUI
 
         private void BuildRightSP(int[] bbx, Bitmap bmp)
         {
-            Bitmap clusterBmp = new Bitmap(bbx[2] - bbx[0], bbx[3] - bbx[1]);
+            // The bounding box is slightly resized so as to give a proper visual
 
-            for (int j = bbx[1]; j < bbx[3]; j++)
-                for (int i = bbx[0]; i < bbx[2]; i++) clusterBmp.SetPixel(i - bbx[0], j - bbx[1], bmp.GetPixel(i, j));
+            bbx[0] = bbx[0] - 5;
+            bbx[1] = bbx[1] - 5;
+            bbx[2] = bbx[2] + 5;
+            bbx[2] = bbx[2] + 5;
+
+            Bitmap clusterBmp = getBitmapFromBbx(bbx, bmp);
 
             System.Windows.Controls.Image img = new System.Windows.Controls.Image();
 
@@ -345,7 +351,7 @@ namespace PetriUI
             leftSp.MouseLeave += new System.Windows.Input.MouseEventHandler(navigationArrowLeave);
 
             leftSp.MouseDown += new MouseButtonEventHandler(scrollLeft);
-
+            leftSp.Uid = "leftUid";
         }
 
         // Navigation functionality definitions
@@ -386,6 +392,9 @@ namespace PetriUI
             int current = Int32.Parse(data[0]);
             int total = Int32.Parse(data[1]);
 
+            System.Windows.Controls.StackPanel b = (System.Windows.Controls.StackPanel)sender;
+            Console.WriteLine(b.Uid);
+
             if (current == total)
             {
                 sampleSP.Children.Clear();
@@ -405,10 +414,7 @@ namespace PetriUI
                     Show(current);
                 }
                 catch (ArgumentOutOfRangeException ex) { }
-
-                infoLabel.Content = (current + 1) + "/" + imagesMap.Count.ToString();
             }
-
         }
 
         private void scrollLeft(object sender, MouseButtonEventArgs e)
@@ -428,8 +434,6 @@ namespace PetriUI
                     Show(total - 1);
                 }
                 catch (Exception) { }
-
-                infoLabel.Content = total + "/" + imagesMap.Count.ToString();
             }
             else
             {
@@ -440,10 +444,7 @@ namespace PetriUI
                     Show(current - 2);
                 }
                 catch (ArgumentOutOfRangeException ex) { }
-
-                infoLabel.Content = (current - 1) + "/" + imagesMap.Count.ToString();
             }
-
         }
 
         // Artificial Scroll will always be set to the first process that exists
@@ -495,6 +496,12 @@ namespace PetriUI
         private Bitmap getBitmapFromBbx(int[] bbx, Bitmap sourceBmp)
         {
             int size = Kohonen.AdvancedOptions._nBitmapSize;
+
+            if (bbx[0] < 0) bbx[0] = 0;
+            if (bbx[1] < 0) bbx[1] = 0;
+            if (bbx[2] > sourceBmp.Width) bbx[2] = sourceBmp.Width;
+            if (bbx[3] > sourceBmp.Height) bbx[3] = sourceBmp.Height;
+
             Bitmap bmp = new Bitmap(bbx[2] - bbx[0], bbx[3] - bbx[1]);
 
             for(int j= bbx[1]; j < bbx[3]; j++)
@@ -540,6 +547,7 @@ namespace PetriUI
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
             string s = labelTextBox.Text;
+            System.Windows.Controls.Button b = (System.Windows.Controls.Button)sender;
 
             if (s.Length < 1) { System.Windows.MessageBox.Show("Please introduce a valid label"); return; }
 
@@ -549,7 +557,9 @@ namespace PetriUI
 
             if (res == DialogResult.OK && !string.IsNullOrWhiteSpace(sfd.SelectedPath))
             {
-                string loc = sfd.SelectedPath;
+                string loc = System.IO.Path.Combine(sfd.SelectedPath, "classificationOutput");
+                ToolBox.EnsureDirectoryExists(loc);
+
                 string imageName = System.IO.Path.Combine(loc, "savedColony.bmp");
                 string fileName = System.IO.Path.Combine(loc, "label.txt");
 
@@ -557,23 +567,57 @@ namespace PetriUI
                 {
                     System.Windows.Controls.Image img = (System.Windows.Controls.Image)child;
 
-                    // !!!!!!!!!!!!!!!!!!!!!!!! FAILING
-
-                    Bitmap bmpOut = null;
-
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        PngBitmapEncoder encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create((BitmapSource)img.Source));
-
-                        using (Bitmap bmp = new Bitmap(ms)) bmpOut = new Bitmap(bmp);
-                    }
-
+                    Bitmap bmpOut = getBitmapFromControlsImage(img);
                     bmpOut.Save(imageName);
+                    
                 }
 
-                string[] content = new string[] {"Colony saved for future trainings", "Map position found to be the closest " + this.Uid, "Label set: " + s};
+                string[] content = new string[] {"Colony saved for future trainings", "Map position found to be the closest: " + b.Uid.ToString(), "Label set: " + s};
+                File.AppendAllLines(fileName, content);
+
+                labelTextBox.Text = "";
+                undefinedCanvas.Visibility = Visibility.Hidden;
             }
+        }
+
+        private Bitmap getBitmapFromControlsImage(System.Windows.Controls.Image img)
+        {
+
+            var d = new System.Windows.DataObject(System.Windows.DataFormats.Bitmap, img.Source, true);
+            var bmp = d.GetData("System.Drawing.Bitmap") as System.Drawing.Bitmap;
+
+            return bmp;
+
+            //MemoryStream ms = null;
+            //JpegBitmapEncoder jpegBitmapEncoder = null;
+            //BitmapEncoder bencoder = new JpegBitmapEncoder();
+
+            //Bitmap bmp = null;
+         
+            //BitmapImage bitmapImage = new BitmapImage();
+
+            //if ((int)img.Source.Width > 0)
+            //{
+            //    RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap((int)img.Source.Width,
+            //                                                                   (int)img.Source.Height,
+            //                                                                   100, 100, PixelFormats.Default);
+            //    renderTargetBitmap.Render(img);
+
+            //    jpegBitmapEncoder = new JpegBitmapEncoder();
+            //    jpegBitmapEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+
+            //    bencoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+            //    using (ms = new MemoryStream())
+            //    {
+            //        bencoder.Save(ms);
+            //        bmp = new System.Drawing.Bitmap(ms);
+            //    }
+            //}
+
+            //Bitmap bmp2 = new Bitmap(bmp);
+            //bmp.Dispose();
+
+            //return bmp2;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace PetriUI
 
         // This window will work as the link between the capture processes and the analysis processes
 
-        public AnalysisWindow(CaptureWindow cw, bool countAnalysis, bool classAnalysis, string map)
+        public AnalysisWindow(CaptureWindow cw, bool countAnalysis, bool classAnalysis, string map, string folder)
         {
             InitializeComponent();
 
@@ -46,9 +46,9 @@ namespace PetriUI
             this.Height = 900;
 
             if (countAnalysis) { countPage = new CountAnalytics(this); chartPage = new ChartPage(); }
-            if (classAnalysis) { clssPage = new ClassifyAnalytics(); clssPage.Init(map, countPage); }
+            if (classAnalysis) { clssPage = new ClassifyAnalytics(); if (map.Length > 1) { clssPage.Init(map, countPage); }}
 
-            pick = new Picker(cw, countAnalysis, classAnalysis, clssPage, countPage, chartPage);
+            pick = new Picker(cw, countAnalysis, classAnalysis, clssPage, countPage, chartPage, folder);
 
             Navigate(pick);
 

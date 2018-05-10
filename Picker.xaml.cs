@@ -33,10 +33,11 @@ namespace PetriUI
         private ClassifyAnalytics clssPage;
         private CountAnalytics countPage;
         private ChartPage chartPage;
+        private string saveFolder;
 
         // UI initialization with a link to every analysis related interface
 
-        public Picker(CaptureWindow cw, bool count, bool classAn, ClassifyAnalytics clss, CountAnalytics cnt, ChartPage chp)
+        public Picker(CaptureWindow cw, bool count, bool classAn, ClassifyAnalytics clss, CountAnalytics cnt, ChartPage chp, string folder)
         {
             InitializeComponent();
 
@@ -52,6 +53,8 @@ namespace PetriUI
             countPage = cnt;
 
             chartPage = chp;
+
+            saveFolder = folder;
         }
 
         // Each stackPanel, when clicked, holds the navigation to the analysis feature it represents
@@ -107,6 +110,7 @@ namespace PetriUI
         {
             if (countAnalysis)
             {
+                chartPage.initCharts(countPage, saveFolder);
                 this.NavigationService.Navigate(chartPage);
             }
         }

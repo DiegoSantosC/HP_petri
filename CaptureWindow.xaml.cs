@@ -99,7 +99,7 @@ namespace PetriUI
 
             t = new Task(this, param[0], param[1], param[2], param[3], u, folder, analysis[0], analysis[1], name, location, size);
 
-            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis(), map);
+            aw = new AnalysisWindow(this, t.getCountAnalysis(), t.getClassAnalysis(), map, folder);
 
             Directory.CreateDirectory(folder);
             file = new LogFile(t.getFolder(), t.getIndex(), t.getName(), t.getNumberOfCaptures());
@@ -723,8 +723,6 @@ namespace PetriUI
                         aw.Show();
                         aw.getCount().initStatics();
                         aw.Navigate(aw.getPicker());
-                        aw.getChart().initCharts(aw.getCount(), t.getFolder());
-
                     }
                     else
                     {
@@ -829,11 +827,11 @@ namespace PetriUI
 
             if (moved)
             {
-                emptyLabel.Content = "Capture #" + (cfs.Count - 2) + " " + cf.getTime() + ": " + Environment.NewLine + "Object deplacement detected";
+                emptyLabel.Content = "Capture #0 " + cf.getTime() + ": " + Environment.NewLine + "Object deplacement detected";
             }
             else
             {
-                emptyLabel.Content = "Capture #" + (cfs.Count - 2) + " " + cf.getTime() + ": " + "Success capture";
+                emptyLabel.Content = "Capture #0 " + cf.getTime() + ": " + "Success capture";
             }
 
             // Set image into bitmap format to be analyzed

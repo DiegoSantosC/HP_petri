@@ -808,7 +808,7 @@ namespace PetriUI
 
             // UI Reset
 
-            AnalysisWindow aw = new AnalysisWindow(null, countA, classA, mapFolder);
+            AnalysisWindow aw = new AnalysisWindow(null, countA, classA, "", folderSave);
 
             ImportBorder.Visibility = Visibility.Hidden;
             ImportChck1.IsChecked = false;
@@ -845,7 +845,11 @@ namespace PetriUI
             if (classA)
             {
 
-                aw.getClass().Init(MapImportLabel.Content.ToString(), aw.getCount());
+                bool returned = aw.getClass().Init(MapImportLabel.Content.ToString(), aw.getCount());
+                if (!returned)
+                {
+                    return;
+                }
 
                 MapImportLabel.Content = "Not defined (classification analysis only)";
 
@@ -882,16 +886,13 @@ namespace PetriUI
         {
             aw.getCount().initStatics();
 
-            aw.getChart().initCharts(aw.getCount(), folder);
+            //aw.getChart().initCharts(aw.getCount(), folder);
 
             aw.Show();
 
             AnalysisBorder.Visibility = Visibility.Hidden;
         }
-
-
-
-
+        
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //      Capturing process functions
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
