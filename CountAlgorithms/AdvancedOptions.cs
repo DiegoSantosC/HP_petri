@@ -15,14 +15,14 @@ namespace PetriUI
     {
         /*  Use :               ConnectedComponents, fnAreSimilar
          *  Definition :        Static grey color value threshold below which two pixels are considered to belong to the same object 
-         *  Recommended value : 80 +- 20;
+         *  Recommended value : 60 +- 20;
          */
 
-        public static int _nSimilarityTolerance = 80;
+        public static int _nSimilarityTolerance = 60;
 
         /*  Use :               ConnectedComponents, fnMustInclude
          *  Definition :        Static grey color value threshold below which a pixel is not considered to be meaningful
-         *  Recommended value : 80 +- 30;
+         *  Recommended value : 100 +- 30;
          */
 
         public static int _nRelevanceThreshold = 100;
@@ -81,7 +81,7 @@ namespace PetriUI
          *  Recommended value : 40 +- 10
          */
 
-        public static int _nMinimumSize = 40;
+        public static int _nMinimumSize = Kohonen.AdvancedOptions._nBitmapSize;
 
         /*  Use :               Tracking
          *  Definition :        ColorDifference of two colonies to be considered of not the same type
@@ -112,17 +112,17 @@ namespace PetriUI
 
         /*  Use :              Picture Handling, CompareOutlines
         *  Definition :        Outline size threshold for two objects to match
-        *  Recommended value : 30 +- 10
+        *  Recommended value : 50 +- 10
         */
 
-        public static int _nSizeThreshold = 30;
+        public static int _nSizeThreshold = 50;
 
        /*  Use :              Picture Handling, CompareOutlines
        *  Definition :        Outline location maximum difference 
-       *  Recommended value : 100 +- 20
+       *  Recommended value : 120 +- 20
        */
 
-        public static int _nLocationThreshold = 100;
+        public static int _nLocationThreshold = 120;
 
     }
 }

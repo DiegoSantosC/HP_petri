@@ -246,7 +246,7 @@ namespace Kohonen
         // Communication
         // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        public Cell getCellAtPosition(int x, int y)
+        public Cell getCellAtPosition(int y, int x)
         {
             return map[y, x];
         }

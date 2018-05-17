@@ -139,7 +139,7 @@ namespace PetriUI
                             }
                             else
                             {
-                           
+
                                 // New colony has appeared
 
                                 List<Cluster> newlist = new List<Cluster>();
@@ -397,11 +397,11 @@ namespace PetriUI
 
             if (boundsDepl > AdvancedOptions._dAbnormalGrowth && centerDepl > AdvancedOptions._dGreatDeplacement) return false;
 
-            if (boundsDepl > AdvancedOptions._dAbnormalGrowth) eventsList.Add(0);
+            if (boundsDepl > AdvancedOptions._dAbnormalGrowth) { eventsList.Add(0); }
 
-            // No reason for rejection having been found, both clusters are considered to be the same in two different moments of time
+                // No reason for rejection having been found, both clusters are considered to be the same in two different moments of time
 
-            return true;
+                return true;
         }
     }
 }

@@ -74,5 +74,27 @@ namespace Kohonen
 
             return returnable;
         }
+
+        public int setNewLabel(string label)
+        {
+            int biggest = getBiggest();
+
+            indexes.Add(biggest + 1);
+            labels.Add(label);
+
+            return biggest + 1;
+        }
+
+        private int getBiggest()
+        {
+            int returnable = -1;
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                if (indexes[i] > returnable) returnable = indexes[i];
+            }
+
+            return returnable;
+        }
     }
 }

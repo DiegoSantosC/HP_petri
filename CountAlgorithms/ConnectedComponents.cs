@@ -210,7 +210,6 @@ namespace PetriUI
                     count++;
 
                     identifiedBlobs.Add(c);
-
                 }
             }
 
