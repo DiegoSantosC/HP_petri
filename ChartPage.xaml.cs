@@ -243,12 +243,12 @@ namespace PetriUI
 
             for (int i = 0; i < bbs.Count; i++)
             {
-                System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle();
+                System.Windows.Shapes.Rectangle r = getRectangleFromBbx(bbs[i], w);
 
                 // Rectangles' size and position is scaled 
 
-                r.Width = ((bbs[i][2] - bbs[i][0]) * 350 / w) + 5;
-                r.Height = ((bbs[i][3] - bbs[i][1]) * 350 / h) + 5;
+                r.Width = ((bbs[i][2] - bbs[i][0]) * 350 / w) * 1.1;
+                r.Height = ((bbs[i][3] - bbs[i][1]) * 350 / h) * 1.1;
 
                 r.Margin = new Thickness((bbs[i][0] * 350 / w) + -2, (bbs[i][1] * 350 / h) - 2, 0, 0);
 
@@ -259,6 +259,21 @@ namespace PetriUI
             }
 
             return rectList;
+        }
+
+        private System.Windows.Shapes.Rectangle getRectangleFromBbx(int[] bbx, int w)
+        {
+            System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle();
+
+            const float margin = 5;
+            float scale = (float)ColonySizesCanvas.Width / (float)w;
+            r.Width = ((bbx[2] - bbx[0]) * scale) + 2 * margin;
+            r.Height = ((bbx[3] - bbx[1]) * scale) + 2 * margin;
+
+
+            r.Margin = new Thickness((bbx[0] * scale) - margin, (bbx[1] * scale) - margin, 0, 0);
+
+            return r;
         }
 
         private List<System.Windows.Controls.Image> convertToFormat(List<Bitmap> images)

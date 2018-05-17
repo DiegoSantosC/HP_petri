@@ -113,6 +113,8 @@ namespace PetriUI
             RebuildClusterLocations(index);            
         }
 
+        // 
+
         private void RebuildClusterLocations(int index)
         {
             rectanglesCanvas.Children.Clear();
@@ -169,7 +171,6 @@ namespace PetriUI
 
         private void modifyLeft(Thickness t, int[] best, int index)
         {
-            undefinedCanvas.Visibility = Visibility.Hidden;
 
             StackPanel1.Children.Clear();
 
@@ -213,27 +214,29 @@ namespace PetriUI
             if (winner.getIndex() < 0)
             {
                 label = "       undefined";
-                undefinedCanvas.Visibility = Visibility.Visible;
-
-                string s = best[0] + " " + best[1];
-
-                String s2 = infoLabel.Content.ToString();
-                String[] data = s2.Split('/');
-
-                int current = Int32.Parse(data[0]) - 1;
-
-                int[] bbx = clusters[current][index].getBoundingBox();
-
-                labelTextBox.Text = "";
-                StackPanel2.Children.Clear();
-                saveButton.Uid = s;
-
-                BuildRightSP(bbx, imagesMap[current]);
+                
             }
             else {
 
                 label = lh.getLabel(winner.getIndex());
             }
+
+            undefinedCanvas.Visibility = Visibility.Visible;
+
+            string s = best[0] + " " + best[1];
+
+            String s2 = infoLabel.Content.ToString();
+            String[] data = s2.Split('/');
+
+            int current = Int32.Parse(data[0]) - 1;
+
+            int[] bbx = clusters[current][index].getBoundingBox();
+
+            labelTextBox.Text = "";
+            StackPanel2.Children.Clear();
+            saveButton.Uid = s;
+
+            BuildRightSP(bbx, imagesMap[current]);
 
             Label1.Content = "Winner map position:     [" + best[0] + " " + best[1]  + "] " + Environment.NewLine + 
                 "Winner label: " + label;
@@ -245,10 +248,10 @@ namespace PetriUI
         {
             // The bounding box is slightly resized so as to give a proper visual
 
-            bbx[0] = bbx[0] - 5;
-            bbx[1] = bbx[1] - 5;
-            bbx[2] = bbx[2] + 5;
-            bbx[2] = bbx[2] + 5;
+            if (bbx[0] - 5 < 0) bbx[0] = 0; else bbx[0] = bbx[0] - 5;
+            if (bbx[1] - 5 < 0) bbx[1] = 0; else bbx[1] = bbx[1] - 5;
+            if (bbx[2] + 5 > bmp.Width) bbx[2] = bmp.Width; else bbx[2] = bbx[2] + 5;
+            if (bbx[3] + 5 > bmp.Height) bbx[3] = bmp.Height; else bbx[3] = bbx[3] + 5;
 
             Bitmap clusterBmp = getBitmapFromBbx(bbx, bmp);
 
@@ -523,25 +526,29 @@ namespace PetriUI
 
             for (int i = 0; i < list.Count; i++)
             {
-                int[] bbx = list[i].getBoundingBox();
-
-                System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle();
-
-                // Rectangles' size and position is scaled 
-
-                if(img.Width > img.Height) { sampleSP.Width = 350; sampleSP.Height = 350 * sampleSP.Height / sampleSP.Width; }
-
-                r.Width = ((bbx[2] -bbx[0]) * sampleSP.Width * 1.1 / img.Width);
-                r.Height = ((bbx[3] - bbx[1]) * sampleSP.Height * 1.1 / img.Height);
-
-                r.Margin = new Thickness((bbx[0] * sampleSP.Width / img.Width), (bbx[1] * sampleSP.Height / img.Height), 0, 0);
-
+                
+                System.Windows.Shapes.Rectangle r = getRectangleFromBbx(list[i].getBoundingBox(), img);
                 r.Uid = i.ToString();
 
                 locs.Add(r);
             }
 
             return locs;
+        }
+
+        private System.Windows.Shapes.Rectangle getRectangleFromBbx(int[] bbx, System.Drawing.Image img)
+        {
+            System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle();
+
+            const float margin = 5;
+            float scale = (float)sampleSP.Width / (float)img.Width;
+            r.Width = ((bbx[2] - bbx[0]) * scale) + 2 * margin;
+            r.Height = ((bbx[3] - bbx[1]) * scale) + 2 * margin;
+
+
+            r.Margin = new Thickness((bbx[0] * scale) - margin, (bbx[1] * scale) - margin, 0, 0);
+
+            return r;
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
@@ -587,37 +594,6 @@ namespace PetriUI
             var bmp = d.GetData("System.Drawing.Bitmap") as System.Drawing.Bitmap;
 
             return bmp;
-
-            //MemoryStream ms = null;
-            //JpegBitmapEncoder jpegBitmapEncoder = null;
-            //BitmapEncoder bencoder = new JpegBitmapEncoder();
-
-            //Bitmap bmp = null;
-         
-            //BitmapImage bitmapImage = new BitmapImage();
-
-            //if ((int)img.Source.Width > 0)
-            //{
-            //    RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap((int)img.Source.Width,
-            //                                                                   (int)img.Source.Height,
-            //                                                                   100, 100, PixelFormats.Default);
-            //    renderTargetBitmap.Render(img);
-
-            //    jpegBitmapEncoder = new JpegBitmapEncoder();
-            //    jpegBitmapEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
-
-            //    bencoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
-            //    using (ms = new MemoryStream())
-            //    {
-            //        bencoder.Save(ms);
-            //        bmp = new System.Drawing.Bitmap(ms);
-            //    }
-            //}
-
-            //Bitmap bmp2 = new Bitmap(bmp);
-            //bmp.Dispose();
-
-            //return bmp2;
         }
     }
 }
