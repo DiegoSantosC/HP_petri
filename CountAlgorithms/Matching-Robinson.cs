@@ -105,28 +105,15 @@ namespace PetriUI
                     int edgyness = 0;
 
                     System.Drawing.Color center = bmp.GetPixel(x, y);
-                    System.Drawing.Color L = bmp.GetPixel(x - 1, y);
-                    System.Drawing.Color U = bmp.GetPixel(x, y - 1);
-                    //System.Drawing.Color R = bmp.GetPixel(x + 1, y);
-                    //System.Drawing.Color D = bmp.GetPixel(x, y + 1);
-
+                    System.Drawing.Color L = bmp.GetPixel(x - 1, y); // left side
+                    System.Drawing.Color U = bmp.GetPixel(x, y - 1); // top side
+               
                     edgyness += (Math.Abs(center.R - L.R) + Math.Abs(center.G - L.G) + Math.Abs(center.B - L.B));
                     edgyness += (Math.Abs(center.R - U.R) + Math.Abs(center.G - U.G) + Math.Abs(center.B - U.B));
-                    //edgyness -= (Math.Abs(center.R - D.R) + Math.Abs(center.G - D.G) + Math.Abs(center.B - D.B));
-                    //edgyness -= (Math.Abs(center.R - R.R) + Math.Abs(center.G - R.G) + Math.Abs(center.B - R.B));
-
+                    
                     // threshold to be consider an edge is put to 255/3 * 3 * 2, this is (RGB MAX value)/3 * |RGB| * |Directions considered|
 
                     edgeGreyScale[x, y] = 255 - (edgyness / 6);
-
-                    //int greyColor = (center.R + center.G + center.B) / 3;
-
-                    //if (edgyness > ((255 / 10) * 3 * 2)) edgeGreyScale[x, y] = greyColor;
-                    //else edgeGreyScale[x, y] = 255;
-
-
-
-                    // Borders are not fittable for being edges
                 }
             }
 
